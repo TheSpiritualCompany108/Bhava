@@ -55,6 +55,15 @@
 }
 
 .homeMainHeroDescription {
+  font-size: 19px;
+  gap: 10px;
+  color: #3d4d42;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+}
+
+.homeMainHeroDescription1 {
   font-size: 16px;
   color: #3d4d42;
   margin-bottom: 20px;
