@@ -14,7 +14,7 @@
   position: relative;
   /* Use solid cream background for the section; quote card remains white */
   background: var(--color-bg-soft);
-  padding: 60px 0 80px;
+  padding: 18px 0 80px;
   overflow: hidden;
 }
 
@@ -30,36 +30,6 @@
 }
 
 /* =========================
-   HEADER
-========================= */
-.gitaHeader {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  margin-bottom: 40px;
-  padding: 0 20px;
-}
-
-.gitaHeading {
-  font-size: 32px;
-  font-weight: 700;
-  color: #4A0B1D;
-  font-family: 'Canela', Cormorant, serif;
-  margin-bottom: 8px;
-}
-
-.gitaHeading12{
-  color: #C0671E;
-}
-
-.gitaSubheading {
-  font-size: 14px;
-  color: var(--color-text-muted);
-  letter-spacing: 1px;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
-}
-
-/* =========================
    OUTER WRAPPER — full width, arrows float at edges
 ========================= */
 .sliderWrapper {
@@ -68,6 +38,16 @@
   width: 100%;
   padding: 0 20px;
   box-sizing: border-box;
+  margin-top: 0;
+}
+
+.dailyReflectionGrid {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(340px, 460px) minmax(0, 1fr);
+  gap: 70px;
+  align-items: start;
 }
 
 /* =========================
@@ -117,22 +97,60 @@
 ========================= */
 .quoteCard {
   width: 100%;
-  height: 400px;                /* FIXED height — never grows or shrinks */
-  margin: 0;
-  padding: 52px 80px;
+  max-width: 460px;
+  min-height: 440px;
+  margin: 0 0 0 18px;
+  padding: 0 28px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
-  /* Use solid white background for the quote card */
   background: #ffffff;
-  border: none;
-  border-radius: 22px;
+  border: 1px solid rgba(74, 11, 29, 0.12);
+  border-radius: 16px;
   backdrop-filter: blur(6px);
-  overflow: hidden;             /* text never pushes the box open */
+  overflow: hidden;
   box-sizing: border-box;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+}
+
+.quoteCardTop {
+  width: 100%;
+  padding: 22px 24px 12px;
+}
+
+.quoteBrand {
+  font-family: 'Canela', Cormorant, serif;
+  color: #4A0B1D;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.quoteImage {
+  width: calc(100% + 26px);
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  border-radius: 2px;
+  margin: 0 -13px;
+}
+
+.quoteCardBody {
+  width: 100%;
+  padding: 6px 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.quoteSectionLabel {
+  color: #C0671E;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  margin-bottom: 12px;
 }
 
 .quoteIcon {
@@ -147,19 +165,28 @@
 
 .quoteText {
   font-size: 22px;
-  line-height: 1.55;
+  line-height: 1.5;
   color: var(--color-text-dark);
   font-family: 'Canela', Cormorant, serif;
   font-weight: 400;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
   max-width: 860px;
 
   /* clamp to 3 lines max if needed so box never grows */
   display: -webkit-box;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.quoteMark {
+  color: var(--color-saffron);
+  font-size: 1.2em;
+  line-height: 0;
+  position: relative;
+  top: 0.08em;
+  margin: 0 4px;
 }
 
 .quoteDivider {
@@ -181,7 +208,7 @@
 }
 
 .shareBtn {
-  margin-top: 20px;
+  margin: 20px auto 0;
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -201,13 +228,88 @@
   transform: scale(1.08);
 }
 
+.reflectionNotes {
+  padding: 18px 8px 0 0;
+  max-width: 760px;
+  margin-top: 18px;
+}
+
+.reflectionTitle {
+  font-size: 38px;
+  line-height: 1.05;
+  font-family: 'Canela', Cormorant, serif;
+  color: #4A0B1D;
+  margin: 0 0 8px;
+}
+
+.reflectionSubtitle {
+  color: #C0671E;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 26px;
+}
+
+.reflectionItem {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 4px;
+  align-items: start;
+  margin-bottom: 26px;
+}
+
+.reflectionIndex {
+  color: #C0671E;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.reflectionItem h4 {
+  margin: 0 0 4px;
+  font-size: 19px;
+  line-height: 1.15;
+  color: #2B2B2B;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+}
+
+.reflectionItem p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.42;
+  color: #5f574f;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  max-width: 760px;
+}
+
 /* =========================
    RESPONSIVE
 ========================= */
+@media (max-width: 1180px) {
+  .dailyReflectionGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    max-width: 780px;
+  }
+
+  .quoteCard {
+    margin-left: 0;
+  }
+
+  .reflectionNotes {
+    padding: 0 8px;
+    max-width: none;
+    margin-top: 0;
+  }
+
+  .reflectionTitle {
+    font-size: 34px;
+  }
+}
+
 @media (max-width: 1024px) {
   .quoteCard {
-    padding: 44px 56px;
-    height: 380px;
+    min-height: 415px;
   }
   .quoteText {
     font-size: 20px;
@@ -216,18 +318,35 @@
 
 @media (max-width: 768px) {
   .quoteCard {
-    padding: 36px 32px;
-    height: 340px;
+    min-height: 390px;
   }
   .quoteText {
     font-size: 17px;
     line-height: 1.5;
-    -webkit-line-clamp: 5;
-    line-clamp: 5;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
   }
   .quoteIcon {
     font-size: 40px;
     margin-bottom: 14px;
+  }
+  .quoteImage {
+    width: calc(100% + 22px);
+    height: 172px;
+    margin: 0 -11px;
+  }
+  .reflectionTitle {
+    font-size: 30px;
+  }
+  .reflectionSubtitle {
+    font-size: 16px;
+  }
+  .reflectionItem h4 {
+    font-size: 17px;
+  }
+  .reflectionItem p {
+    font-size: 15px;
+    line-height: 1.38;
   }
   .arrow {
     width: 44px;
@@ -238,21 +357,48 @@
 
 @media (max-width: 480px) {
   .gitaSection {
-    padding: 48px 0 64px;
+    padding: 12px 0 64px;
   }
   .quoteCard {
-    padding: 28px 20px;
-    height: 310px;
+    min-height: 360px;
   }
   .quoteText {
     font-size: 15px;
     margin-bottom: 16px;
-    -webkit-line-clamp: 5;
-    line-clamp: 5;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
   }
   .quoteIcon {
     font-size: 34px;
     margin-bottom: 12px;
+  }
+  .quoteCardTop {
+    padding: 18px 18px 10px;
+  }
+  .quoteCardBody {
+    padding: 8px 18px 0;
+  }
+  .quoteImage {
+    width: calc(100% + 20px);
+    height: 154px;
+    margin: 0 -10px;
+  }
+  .reflectionTitle {
+    font-size: 26px;
+  }
+  .reflectionSubtitle {
+    font-size: 15px;
+  }
+  .reflectionItem {
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+  }
+  .reflectionItem h4 {
+    font-size: 16px;
+  }
+  .reflectionItem p {
+    font-size: 14px;
+    line-height: 1.34;
   }
   .quoteDivider {
     width: 44px;

@@ -3,6 +3,7 @@ import styles from "./GitaSlider.module.css";
 import { getTodaysQuote } from "./gitaQuotes";
 
 const quote = getTodaysQuote();
+const krishnaImage = "/krishna.imgae.png";
 
 /** Wrap text to fit within maxWidth on a canvas context */
 function wrapText(ctx, text, maxWidth) {
@@ -185,37 +186,73 @@ function GitaSlider() {
     <section className={styles.gitaSection}>
       <div className={styles.gitaBg} />
 
-      <div className={styles.gitaHeader}>
-        <h2 className={styles.gitaHeading}>Daily <span className={styles.gitaHeading12}>Reflection</span></h2>
-        <p className={styles.gitaSubheading}>
-          Ancient words, experienced in the present moment.
-        </p>
-      </div>
-
       <div className={styles.sliderWrapper}>
-        <div className={styles.quoteCard}>
-          <div className={styles.quoteIcon}>"</div>
-          <p className={styles.quoteText}>{quote.text}</p>
-          <div className={styles.quoteDivider} />
-          <span className={styles.quoteRef}>{quote.ref}</span>
-          <button
-            className={styles.shareBtn}
-            onClick={handleShare}
-            aria-label="Share quote"
-            title={copied ? "Copied!" : "Share"}
-          >
-            {copied ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                <polyline points="16 6 12 2 8 6" />
-                <line x1="12" y1="2" x2="12" y2="15" />
-              </svg>
-            )}
-          </button>
+        <div className={styles.dailyReflectionGrid}>
+          <div className={styles.quoteCard}>
+            <div className={styles.quoteCardTop}>
+              <div className={styles.quoteBrand}>BHAVA</div>
+              <img className={styles.quoteImage} src={krishnaImage} alt="Lord Krishna" />
+            </div>
+
+            <div className={styles.quoteCardBody}>
+              <div className={styles.quoteSectionLabel}>TODAY'S REFLECTION</div>
+              <p className={styles.quoteText}>
+                <span className={styles.quoteMark}>&ldquo;</span>
+                {quote.text}
+                <span className={styles.quoteMark}>&rdquo;</span>
+              </p>
+              <div className={styles.quoteDivider} />
+              <span className={styles.quoteRef}>{quote.ref}</span>
+            </div>
+
+            <button
+              className={styles.shareBtn}
+              onClick={handleShare}
+              aria-label="Share quote"
+              title={copied ? "Copied!" : "Share"}
+            >
+              {copied ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                  <polyline points="16 6 12 2 8 6" />
+                  <line x1="12" y1="2" x2="12" y2="15" />
+                </svg>
+              )}
+            </button>
+          </div>
+
+          <div className={styles.reflectionNotes}>
+            <h3 className={styles.reflectionTitle}>Daily Reflections</h3>
+            <p className={styles.reflectionSubtitle}>Bringing Ancient Wisdom to Daily Life</p>
+
+            <div className={styles.reflectionItem}>
+              <span className={styles.reflectionIndex}>01</span>
+              <div>
+                <h4>Today's Reflection &amp; Meaning</h4>
+                <p>Every day offers a carefully translated Gita verse paired with a contemporary, practical explanation to cultivate quiet focus and mental clarity.</p>
+              </div>
+            </div>
+
+            <div className={styles.reflectionItem}>
+              <span className={styles.reflectionIndex}>02</span>
+              <div>
+                <h4>How to Live It Today</h4>
+                <p>Translate theory into action with immediate, simple daily practices designed to integrate spiritual teachings smoothly into modern routines.</p>
+              </div>
+            </div>
+
+            <div className={styles.reflectionItem}>
+              <span className={styles.reflectionIndex}>03</span>
+              <div>
+                <h4>Save &amp; Share Reflections</h4>
+                <p>Build your personal archive of wisdom by saving meaningful insights, or easily share daily lessons with friends and family to grow together.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
