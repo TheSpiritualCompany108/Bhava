@@ -162,6 +162,10 @@ const YouTubeIcon = () => (
   </svg>
 );
 
+const PinterestIcon = () => (
+  <i className="fa-brands fa-pinterest" aria-hidden="true" />
+);
+
 function Footer() {
 
 
@@ -182,6 +186,11 @@ function Footer() {
 
   const socialLinks = [
     {
+      name: "Spotify",
+      icon: () => <i className="fa-brands fa-spotify" aria-hidden="true" />,
+      href: "https://open.spotify.com/user/3123m7vtxk6b6qpa35peedurvd2e",
+    },
+    {
       name: "Instagram",
       icon: InstagramIcon,
       href: "https://www.instagram.com/thespiritualcompany108?utm_source=qr&igsh=MXUxbDJ1a2NjYTl6aw==",
@@ -200,6 +209,11 @@ function Footer() {
       name: "YouTube",
       icon: YouTubeIcon,
       href: "https://youtube.com/@thespiritualcompany?si=MYR68OVf3RPV94NE",
+    },
+    {
+      name: "Pinterest",
+      icon: PinterestIcon,
+      href: "https://in.pinterest.com/bhavaglobal/",
     },
   ];
 
@@ -297,6 +311,9 @@ function Footer() {
               );
             })}
           </div>
+          <p className={styles.footerAddress}>
+            Regd. Address : #258, Pocket-5, Sector-2, Rohini, New Delhi - 110085
+          </p>
         </div>
       </div>
 

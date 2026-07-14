@@ -21,6 +21,11 @@
   text-align: left;
 }
 
+.footerContainer > .footerColumn:last-child {
+  align-items: center;
+  text-align: center;
+}
+
 /* Footer Heading */
 .footerHeading {
   font-size: 1.1rem;
@@ -59,6 +64,21 @@
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
+}
+
+.footerContainer > .footerColumn:last-child .footerSocialIcons {
+  justify-content: center;
+}
+
+.footerAddress {
+  margin: 24px 0 0;
+  max-width: 360px;
+  color: #d5dbd8;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  letter-spacing: 0.2px;
+  word-spacing: 2px;
+  text-align: center;
 }
 
 /* Icon-only circles — no label */
@@ -217,6 +237,12 @@
     width: 36px;
     height: 36px;
   }
+  .footerAddress {
+    font-size: 0.84rem;
+    max-width: 320px;
+    line-height: 1.8;
+    word-spacing: 1.5px;
+  }
   .footerCopyright {
     font-size: 0.86rem;
   }
@@ -247,6 +273,13 @@
   .socialIcon {
     width: 34px;
     height: 34px;
+  }
+  .footerAddress {
+    font-size: 0.8rem;
+    max-width: 280px;
+    margin-top: 18px;
+    line-height: 1.75;
+    word-spacing: 1px;
   }
   .footerBottom {
     padding: 20px 0;
