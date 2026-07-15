@@ -224,35 +224,6 @@ function GitaSlider() {
               )}
             </button>
           </div>
-
-          <div className={styles.reflectionNotes}>
-            <h3 className={styles.reflectionTitle}>Daily Reflections</h3>
-            <p className={styles.reflectionSubtitle}>Bringing Ancient Wisdom to Daily Life</p>
-
-            <div className={styles.reflectionItem}>
-              <span className={styles.reflectionIndex}>01</span>
-              <div>
-                <h4>Today's Reflection &amp; Meaning</h4>
-                <p>Every day offers a carefully translated Gita verse paired with a contemporary, practical explanation to cultivate quiet focus and mental clarity.</p>
-              </div>
-            </div>
-
-            <div className={styles.reflectionItem}>
-              <span className={styles.reflectionIndex}>02</span>
-              <div>
-                <h4>How to Live It Today</h4>
-                <p>Translate theory into action with immediate, simple daily practices designed to integrate spiritual teachings smoothly into modern routines.</p>
-              </div>
-            </div>
-
-            <div className={styles.reflectionItem}>
-              <span className={styles.reflectionIndex}>03</span>
-              <div>
-                <h4>Save &amp; Share Reflections</h4>
-                <p>Build your personal archive of wisdom by saving meaningful insights, or easily share daily lessons with friends and family to grow together.</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

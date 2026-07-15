@@ -312,7 +312,7 @@ function Footer() {
             })}
           </div>
           <p className={styles.footerAddress}>
-            Regd. Address : #258, Pocket-5, Sector-2, Rohini, New Delhi - 110085
+            Address : #258, Pocket-5, Sector-2, Rohini, New Delhi - 110085
           </p>
         </div>
       </div>

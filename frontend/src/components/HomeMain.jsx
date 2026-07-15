@@ -22,10 +22,10 @@ function HomeMain() {
           </h1>
 
           <p className={styles.homeMainHeroDescription}>
-           A  Simple  Daily  Ritual  System  For  Modern <br/> Homes.
+           A  Simple  Daily  Ritual  System  For <br/> Modern Homes.
           </p>
 
-          <p className={styles.homeMainHeroDescription1}> “Ritual is not reserved for special occasions. <br /> It is the quiet return to yourself, every single day.” </p>
+          <p className={styles.homeMainHeroDescription1}> Ritual is not reserved for special occasions. <br /> It is the quiet return to yourself, every single day. </p>
 
           <div className={styles.homeMainHeroButtons}>
             <button className={styles.homeMainBtnPrimary}>Begin With Bhava</button>

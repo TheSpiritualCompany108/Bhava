@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { motion, useMotionValue, animate } from "framer-motion"; // eslint-disable-line no-unused-vars
+ import { useState, useEffect, useRef, useCallback } from "react";
+ import { motion, useMotionValue, animate } from "framer-motion"; // eslint-disable-line no-unused-vars
 import styles from "./SacredCollection.module.css";
-import { useCart } from "../context/CartContext";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const CATEGORY = "Products";
-const GAP = 12;
+ import { useCart } from "../context/CartContext";
+ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+ const CATEGORY = "Products";
+ const GAP = 12;
 
 // Fallback hardcoded products if API fails
 const fallbackCards = [

@@ -1,5 +1,6 @@
 import React from "react";
 import HomeMain from "../components/HomeMain";
+import WhyRituals from "../components/WhyRituals";
 
 import SacredCollection from "../components/SacredCollection";
 import ProductSpecification from "../components/ProductSpecification";
@@ -15,8 +16,9 @@ function Home() {
   return (
     <>
       <HomeMain />
-      <SacredCollection />
+      <WhyRituals />
       <GitaSlider />
+      <SacredCollection />
       <ProductSpecification />
       <SacredMissionSection />
       <FundRaiser />

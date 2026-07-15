@@ -61,6 +61,7 @@
   margin-bottom: 20px;
   line-height: 1.6;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-weight: 500;
 }
 
 .homeMainHeroDescription1 {
@@ -69,6 +70,7 @@
   margin-bottom: 20px;
   line-height: 1.6;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-weight: 400;
 }
 
 .homeMainHeroButtons {
