@@ -3,14 +3,26 @@
   position: relative;
   background-color: #F4EFE6;
   padding: 60px 0 80px;
-  overflow: hidden;
 }
 
 /* ========================= HEADER ========================= */
 .communityHeader {
-  text-align: center;
+  text-align: left;
   margin-bottom: 40px;
-  padding: 0 20px;
+  padding: 0 40px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.kicker {
+  margin: 0 0 8px;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #e07b39;
+  text-transform: uppercase;
 }
 
 .communityTitle {
@@ -21,135 +33,88 @@
   margin: 0;
 }
 
-.highlight {
-  color: #e07b39;
-}
-
-/* ========================= SLIDER WRAPPER ========================= */
-.fullWidthSlider {
-  position: relative;
-  width: 100%;
+/* ========================= GRID ========================= */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0 40px;
   box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.sliderInner {
-  width: 100%;
-  max-width: 1200px;
-  overflow: hidden;
-}
-
-/* ========================= CARD ========================= */
-.testimonialCardLarge {
-  width: 100%;
-  min-height: 400px;
+.testimonialCard {
   background: #fff;
-  border-radius: 22px;
-  padding: 52px 80px;
-  box-shadow: 0 8px 32px rgba(18, 38, 28, 0.10);
+  border: 1px solid rgba(74, 11, 29, 0.12);
+  border-radius: 18px;
+  padding: 40px 32px;
+  box-shadow: 0 8px 24px rgba(18, 38, 28, 0.06);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
 }
 
-.stars {
-  font-size: 26px;
-  color: #f5a623;
-  letter-spacing: 6px;
-  margin-bottom: 28px;
-  flex-shrink: 0;
+.testimonialCardAccent {
+  border: 1.5px solid #e07b39;
 }
 
-.testimonialTextLarge {
-  font-size: 22px;
+.quoteMark {
+  font-family: 'Canela', Cormorant, serif;
+  font-size: 44px;
+  color: #e07b39;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.testimonialText {
+  font-size: 16px;
   line-height: 1.7;
   color: #2B2B2B;
   font-family: 'Canela', Cormorant, serif;
   font-style: italic;
   font-weight: 400;
-  max-width: 860px;
-  margin: 0 0 24px 0;
-}
-
-.quoteDivider {
-  width: 60px;
-  height: 2px;
-  background: rgba(224, 123, 57, 0.4);
-  margin-bottom: 18px;
-  flex-shrink: 0;
+  margin: 0 0 28px;
+  flex-grow: 1;
 }
 
 .testimonialAuthor {
+  font-size: 18px;
+  font-weight: 700;
+  color: #4A0B1D;
+  font-family: 'Canela', Cormorant, serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.testimonialLocation {
   font-size: 12px;
   font-weight: 700;
-  color: #2d4a3a;
-  letter-spacing: 2px;
+  color: #e07b39;
+  letter-spacing: 1px;
   text-transform: uppercase;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
-  margin: 0;
-  flex-shrink: 0;
-}
-
-/* ========================= DOTS ========================= */
-.dots {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 32px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(45, 74, 58, 0.25);
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  transition: all 0.3s ease;
-}
-
-.dotActive {
-  background: #2d4a3a;
-  width: 24px;
-  border-radius: 4px;
 }
 
 /* ========================= RESPONSIVE ========================= */
 @media (max-width: 1024px) {
-  .testimonialCardLarge {
-    padding: 44px 56px;
-    min-height: 380px;
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .testimonialTextLarge { font-size: 20px; }
 }
 
 @media (max-width: 768px) {
-  .testimonialCardLarge {
-    padding: 36px 32px;
-    min-height: 340px;
+  .communityHeader { padding: 0 24px; }
+  .grid {
+    grid-template-columns: 1fr;
+    padding: 0 24px;
   }
-  .testimonialTextLarge {
-    font-size: 17px;
-    line-height: 1.6;
-  }
-  .stars { font-size: 22px; }
+  .communityTitle { font-size: 32px; }
+  .testimonialCard { padding: 32px 28px; }
 }
 
 @media (max-width: 480px) {
   .communitySection { padding: 48px 0 64px; }
-  .communityTitle { font-size: 32px; }
-  .testimonialCardLarge {
-    padding: 28px 20px;
-    min-height: 300px;
-    border-radius: 16px;
-  }
-  .testimonialTextLarge { font-size: 15px; margin-bottom: 18px; }
-  .stars { font-size: 18px; margin-bottom: 20px; }
 }

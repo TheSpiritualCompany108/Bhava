@@ -99,6 +99,30 @@
   color: #ffffff;
 }
 
+.trustPillars {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin: 22px 0 0;
+  padding: 0;
+}
+
+.trustPillars li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4A0B1D;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+}
+
+.trustPillars svg {
+  flex-shrink: 0;
+  color: #e07b39;
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .homeMainContainer {
@@ -130,6 +154,9 @@
   .homeMainElevateText { font-size: 40px; }
   .homeMainHighlight   { font-size: 36px; }
   .homeMainHeroButtons {
+    justify-content: center;
+  }
+  .trustPillars {
     justify-content: center;
   }
 }

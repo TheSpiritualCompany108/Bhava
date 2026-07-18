@@ -1,0 +1,135 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 3), minmax(0, 1fr));
+  gap: 24px;
+}
+
+.card {
+  position: relative;
+  background: #fff;
+  border: 1px solid rgba(74, 11, 29, 0.12);
+  border-radius: 16px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardAccent {
+  border: 1.5px solid #e07b39;
+}
+
+.badge {
+  position: absolute;
+  top: -12px;
+  right: 24px;
+  background: #e07b39;
+  color: #fff;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 5px 14px;
+  border-radius: 999px;
+}
+
+.name {
+  margin: 0 0 8px;
+  font-family: "Canela", Cormorant, serif;
+  font-size: 24px;
+  color: #3e0918;
+}
+
+.priceRow {
+  margin: 0 0 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+}
+
+.price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e07b39;
+}
+
+.tagDivider {
+  color: rgba(74, 11, 29, 0.25);
+}
+
+.tag {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4A0B1D;
+}
+
+.tagline {
+  margin: 0 0 6px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  font-style: italic;
+  color: #101010;
+}
+
+.description {
+  margin: 0 0 20px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4a4a4a;
+}
+
+.itemsLabel {
+  margin: 0 0 10px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #101010;
+}
+
+.items {
+  list-style: disc;
+  margin: 0 0 20px;
+  padding-left: 18px;
+  flex-grow: 1;
+}
+
+.items li {
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4a4a4a;
+}
+
+.practice {
+  padding-top: 16px;
+  border-top: 1px solid rgba(74, 11, 29, 0.1);
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 13px;
+  color: #101010;
+}
+
+.practiceLabel {
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.comingSoon {
+  margin-top: 16px;
+  align-self: flex-start;
+  background: rgba(74, 11, 29, 0.08);
+  color: #4A0B1D;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

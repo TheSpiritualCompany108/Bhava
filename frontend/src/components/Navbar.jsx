@@ -105,6 +105,13 @@ function Navbar() {
                 </Link>
               </li>
               <li className={styles.navItem}>
+                <Link
+                  className={`${styles.navLink} ${isActive("/about") ? styles.navLinkActive : ""}`}
+                  to="/about"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  About
+                </Link>
               </li>
               <li className={styles.navItem}>
                 <Link

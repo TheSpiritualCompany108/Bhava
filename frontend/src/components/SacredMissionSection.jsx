@@ -49,26 +49,27 @@ export default function SacredMissionSection() {
       <div className={styles.panel}>
         <div className={styles.container}>
           <div className={styles.textCol}>
+            <p className={styles.kicker}>Our Sacred Mission</p>
             <h2 id="sacred-mission-title" className={styles.title}>
-              Our Sacred Mission
+              Living Presence
             </h2>
             <p className={styles.body}>
-              Devotion has become occasional. Structure brings it back into
-              daily life. This is Bhava. We don’t create products. We design
-              systems for daily ritual. Begin with Bhava. Consistency creates
-              clarity. Small rituals. Daily. Stay with the practice.
+              Devotion has become occasional. Structure returns it gently to
+              daily life. At Bhava, we do not create products; we design quiet
+              systems for presence.
             </p>
-            {/* <p className={styles.body}>
-              Every product carries the energy of intention—sourced from temple
-              partnerships, blessed by traditional practitioners, and designed
-              for modern devotees who refuse to compromise on quality or
-              authenticity.
-            </p>
+            <ul className={styles.list}>
+              <li>A single flame offered at dawn.</li>
+              <li>The slow turning of beads between fingers.</li>
+              <li>Smoke that rises and carries the mind home.</li>
+            </ul>
             <p className={styles.body}>
-              We are building a movement where faith, commerce, and
-              sustainability align—creating sacred spaces in every home, every
-              heart, and every ritual.
-            </p> */}
+              These small, repeated acts shape clarity, transforming scattered
+              days into something steadier.
+            </p>
+            <p className={styles.closing}>
+              Consistency is the quiet teacher. Stay with the practice.
+            </p>
           </div>
 
           <div className={styles.imageCol}>

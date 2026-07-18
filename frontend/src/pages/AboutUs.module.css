@@ -1,0 +1,282 @@
+.page {
+  background: #f6f1e8;
+}
+
+.inner {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.kicker {
+  margin: 0 0 8px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #e07b39;
+}
+
+.kickerLarge {
+  margin: 0 0 40px;
+  font-family: "Canela", Cormorant, serif;
+  font-size: clamp(28px, 3vw, 36px);
+  color: #3e0918;
+}
+
+.kickerCentered {
+  margin: 0 0 8px;
+  text-align: center;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #e07b39;
+}
+
+.sectionTitle {
+  margin: 0 0 24px;
+  font-family: "Canela", Cormorant, serif;
+  font-size: clamp(28px, 3.2vw, 40px);
+  color: #3e0918;
+  letter-spacing: -0.02em;
+}
+
+.body {
+  margin: 0 0 14px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #4a4a4a;
+}
+
+.bodyAccent {
+  margin: 0;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 700;
+  color: #e07b39;
+}
+
+/* ── Hero / Belief + Story ── */
+.heroSection {
+  padding: 72px 0 64px;
+}
+
+.heroTitle {
+  margin: 0 0 48px;
+  font-family: "Canela", Cormorant, serif;
+  font-size: clamp(36px, 4.6vw, 56px);
+  color: #3e0918;
+  letter-spacing: -0.02em;
+}
+
+.beliefGrid {
+  display: grid;
+  grid-template-columns: 1fr minmax(240px, 360px) 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.colHeading {
+  margin: 0 0 16px;
+  font-family: "Canela", Cormorant, serif;
+  font-size: 22px;
+  color: #101010;
+}
+
+.beliefImageWrapper {
+  border-radius: 18px;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  box-shadow: 0 18px 38px rgba(49, 29, 17, 0.12);
+}
+
+.beliefImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Philosophy ── */
+.philosophySection {
+  background: #fbf8f2;
+  padding: 64px 0;
+}
+
+.philosophyGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 56px;
+}
+
+.beliefList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.beliefList li {
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4a4a4a;
+}
+
+/* ── Six Core Pillars ── */
+.pillarsSection {
+  padding: 64px 0;
+}
+
+.pillarsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.pillarCard,
+.craftingCard {
+  background: #fff;
+  border: 1px solid rgba(74, 11, 29, 0.1);
+  border-radius: 16px;
+  padding: 28px 26px;
+  display: flex;
+  flex-direction: column;
+}
+
+.number {
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e07b39;
+  margin-bottom: 12px;
+}
+
+.pillarTitle {
+  margin: 0 0 8px;
+  font-family: "Canela", Cormorant, serif;
+  font-size: 21px;
+  color: #101010;
+}
+
+.pillarDescription {
+  margin: 0 0 18px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4a4a4a;
+  flex-grow: 1;
+}
+
+.pillarLink {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e07b39;
+  cursor: pointer;
+}
+
+.pillarLink:hover {
+  color: #c0671e;
+  text-decoration: underline;
+}
+
+/* ── Crafting Moments of Presence ── */
+.craftingSection {
+  background: #fbf8f2;
+  padding: 64px 0;
+}
+
+.craftingGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* ── The Bhava Experience ── */
+.experienceSection {
+  padding: 64px 0 96px;
+  text-align: center;
+}
+
+.experienceTitle {
+  margin: 0 0 32px;
+  font-family: "Canela", Cormorant, serif;
+  font-size: clamp(28px, 3.2vw, 40px);
+  color: #3e0918;
+}
+
+.experienceDivider {
+  height: 1px;
+  background: rgba(74, 11, 29, 0.15);
+  margin: 0 0 40px;
+}
+
+.experienceGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+  text-align: left;
+  margin-bottom: 48px;
+}
+
+.experienceColTitle {
+  margin: 0 0 8px;
+  font-family: "Canela", Cormorant, serif;
+  font-size: 21px;
+  color: #101010;
+}
+
+.experienceClosing {
+  max-width: 720px;
+  margin: 0 auto 24px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  color: #4a4a4a;
+}
+
+.experienceTagline {
+  margin: 0;
+  font-family: "Canela", Cormorant, serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #3e0918;
+}
+
+.dot {
+  color: #e07b39;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .beliefGrid {
+    grid-template-columns: 1fr;
+  }
+  .beliefImageWrapper {
+    order: -1;
+    aspect-ratio: 16 / 10;
+  }
+  .philosophyGrid,
+  .pillarsGrid,
+  .craftingGrid {
+    grid-template-columns: 1fr;
+  }
+  .experienceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .experienceGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -30,6 +30,16 @@
   padding-bottom: 72px;
 }
 
+.kicker {
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #e07b39;
+  margin: 0 0 12px;
+}
+
 .title {
   font-family: 'Canela', 'Cormorant', serif;
   font-size: 64px;
@@ -43,6 +53,39 @@
   line-height: 1.9;
   margin-bottom: 18px;
   font-size: 17px;
+  max-width: 62ch;
+}
+
+.list {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  max-width: 62ch;
+}
+
+.list li {
+  position: relative;
+  padding-left: 22px;
+  color: rgba(255, 255, 255, 0.94);
+  line-height: 1.9;
+  font-size: 17px;
+}
+
+.list li::before {
+  content: "\2726";
+  position: absolute;
+  left: 0;
+  color: #e07b39;
+  font-size: 13px;
+  top: 4px;
+}
+
+.closing {
+  color: #e07b39;
+  font-family: 'Canela', 'Cormorant', serif;
+  font-style: italic;
+  font-size: 19px;
+  margin: 8px 0 0;
   max-width: 62ch;
 }
 

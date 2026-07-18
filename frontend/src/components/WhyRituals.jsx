@@ -17,7 +17,9 @@ function WhyRituals() {
     <section className={styles.ritualSection} aria-labelledby="why-rituals-title">
       <div className={styles.inner}>
         <div className={styles.copy}>
-           <h2  className={styles.title1} style={{color:"#3e0918"}}>Why Ritual Matters ?</h2>
+          <h2 className={styles.title1} style={{ color: "#3e0918" }}>
+            Why Ritual Matters ?
+          </h2>
 
           <div className={styles.body}>
             {ritualLines.map((line) => (

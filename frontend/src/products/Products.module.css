@@ -50,6 +50,53 @@
   z-index: 1;
 }
 
+/* ── Ritual tier sections ── */
+.tierSection {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 48px 48px 0;
+  box-sizing: border-box;
+}
+
+.tierSectionKicker {
+  margin: 0 0 8px;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e07b39;
+}
+
+.tierSectionTitle {
+  margin: 0 0 32px;
+  font-family: 'Canela', Cormorant, serif;
+  font-size: clamp(28px, 3vw, 36px);
+  color: #4A0B1D;
+}
+
+.exploreMore {
+  margin: 28px 0 0;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-size: 15px;
+  color: #4A0B1D;
+}
+
+.exploreMore a {
+  color: #e07b39;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.individualProductsKicker {
+  max-width: 1400px;
+  margin: 56px auto 0;
+  padding: 0 48px;
+  box-sizing: border-box;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e07b39;
+}
+
 /* ── Filter row ── */
 .filterRow {
   display: flex;
@@ -298,6 +345,8 @@
 @media (max-width: 1280px) {
   .container { padding: 36px 32px 0; }
   .filterRow { padding: 36px 32px 0; }
+  .tierSection { padding: 48px 32px 0; }
+  .individualProductsKicker { padding: 0 32px; }
 }
 
 @media (max-width: 1024px) {
@@ -306,6 +355,8 @@
   .filterRow { padding: 32px 24px 0; }
   .filterBtn { padding: 11px 28px; font-size: 14px; }
   .cardOuter { height: 500px; }
+  .tierSection { padding: 40px 24px 0; }
+  .individualProductsKicker { padding: 0 24px; }
 }
 
 @media (max-width: 768px) {
@@ -316,6 +367,8 @@
   .cardOuter { height: 460px; }
   .filterRow { padding: 28px 20px 0; gap: 10px; }
   .filterBtn { padding: 10px 20px; font-size: 13px; flex: none; }
+  .tierSection { padding: 32px 20px 0; }
+  .individualProductsKicker { padding: 0 20px; margin-top: 40px; }
 }
 
 @media (max-width: 480px) {

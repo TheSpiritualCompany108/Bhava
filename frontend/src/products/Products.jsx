@@ -257,6 +257,7 @@ import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
 import styles from "./Products.module.css";
 import { useCart } from "../context/CartContext";
 import { useLocation } from "react-router-dom";
+import RitualTierCards, { homeRitualTiers, premiumRitualTiers } from "../components/RitualTierCards";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -429,6 +430,32 @@ function Products() {
           Ritual needs the right elements. Each part has a role. Build your practice with Bhava:
         </p>
       </div>
+
+      {/* Ritual system pricing tiers */}
+      <div className={styles.tierSection}>
+        <RitualTierCards tiers={homeRitualTiers} />
+      </div>
+
+      {/* Premium collections */}
+      <div className={styles.tierSection}>
+        <p className={styles.tierSectionKicker}>Premium Collections</p>
+        <h2 className={styles.tierSectionTitle}>
+          Elevated Ritual Practice &amp; Signature Systems
+        </h2>
+        <RitualTierCards tiers={premiumRitualTiers} columns={2} />
+        <p className={styles.exploreMore}>
+          Explore More Products:{" "}
+          <a
+            href="https://docs.google.com/document/d/10JZpuzdRjNUkefZWmYT5Z6wU_ohVcnVHkMGUesKaFU/edit?usp=drive_link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View the full catalog
+          </a>
+        </p>
+      </div>
+
+      <p className={styles.individualProductsKicker}>Individual Products</p>
 
       {/* Filters */}
       <div className={styles.filterRow}>

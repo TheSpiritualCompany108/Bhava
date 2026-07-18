@@ -1,32 +1,36 @@
-import React from "react";
 import styles from "./FundRaiser.module.css";
 
 function FundRaiser() {
   return (
     <section className={styles.section}>
       <div className={styles.card}>
-        {/* Left — 40% description */}
-        <div className={styles.content}>
-          <h2 className={styles.title}>
-            Pray for Families affected in Middle East amid War
-          </h2>
-
-          <p className={styles.date}>Apr 01 – 10</p>
-
-          <div className={styles.buttons}>
-            <button className={styles.btnJoin}>Join</button>
-            <button className={styles.btnDetails}>Details</button>
-          </div>
-        </div>
-
-        {/* Right — 60% image */}
         <div className={styles.imageWrapper}>
           <img
-            src="./Fund Raiser.png"
-            alt="Pray for Families affected in Middle East amid War"
+            src="/anionting.jpeg"
+            alt="A quiet offering for our Bharat"
             className={styles.image}
           />
-          <div className={styles.imageOverlay} />
+        </div>
+
+        <div className={styles.content}>
+          <p className={styles.kicker}>A quiet offering for our Bharat</p>
+          <h2 className={styles.title}>
+            Pray for the Families of Our Jawans and Martyrs
+          </h2>
+
+          <p className={styles.body}>
+            In remembrance of the soldiers who stand at our borders with
+            courage and quiet resolve.
+          </p>
+          <p className={styles.body}>
+            May their families find strength, peace, and protection.
+          </p>
+          <p className={styles.body}>
+            We light a lamp and offer our gratitude to those who guard the
+            nation's honour.
+          </p>
+
+          <p className={styles.closing}>Jai Hind.</p>
         </div>
       </div>
     </section>

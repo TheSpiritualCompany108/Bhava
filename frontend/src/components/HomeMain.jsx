@@ -32,6 +32,18 @@ function HomeMain() {
             <button className={styles.homeMainBtnSecondary}>Explore the System</button>
           </div>
 
+          <ul className={styles.trustPillars}>
+            {["Designed for Daily Practice", "Crafted with Intention", "Guided Every Day"].map((label) => (
+              <li key={label}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M8 12.5l2.5 2.5L16 9.5" />
+                </svg>
+                {label}
+              </li>
+            ))}
+          </ul>
+
             <ScrollDown />
 
         </div>
