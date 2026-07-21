@@ -13,7 +13,6 @@ function FundRaiser() {
         </div>
 
         <div className={styles.content}>
-          <p className={styles.kicker}>A quiet offering for our Bharat</p>
           <h2 className={styles.title}>
             Pray for the Families of Our Jawans and Martyrs
           </h2>

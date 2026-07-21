@@ -228,7 +228,7 @@ function SacredCollection() {
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, [instantTo]);
+  }, [instantTo, products]);
 
   // Auto-advance
   useEffect(() => {

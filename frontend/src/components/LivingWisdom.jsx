@@ -17,9 +17,8 @@ function LivingWisdom() {
     <section className={styles.section} aria-labelledby="living-wisdom-title">
       <div className={styles.inner}>
         <div className={styles.left}>
-          <p className={styles.kicker}>Daily Practice &amp; Philosophy</p>
           <h2 id="living-wisdom-title" className={styles.title}>
-            Living Wisdom
+            Living Wisdom with Daily Practice &amp; Philosophy
           </h2>
           <p className={styles.description}>
             A structured path to integrate timeless philosophy into modern

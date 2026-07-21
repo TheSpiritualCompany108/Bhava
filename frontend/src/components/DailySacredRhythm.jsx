@@ -31,7 +31,6 @@ function DailySacredRhythm() {
   return (
     <section className={styles.section} aria-labelledby="daily-sacred-rhythm-title">
       <div className={styles.inner}>
-        <p className={styles.kicker}>The Four Pillars of Practice</p>
         <h2 id="daily-sacred-rhythm-title" className={styles.title}>
           Your Daily Sacred Rhythm
         </h2>

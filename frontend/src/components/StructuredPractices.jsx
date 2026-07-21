@@ -31,7 +31,6 @@ function StructuredPractices() {
   return (
     <section className={styles.section} aria-labelledby="structured-practices-title">
       <div className={styles.inner}>
-        <p className={styles.kicker}>Presence is cultivated through repetition</p>
         <h2 id="structured-practices-title" className={styles.title}>
           Structured Practices
         </h2>
