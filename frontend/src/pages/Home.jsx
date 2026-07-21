@@ -1,6 +1,5 @@
 import React from "react";
 import HomeMain from "../components/HomeMain";
-import HeroCarousel from "../components/HeroCarousel";
 import WhyRituals from "../components/WhyRituals";
 
 import SacredCollection from "../components/SacredCollection";
@@ -16,19 +15,16 @@ import AppSection from "../components/AppSection";
 import FAQ from "../components/FAQ";
 import SacredJourney from "../components/SacredJourney";
 import GitaSlider from "../knowledge/GitaSlider";
-import DailyReflectionInfo from "../components/DailyReflectionInfo";
 
 function Home() {
   return (
     <>
       {/* Phase I — The Awakening */}
       <HomeMain />
-      <HeroCarousel />
       <WhyRituals />
       <GitaSlider />
-      <DailyReflectionInfo />
-      <FeaturedRituals />
       <SacredCollection />
+      <FeaturedRituals />
       <ProductSpecification />
 
       {/* Phase II — The Daily Practice */}

@@ -1,10 +1,8 @@
 .scrollDown {
   position: absolute;
-  left: 96%;
-  top: 111%;
-  transform: translateX(-50%);
-  bottom: 0;
- 
+  right: 24px;
+  bottom: 24px;
+
   width: 56px;
   height: 56px;
   margin-bottom: 0;
@@ -32,7 +30,7 @@
 }
  
 .scrollDown:hover {
-  transform: translateX(-50%) translateY(-6px) scale(1.07);
+  transform: translateY(-6px) scale(1.07);
   background: #FFAE91;
   animation: none;
   /* box-shadow:

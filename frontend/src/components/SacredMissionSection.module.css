@@ -2,63 +2,77 @@
   width: 100%;
   background: transparent;
   margin: 64px 0;
-  padding: 48px 32px; /* match FundRaiser section spacing */
-}
-
-.panel {
-  background: #281534;
-  color: #fff;
-  border-radius: 28px;
-  padding: 72px 60px 0; /* inner panel padding — align with site containers */
-  margin: 0 auto;
-  overflow: hidden;
-  height: auto;
-  max-width: 1280px;    /* match FundRaiser card width */
-  width: auto;
+  padding: 0 32px;
 }
 
 .container {
   display: grid;
-  grid-template-columns: 1fr minmax(360px, 560px); /* flexible right column */
-  gap: 0;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.85fr);
+  gap: 40px;
+  align-items: center;
+  max-width: 1520px;
+  margin: 0 auto;
+  background: #281534;
+  border-radius: 28px;
+  padding: 48px 64px;
+  overflow: hidden;
+  position: relative;
 }
 
+/* Right: image bottom-aligns within the card, independent of text height */
+.imageCol {
+  height: 100%;
+  min-height: 380px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  align-self: end;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+  object-position: bottom center;
+  display: block;
+}
+
+/* Left: readable content on the dark card background */
 .textCol {
-  max-width: 720px;
-  padding-right: 40px;
-  padding-bottom: 72px;
+  max-width: 640px;
 }
 
 .kicker {
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: #e07b39;
   margin: 0 0 12px;
 }
 
 .title {
-  font-family: 'Canela', 'Cormorant', serif;
-  font-size: 64px;
-  margin: 0 0 24px 0;
-  line-height: 1.02;
+  font-family: "Canela", "Cormorant", serif;
+  font-size: 56px;
+  color: #e07b39;
+  margin: 0 0 20px 0;
+  line-height: 1.05;
   letter-spacing: -0.02em;
 }
 
 .body {
-  color: rgba(255, 255, 255, 0.94);
-  line-height: 1.9;
-  margin-bottom: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.8;
+  margin-bottom: 16px;
   font-size: 17px;
   max-width: 62ch;
+  font-weight: 450;
 }
 
 .list {
   list-style: none;
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   padding: 0;
   max-width: 62ch;
 }
@@ -66,9 +80,10 @@
 .list li {
   position: relative;
   padding-left: 22px;
-  color: rgba(255, 255, 255, 0.94);
-  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.8;
   font-size: 17px;
+  font-weight: 420;
 }
 
 .list li::before {
@@ -77,81 +92,49 @@
   left: 0;
   color: #e07b39;
   font-size: 13px;
-  top: 4px;
+  top: 5px;
 }
 
 .closing {
   color: #e07b39;
-  font-family: 'Canela', 'Cormorant', serif;
+  font-family: "Canela", "Cormorant", serif;
   font-style: italic;
   font-size: 19px;
   margin: 8px 0 0;
   max-width: 62ch;
-}
-
-.imageCol {
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  align-self: end;
-  overflow: visible; /* allow illustration to overflow to the right */
-  position: relative;
-}
-
-.image {
-  width: 120%;            /* intentionally overflow to create the cropped look */
-  max-width: none;
-  height: 115%;           /* fill column height for the cropped look */
-  object-fit: cover;      /* cover so it fills without distortion */
-  object-position: top center; /* keep head visible at top */
-  transform: translateX(8%); /* nudge right so hands sit near center content */
-  display: block;
-}
-
-/* Slightly reduce the image nudge on typical laptop widths so hands align */
-@media (min-width: 1024px) and (max-width: 1400px) {
-  .image { transform: translateX(4%); }
-}
-
-/* On very wide screens keep original nudge */
-@media (min-width: 1600px) {
-  .image { transform: translateX(10%); }
+  font-weight: 450;
 }
 
 /* Responsive */
 @media (max-width: 1100px) {
   .container {
-    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    padding: 48px 32px;
+  }
+  .title {
+    font-size: 46px;
   }
 }
 
 @media (max-width: 900px) {
   .sacredMission {
-    margin: 32px 0; /* section vertical spacing only */
-    padding: 40px 0 0 0;
-  }
-  .panel {
-    margin: 0 20px;
-    padding: 40px 20px 0 20px;
+    margin: 32px 0;
+    padding: 0 20px;
   }
   .container {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 28px;
+    padding: 40px 24px;
+    text-align: left;
   }
-  .textCol {
-    padding-right: 0;
-    padding-bottom: 0;
+  .imageCol {
+    min-height: 240px;
+    order: -1;
+  }
+  .image {
+    max-height: 260px;
   }
   .title {
     font-size: 36px;
-  }
-  .imageCol {
-    height: 320px;
-  }
-  .image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top center;
   }
 }

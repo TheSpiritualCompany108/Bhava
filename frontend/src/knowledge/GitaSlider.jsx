@@ -190,7 +190,6 @@ function GitaSlider() {
         <div className={styles.dailyReflectionGrid}>
           <div className={styles.quoteCard}>
             <div className={styles.quoteCardTop}>
-              <div className={styles.quoteBrand}>BHAVA</div>
               <img className={styles.quoteImage} src={krishnaImage} alt="Lord Krishna" />
             </div>
 

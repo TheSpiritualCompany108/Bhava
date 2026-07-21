@@ -218,8 +218,8 @@ function AboutUs() {
           </p>
 
           <p className={styles.experienceTagline}>
-            Awaken Bhava. <span className={styles.dot}>•</span> Live Divine.{" "}
-            <span className={styles.dot}>•</span> Every Day.
+            Awaken Bhava: <span className={styles.dot}>.</span> Live Divine{" "}
+            <span className={styles.dot}>.</span> Every Day.
           </p>
         </div>
       </section>

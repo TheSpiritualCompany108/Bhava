@@ -3,7 +3,7 @@ import styles from "./LatestArticles.module.css";
 
 const articles = [
   {
-    brand: "Bhava",
+    brand: "Bhava:",
     tag: "#SACRED26",
     title: "Mahāśivarātri 2026",
     sub: "The Great Night of Shiva",
@@ -13,7 +13,7 @@ const articles = [
     titleColor: "#ffffff",
   },
   {
-    brand: "Bhava",
+    brand: "Bhava:",
     tag: null,
     title: "Divine Consciousness",
     sub: "Podcast",
@@ -23,7 +23,7 @@ const articles = [
     titleColor: "#ffffff",
   },
   {
-    brand: "Bhava",
+    brand: "Bhava:",
     tag: null,
     title: "Reflections on Being",
     sub: "Podcast",
@@ -33,7 +33,7 @@ const articles = [
     titleColor: "#f59e42",
   },
   {
-    brand: "Bhava",
+    brand: "Bhava:",
     tag: null,
     title: "Mother Divine: History, Power, Prayers",
     sub: "Article",
@@ -43,7 +43,7 @@ const articles = [
     titleColor: "#ffffff",
   },
   {
-    brand: "Bhava",
+    brand: "Bhava:",
     tag: null,
     title: "The Science of Karma",
     sub: "Article",
@@ -53,7 +53,7 @@ const articles = [
     titleColor: "#ffffff",
   },
   {
-    brand: "Bhava",
+    brand: "Bhava:",
     tag: null,
     title: "Vedic Astrology Basics",
     sub: "Podcast",

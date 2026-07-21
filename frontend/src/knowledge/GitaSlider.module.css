@@ -108,12 +108,12 @@
   height: 100%;
   max-height: 100%;
   margin: 0;
-  padding: 0 28px 28px;
+  padding: 0 28px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  background: #ffffff;
+  background: #F4EFE6;
   border: 1px solid rgba(74, 11, 29, 0.12);
   border-radius: 16px;
   backdrop-filter: blur(6px);
@@ -127,28 +127,19 @@
   margin: 0 -28px; /* cancel quoteCard's side padding so this block can bleed to the card's true edge */
   flex: 1 1 auto;
   min-height: 0;
-  padding: 16px 16px 12px; /* small uniform margin around brand + image */
+  padding: 6px 16px; /* small uniform margin around image */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.quoteBrand {
-  font-family: 'Canela', Cormorant, serif;
-  color: #4A0B1D;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-bottom: 16px;
-  flex-shrink: 0;
-}
-
 .quoteImage {
   width: 100%;
   flex: 1 1 auto;
   min-height: 0;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center 30%;
   display: block;
   border-radius: 2px;
 }
@@ -156,7 +147,7 @@
 .quoteCardBody {
   width: 100%;
   flex-shrink: 0;
-  padding: 6px 20px 0;
+  padding: 4px 20px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -167,7 +158,7 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.8px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .quoteIcon {
@@ -182,11 +173,11 @@
 
 .quoteText {
   font-size: 22px;
-  line-height: 1.5;
+  line-height: 1.4;
   color: var(--color-text-dark);
   font-family: 'Canela', Cormorant, serif;
   font-weight: 400;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
   max-width: 860px;
 
   /* clamp to 3 lines max if needed so box never grows */
@@ -210,7 +201,7 @@
   width: 60px;
   height: 2px;
   background: var(--color-saffron-light);
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   flex-shrink: 0;
 }
 
@@ -225,7 +216,7 @@
 }
 
 .shareBtn {
-  margin: 20px auto 0;
+  margin: 12px auto 0;
   width: 44px;
   height: 44px;
   border-radius: 50%;

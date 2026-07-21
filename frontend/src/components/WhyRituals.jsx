@@ -1,16 +1,19 @@
 import styles from "./WhyRituals.module.css";
 
-const ritualLines = [
+const introLines = [
   "Modern life teaches speed.",
   "Ritual teaches return.",
   "Every day asks something of us.",
-  "Attention.",
-  "Patience.",
-  "Presence.",
+];
+
+const qualities = ["Attention.", "Patience.", "Presence."];
+
+const outroLines = [
   "A simple daily practice creates a gentle pause between doing and being.",
   "It is not about perfection.",
-  "It is about returning—again and again—to what matters.",
 ];
+
+const closingLine = "It is about returning—again and again—to what matters.";
 
 function WhyRituals() {
   return (
@@ -22,9 +25,21 @@ function WhyRituals() {
           </h2>
 
           <div className={styles.body}>
-            {ritualLines.map((line) => (
+            {introLines.map((line) => (
               <p key={line}>{line}</p>
             ))}
+
+            <ul className={styles.qualityList}>
+              {qualities.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+
+            {outroLines.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+
+            <p style={{ color: "#E07B39", fontStyle: "italic" }}>{closingLine}</p>
           </div>
         </div>
 

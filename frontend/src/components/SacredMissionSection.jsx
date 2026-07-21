@@ -46,39 +46,37 @@ export default function SacredMissionSection() {
       className={styles.sacredMission}
       aria-labelledby="sacred-mission-title"
     >
-      <div className={styles.panel}>
-        <div className={styles.container}>
-          <div className={styles.textCol}>
-            <p className={styles.kicker}>Our Sacred Mission</p>
-            <h2 id="sacred-mission-title" className={styles.title}>
-              Living Presence
-            </h2>
-            <p className={styles.body}>
-              Devotion has become occasional. Structure returns it gently to
-              daily life. At Bhava, we do not create products; we design quiet
-              systems for presence.
-            </p>
-            <ul className={styles.list}>
-              <li>A single flame offered at dawn.</li>
-              <li>The slow turning of beads between fingers.</li>
-              <li>Smoke that rises and carries the mind home.</li>
-            </ul>
-            <p className={styles.body}>
-              These small, repeated acts shape clarity, transforming scattered
-              days into something steadier.
-            </p>
-            <p className={styles.closing}>
-              Consistency is the quiet teacher. Stay with the practice.
-            </p>
-          </div>
+      <div className={styles.container}>
+        <div className={styles.textCol}>
+          <p className={styles.kicker}>Our Sacred Mission</p>
+          <h2 id="sacred-mission-title" className={styles.title}>
+            Living Presence
+          </h2>
+          <p className={styles.body}>
+            Devotion has become occasional. Structure returns it gently to
+            daily life. At Bhava, we do not create products; we design quiet
+            systems for presence.
+          </p>
+          <ul className={styles.list}>
+            <li>A single flame offered at dawn.</li>
+            <li>The slow turning of beads between fingers.</li>
+            <li>Smoke that rises and carries the mind home.</li>
+          </ul>
+          <p className={styles.body}>
+            These small, repeated acts shape clarity, transforming scattered
+            days into something steadier.
+          </p>
+          <p className={styles.closing}>
+            Consistency is the quiet teacher. Stay with the practice.
+          </p>
+        </div>
 
-          <div className={styles.imageCol}>
-            <img
-              src="/Sacred Mission.png"
-              className={styles.image}
-              alt="Praying figure illustration"
-            />
-          </div>
+        <div className={styles.imageCol}>
+          <img
+            src="/Sacred Mission.png"
+            className={styles.image}
+            alt="Praying figure illustration"
+          />
         </div>
       </div>
     </section>

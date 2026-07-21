@@ -16,6 +16,7 @@
   height: 100%;
   object-fit: cover;
   object-position: top center;
+  
 }
 
 /* ── Left content ── */
@@ -69,8 +70,9 @@
   color: #3d4d42;
   margin-bottom: 20px;
   line-height: 1.6;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
-  font-weight: 400;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-weight: 450;
+  letter-spacing: 0.2px;
 }
 
 .homeMainHeroButtons {
@@ -123,6 +125,100 @@
   color: #e07b39;
 }
 
+/* ── Rotating slide content (slides 01-06) ── */
+.slideLabel {
+  margin: 0 0 14px;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #e07b39;
+}
+
+.slideTitle {
+  margin: 0 0 18px;
+  font-family: 'Canela', Cormorant, serif;
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 1.1;
+  color: #4A0B1D;
+}
+
+.slideTitle span {
+  display: block;
+}
+
+.slideDescription {
+  font-size: 17px;
+  color: #3d4d42;
+  margin-bottom: 24px;
+  line-height: 1.6;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-weight: 450;
+  max-width: 46ch;
+}
+
+.slideCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #4A0B1D;
+  background: transparent;
+  border: 2px solid #4A0B1D;
+  padding: 12px 28px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.slideCta:hover {
+  background: #4A0B1D;
+  color: #ffffff;
+}
+
+.slideCta .material-symbols-outlined {
+  color: #e07b39;
+  font-size: 22px;
+  flex-shrink: 0;
+  transition: color 0.3s;
+}
+
+.slideCta:hover .material-symbols-outlined {
+  color: #ffffff;
+}
+
+/* ── Dots ── */
+.slideDots {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+  margin: 32px 0 0;
+  padding: 0;
+}
+
+.dot,
+.dotActive {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(74, 11, 29, 0.25);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.dotActive {
+  background: #e07b39;
+  width: 24px;
+  border-radius: 4px;
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .homeMainContainer {
@@ -130,6 +226,7 @@
   }
   .homeMainElevateText { font-size: 52px; }
   .homeMainHighlight   { font-size: 48px; }
+  .slideTitle { font-size: 40px; }
 }
 
 @media (max-width: 768px) {
@@ -159,6 +256,8 @@
   .trustPillars {
     justify-content: center;
   }
+  .slideTitle { font-size: 32px; }
+  .slideDots { justify-content: center; }
 }
 
 @media (max-width: 480px) {

@@ -62,7 +62,7 @@ function Navbar() {
               onClick={() => navigate("/")}
               style={{ cursor: "pointer" }}
             >
-              <img src="/logo(3).png" alt="Bhava Logo" className={styles.logo} />
+              <img src="/bhava-icon.png" alt="Bhava Logo" className={styles.logo} />
               <h2 className={styles.heading}>
                 BHAVA
                 <span className={styles.dotsBhava}>
