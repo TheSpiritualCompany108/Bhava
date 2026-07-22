@@ -18,7 +18,7 @@ function LivingWisdom() {
       <div className={styles.inner}>
         <div className={styles.left}>
           <h2 id="living-wisdom-title" className={styles.title}>
-            Living Wisdom with Daily Practice &amp; Philosophy
+             Daily Practice &amp; Philosophy
           </h2>
           <p className={styles.description}>
             A structured path to integrate timeless philosophy into modern
@@ -26,7 +26,7 @@ function LivingWisdom() {
             presence.
           </p>
           <button className={styles.beginBtn} onClick={() => navigate("/knowledge")}>
-            Begin Practice
+            Begin with Bhava:
           </button>
         </div>
 

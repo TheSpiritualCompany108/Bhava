@@ -6,7 +6,7 @@ const introLines = [
   "Every day asks something of us.",
 ];
 
-const qualities = ["Attention.", "Patience.", "Presence."];
+const qualities = ["Attention", "Patience", "Presence"];
 
 const outroLines = [
   "A simple daily practice creates a gentle pause between doing and being.",

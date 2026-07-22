@@ -38,14 +38,8 @@
 .divider {
   height: 3px;
   width: 100%;
-  background: #e07b39;
-  margin-bottom: 24px;
-}
-
-.column:nth-child(2) .divider,
-.column:nth-child(3) .divider,
-.column:nth-child(4) .divider {
   background: rgba(74, 11, 29, 0.15);
+  margin-bottom: 24px;
 }
 
 .number {
@@ -61,7 +55,7 @@
   margin: 0 0 6px;
   font-family: "Canela", Cormorant, serif;
   font-size: 24px;
-  color: #101010;
+  color: #4A0B1D;
 }
 
 .hook {

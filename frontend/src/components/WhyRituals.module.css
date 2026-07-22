@@ -38,7 +38,7 @@
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #000000;
+  color: #3D4D42;
 }
 
 .title1 {
@@ -52,7 +52,7 @@
 
 .body {
   margin-top: 18px;
-  font-weight: 400;
+  font-weight: 450;
 }
 
 .body p {
@@ -60,7 +60,7 @@
   font-family: "Neue Haas Grotesk", Inter, sans-serif;
   font-size: clamp(16px, 1.6vw, 19px);
   line-height: 1.35;
-  color: #101010;
+  color: #3D4D42;
 }
 
 .qualityList {
@@ -76,8 +76,8 @@
   font-family: "Neue Haas Grotesk", Inter, sans-serif;
   font-size: clamp(16px, 1.6vw, 19px);
   line-height: 1.35;
-  color: #101010;
-  font-weight: 400;
+  color: #3D4D42;
+  font-weight: 450;
 }
 
 .qualityList li::before {

@@ -51,14 +51,12 @@ function StructuredPractices() {
                 <h3 className={styles.cardTitle}>{practice.title}</h3>
                 <p className={styles.hook}>{practice.hook}</p>
                 <p className={styles.description}>{practice.description}</p>
-                {isLast && (
-                  <button
-                    className={styles.exploreBtn}
-                    onClick={(e) => { e.stopPropagation(); navigate(practice.route); }}
-                  >
-                    Explore Practices
-                  </button>
-                )}
+                <button
+                  className={styles.exploreBtn}
+                  onClick={(e) => { e.stopPropagation(); navigate(practice.route); }}
+                >
+                  Begin with Bhava:
+                </button>
               </div>
             );
           })}

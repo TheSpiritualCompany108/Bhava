@@ -2,7 +2,7 @@ import styles from "./RitualTierCards.module.css";
 
 export const homeRitualTiers = [
   {
-    name: "Shubh Yatra",
+    name: "Bhava: Shubh Yatra",
     price: "₹501",
     tag: "Pocket Ritual",
     tagline: "Carry presence wherever life takes you.",
@@ -18,7 +18,7 @@ export const homeRitualTiers = [
     badge: null,
   },
   {
-    name: "Daily Starter",
+    name: "Bhava: Daily Starter",
     price: "₹1,100",
     tag: "11-Day System",
     tagline: "Begin your daily rhythm.",
@@ -34,7 +34,7 @@ export const homeRitualTiers = [
     badge: null,
   },
   {
-    name: "Daily Ritual Kit",
+    name: "Bhava: Daily Ritual Kit",
     price: "₹2,100",
     tag: "Complete Kit",
     tagline: "Your Complete Daily Ritual.",

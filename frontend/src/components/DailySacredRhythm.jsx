@@ -8,7 +8,7 @@ const pillars = [
       "Begin the day with stillness before movement. A simple offering creates space for gratitude.",
   },
   {
-    title: "Dhyāna",
+    title: "Dhyana",
     hook: "Sit. Breathe. Stay.",
     description:
       "A few quiet minutes become the foundation for everything that follows in your day.",

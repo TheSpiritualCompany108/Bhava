@@ -193,12 +193,12 @@ function Footer() {
     {
       name: "Instagram",
       icon: InstagramIcon,
-      href: "https://www.instagram.com/thespiritualcompany108?utm_source=qr&igsh=MXUxbDJ1a2NjYTl6aw==",
+      href: "https://www.instagram.com/bhavaglobal/",
     },
     {
       name: "Facebook",
       icon: FacebookIcon,
-      href: "https://www.facebook.com/share/1CEvNyahhT/",
+      href: "https://www.facebook.com/bhavaglobal/",
     },
     {
       name: "LinkedIn",
@@ -208,7 +208,7 @@ function Footer() {
     {
       name: "YouTube",
       icon: YouTubeIcon,
-      href: "https://youtube.com/@thespiritualcompany?si=MYR68OVf3RPV94NE",
+      href: "https://www.youtube.com/channel/UCZP_MBw85WMAoZ0zq_kI08Q",
     },
     {
       name: "Pinterest",

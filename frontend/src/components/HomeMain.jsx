@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"; // eslint-disable-line 
 import styles from "./HomeMain.module.css";
 import ScrollDown from "./ScrollDown";
 
-const INTERVAL = 2000;
+const INTERVAL = 4500;
 
 const slides = [
   { image: "./temple(4).png" },
@@ -17,7 +17,6 @@ const slides = [
   },
   {
     image: "./Slide 02.png",
-    label: "Sacred Objects",
     title: ["Objects Made", "For Practice."],
     description:
       "Every Bhava object has one purpose: to support your daily rhythm with simplicity, beauty, and intention.",
@@ -25,7 +24,6 @@ const slides = [
   },
   {
     image: "./Slide 03.png",
-    label: "Guided Practices",
     title: ["Stay With", "The Practice."],
     description:
       "Guided journeys, reflections, and structured challenges help transform occasional devotion into lasting habits.",
@@ -33,7 +31,6 @@ const slides = [
   },
   {
     image: "./Slide 04.png",
-    label: "Daily Reflections",
     title: ["Ancient Wisdom.", "Daily Life."],
     description:
       "Short reflections, timeless teachings, and practical guidance designed to accompany modern living.",
@@ -41,7 +38,6 @@ const slides = [
   },
   {
     image: "./Slide 05.png",
-    label: "Bhava App",
     title: ["Your Ritual,", "Supported Daily."],
     description:
       "Gentle reminders, progress tracking, and guided experiences that encourage consistency without distraction.",
@@ -49,7 +45,6 @@ const slides = [
   },
   {
     image: "./Slide 06.png",
-    label: "Community",
     title: ["Practice Together.", "Grow Together."],
     description:
       "Quiet stories, shared experiences, and a community that values consistency over perfection.",
