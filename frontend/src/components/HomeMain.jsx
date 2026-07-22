@@ -9,7 +9,6 @@ const slides = [
   { image: "./temple(4).png" },
   {
     image: "./Slide 01.png",
-    label: "Daily Ritual",
     title: ["A Daily Ritual.", "A Different Life."],
     description:
       "Eleven intentional minutes each day can create remarkable clarity over time. Bhava helps you build a practice that quietly becomes part of who you are.",
