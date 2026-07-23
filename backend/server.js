@@ -93,7 +93,10 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://bhava-fkv3.vercel.app", // ← hardcoded as backup
+  "https://bhava-fkv3.vercel.app",
+  "https://bhava-beige.vercel.app",
+  "https://bhavaglobal.com",
+  "https://www.bhavaglobal.com",
   process.env.CLIENT_URL,
 ].filter(Boolean);
 
