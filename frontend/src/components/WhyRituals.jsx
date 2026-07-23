@@ -39,7 +39,7 @@ function WhyRituals() {
               <p key={line}>{line}</p>
             ))}
 
-            <p style={{ color: "#E07B39", fontStyle: "italic" }}>{closingLine}</p>
+            <p style={{ color: "#E07B39", fontStyle: "italic", marginTop: 32 }}>{closingLine}</p>
           </div>
         </div>
 

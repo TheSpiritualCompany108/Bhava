@@ -11,21 +11,21 @@ const fallbackCards = [
   {
     _id: 0,
     title: "Vedic Incense Series",
-    badgeText: "₹1,299",
+    // badgeText: "₹1,299",
     summary: "Hand-rolled using 16th-century temple recipes, infused with Himalayan herbs and sacred mantras.",
     imageUrl: "/uploads/Products/Home Page Incense.png",
   },
   {
     _id: 1,
     title: "Sacred Sambrani Cups",
-    badgeText: "₹899",
+    // badgeText: "₹899",
     summary: "Purified resin sambrani with aromatic woods, perfect for daily pujas and sacred rituals.",
     imageUrl: "/uploads/Products/Home Page Sambrani.png",
   },
   {
     _id: 2,
     title: "Rudraksha Japa Mala",
-    badgeText: "₹749",
+    // badgeText: "₹749",
     summary: "Crafted from 108 medicinal herbs, each stick carries the blessing of traditional temple practitioners.",
     imageUrl: "/uploads/Products/Home Page mala.png",
   },
@@ -85,7 +85,7 @@ function FlipCard({ card, width, onAddToCart }) {
             <div className={styles.frontTop}>
               <span className={styles.frontCategory}>{card.category}</span>
               <h3 className={styles.frontTitle}>{card.title}</h3>
-              <p className={styles.frontPrice}>{card.badgeText}</p>
+              <p className={styles.frontPrice}>Coming Soon</p>
             </div>
             <div className={styles.frontBottom}>
               <p className={styles.frontDescription}>{card.summary}</p>

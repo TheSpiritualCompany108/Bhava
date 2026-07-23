@@ -3,7 +3,7 @@ import styles from "./GitaSlider.module.css";
 import { getTodaysQuote } from "./gitaQuotes";
 
 const quote = getTodaysQuote();
-const krishnaImage = "/krishna.imgae.png";
+const krishnaImage = "/krishna02.png";
 
 /** Wrap text to fit within maxWidth on a canvas context */
 function wrapText(ctx, text, maxWidth) {

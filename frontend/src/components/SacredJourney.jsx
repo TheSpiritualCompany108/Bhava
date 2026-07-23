@@ -1,7 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./SacredJourney.module.css";
 
 function SacredJourney() {
+  const navigate = useNavigate();
+
   return (
     <section className={styles.sacredJourneySection}>
       <div className={styles.sacredContent}>
@@ -15,7 +18,9 @@ function SacredJourney() {
         </p>
 
         <div className={styles.sacredButtons}>
-          <button className={styles.btnPreorder}>Begin with Bhava</button>
+          <button className={styles.btnPreorder} onClick={() => navigate("/products")}>
+            Begin with Bhava:
+          </button>
         </div>
       </div>
     </section>

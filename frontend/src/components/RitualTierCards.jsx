@@ -98,7 +98,7 @@ function RitualTierCards({ tiers, columns = 3 }) {
 
           <h3 className={styles.name}>{tier.name}</h3>
           <p className={styles.priceRow}>
-            <span className={styles.price}>{tier.price}</span>
+            <span className={styles.price}>Coming Soon</span>
             <span className={styles.tagDivider}>|</span>
             <span className={styles.tag}>{tier.tag}</span>
           </p>

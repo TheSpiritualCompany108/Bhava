@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"; // eslint-disable-line 
 import styles from "./HomeMain.module.css";
 import ScrollDown from "./ScrollDown";
 
-const INTERVAL = 4500;
+const INTERVAL = 7000;
 
 const slides = [
   { image: "./temple(4).png" },

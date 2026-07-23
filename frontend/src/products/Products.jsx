@@ -336,7 +336,7 @@ function FlipCard({ card, onAddToCart }) {
             <div className={styles.frontTop}>
               <span className={styles.frontCategory}>{card.category}</span>
               <h3 className={styles.frontTitle}>{card.title}</h3>
-              <p className={styles.frontPrice}>{card.badgeText}</p>
+              <p className={styles.frontPrice}>Coming Soon</p>
             </div>
             <div className={styles.frontBottom}>
               <p className={styles.frontDescription}>{card.summary}</p>
@@ -454,8 +454,6 @@ function Products() {
           </a>
         </p>
       </div>
-
-      <p className={styles.individualProductsKicker}>Individual Products</p>
 
       {/* Filters */}
       <div className={styles.filterRow}>
