@@ -8,6 +8,7 @@ import TrendingTeachings from "./TrendingTeachings";
 import DailyPractices from "./DailyPractices";
 import LearningPaths from "./LearningPaths";
 import LatestTeachings from "./LatestTeachings";
+import StructuredPractices from "../components/StructuredPractices";
 
 function Knowledge() {
   return (
@@ -16,6 +17,7 @@ function Knowledge() {
       <SacredCommitments />
       <ExploreSacredWisdom />
       <TigerEyeSection />
+      <StructuredPractices />
       <GitaSlider />
       <TrendingTeachings />
       <DailyPractices />
