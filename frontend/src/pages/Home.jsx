@@ -6,7 +6,6 @@ import SacredCollection from "../components/SacredCollection";
 import ProductSpecification from "../components/ProductSpecification";
 import FeaturedRituals from "../components/FeaturedRituals";
 import DailySacredRhythm from "../components/DailySacredRhythm";
-import StructuredPractices from "../components/StructuredPractices";
 import LivingWisdom from "../components/LivingWisdom";
 import SacredMissionSection from "../components/SacredMissionSection";
 import FundRaiser from "../components/FundRaiser";
@@ -29,7 +28,6 @@ function Home() {
 
       {/* Phase II — The Daily Practice */}
       <DailySacredRhythm />
-      <StructuredPractices />
       <LivingWisdom />
       <Community />
 
