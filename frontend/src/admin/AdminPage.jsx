@@ -15,6 +15,13 @@ export default function AdminPage() {
     "Products"
   ];
   const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const [section, setSection] = useState("tiles"); // "tiles" | "quotes"
+  const [quotes, setQuotes] = useState([]);
+  const [quotesLoading, setQuotesLoading] = useState(true);
+  const [quotesError, setQuotesError] = useState("");
+  const [quoteForm, setQuoteForm] = useState({ reflection: "", text: "", reference: "", isActive: false });
+  const [editingQuoteId, setEditingQuoteId] = useState(null);
+  const [showQuoteForm, setShowQuoteForm] = useState(false);
   const [form, setForm] = useState({ 
     title: "", 
     subtitle: "", 
@@ -48,6 +55,81 @@ export default function AdminPage() {
     // fetch tiles for active category
     fetchTiles();
   }, [activeCategory]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("bhava_token");
+    if (!token) { navigate("/admin/login"); return; }
+    if (section === "quotes") fetchQuotes();
+  }, [section]);
+
+  const fetchQuotes = async () => {
+    setQuotesLoading(true);
+    setQuotesError("");
+    try {
+      const token = localStorage.getItem("bhava_token");
+      const res = await fetch(`${API_BASE}/api/admin/quotes`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setQuotes(json.data || []);
+      } else if (res.status === 401 || res.status === 403) {
+        navigate("/admin/login");
+      } else {
+        setQuotesError(json.message || "Failed to load quotes");
+      }
+    } catch (err) {
+      setQuotesError(err.message || "Network error");
+    } finally {
+      setQuotesLoading(false);
+    }
+  };
+
+  const handleQuoteChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setQuoteForm({ ...quoteForm, [name]: type === "checkbox" ? checked : value });
+  };
+
+  const resetQuoteForm = () => {
+    setQuoteForm({ reflection: "", text: "", reference: "", isActive: false });
+    setEditingQuoteId(null);
+  };
+
+  const handleQuoteSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("bhava_token");
+    try {
+      const url = editingQuoteId ? `${API_BASE}/api/admin/quotes/${editingQuoteId}` : `${API_BASE}/api/admin/quotes`;
+      const method = editingQuoteId ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify(quoteForm),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        resetQuoteForm();
+        setShowQuoteForm(false);
+        fetchQuotes();
+      } else {
+        setQuotesError(json.message || `Error ${res.status}`);
+      }
+    } catch (err) {
+      setQuotesError(err.message || "Network error");
+    }
+  };
+
+  const handleQuoteEdit = (q) => {
+    setEditingQuoteId(q._id);
+    setQuoteForm({ reflection: q.reflection || "", text: q.text || "", reference: q.reference || q.ref || "", isActive: !!q.isActive });
+    setShowQuoteForm(true);
+  };
+
+  const handleQuoteDelete = async (id) => {
+    if (!confirm("Delete this quote?")) return;
+    const token = localStorage.getItem("bhava_token");
+    const res = await fetch(`${API_BASE}/api/admin/quotes/${id}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    const json = await res.json();
+    if (json.success) fetchQuotes(); else alert(json.message || "Error");
+  };
 
   const fetchTiles = async () => {
     setLoading(true);
@@ -269,7 +351,7 @@ export default function AdminPage() {
     <div style={{ display: "flex", minHeight: "100vh", background: "#f7f4f0" }}>
       {/* TOP NAV */}
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "12px 20px", zIndex: 100, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {activeCategory}</h2>
+        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {section === "quotes" ? "Quotes" : activeCategory}</h2>
         <button onClick={logout} style={{ padding: "8px 16px", background: "#E07B39", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}>Logout</button>
       </div>
 
@@ -278,12 +360,80 @@ export default function AdminPage() {
         <h3 style={{ marginTop: 0, color: "#4A0B1D", fontSize: 14 }}>Categories</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
           {categories.map(c => (
-            <li key={c} onClick={() => { setActiveCategory(c); setSelectedTile(null); setEditingId(null); }} style={{ cursor: 'pointer', padding: "10px 12px", background: c === activeCategory ? "#E07B39" : 'transparent', color: c === activeCategory ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>{c}</li>
+            <li key={c} onClick={() => { setSection("tiles"); setActiveCategory(c); setSelectedTile(null); setEditingId(null); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "tiles" && c === activeCategory ? "#E07B39" : 'transparent', color: section === "tiles" && c === activeCategory ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>{c}</li>
           ))}
+        </ul>
+
+        <h3 style={{ marginTop: 20, color: "#4A0B1D", fontSize: 14, borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>Content</h3>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          <li onClick={() => setSection("quotes")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "quotes" ? "#E07B39" : 'transparent', color: section === "quotes" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>📜 Quotes</li>
         </ul>
       </aside>
 
-      {/* CENTER - TILE GRID */}
+      {section === "quotes" ? (
+      /* CENTER - QUOTES */
+      <main style={{ flex: 1, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
+        {quotesLoading && <div style={{ padding: 12, background: '#fffbe6', borderRadius: 6, marginBottom: 12 }}>Loading quotes…</div>}
+        {quotesError && <div style={{ padding: 12, background: '#ffe6e6', color: '#900', borderRadius: 6, marginBottom: 12 }}>{quotesError}</div>}
+
+        <div style={{ background: "#fff", padding: 20, borderRadius: 8, marginBottom: 20, border: "2px solid #E07B39" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: showQuoteForm ? 16 : 0 }}>
+            <h3 style={{ margin: 0, color: "#4A0B1D", fontSize: 16 }}>{editingQuoteId ? "✏️ Edit Quote" : "➕ Add New Quote"}</h3>
+            <button onClick={() => { if (showQuoteForm) resetQuoteForm(); setShowQuoteForm(!showQuoteForm); }} style={{ background: "#E07B39", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}>
+              {showQuoteForm ? "✕ Close" : "✏️ Open Form"}
+            </button>
+          </div>
+
+          {showQuoteForm && (
+            <form onSubmit={handleQuoteSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, fontWeight: 600, color: "#4A0B1D" }}>Today's Reflection</label>
+                <textarea name="reflection" value={quoteForm.reflection} onChange={handleQuoteChange} style={{ width: "100%", padding: 10, borderRadius: 4, border: "1px solid #ddd", fontSize: 13, minHeight: 50, resize: "vertical" }} placeholder="A short reflection shown below the TODAY'S REFLECTION heading..." />
+              </div>
+
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, fontWeight: 600, color: "#4A0B1D" }}>Quote *</label>
+                <textarea name="text" value={quoteForm.text} onChange={handleQuoteChange} required style={{ width: "100%", padding: 10, borderRadius: 4, border: "1px solid #ddd", fontSize: 13, minHeight: 80, resize: "vertical" }} placeholder="Abandoning without exception all the desires born of volition..." />
+              </div>
+
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 12, fontWeight: 600, color: "#4A0B1D" }}>Page Number *</label>
+                <input name="reference" value={quoteForm.reference} onChange={handleQuoteChange} required style={{ width: "100%", padding: 10, borderRadius: 4, border: "1px solid #ddd", fontSize: 13 }} placeholder="Bhagavad Gita 6:24" />
+              </div>
+
+              <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#4A0B1D" }}>
+                <input type="checkbox" name="isActive" checked={quoteForm.isActive} onChange={handleQuoteChange} />
+                Show on homepage (Today's Reflection)
+              </label>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <button type="submit" style={{ flex: 1, padding: 12, background: "#4CAF50", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>{editingQuoteId ? "✓ Save Quote" : "✓ Create Quote"}</button>
+                <button type="button" onClick={() => { resetQuoteForm(); setShowQuoteForm(false); }} style={{ flex: 1, padding: 12, background: "#f0f0f0", color: "#333", border: "1px solid #ddd", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>Cancel</button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        <h3 style={{ marginTop: 0, color: "#4A0B1D" }}>All Quotes</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {quotes.map(q => (
+            <div key={q._id} style={{ background: "#fff", padding: 16, borderRadius: 8, border: q.isActive ? "2px solid #4CAF50" : "1px solid #ddd" }}>
+              <p style={{ margin: "0 0 4px 0", fontSize: 10, color: "#999", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>TODAY'S REFLECTION</p>
+              {q.reflection && <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#666" }}>{q.reflection}</p>}
+              <p style={{ margin: "0 0 8px 0", fontSize: 14, color: "#333", fontStyle: "italic" }}>&ldquo;{q.text}&rdquo;</p>
+              <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#9B3A2A", fontWeight: 700, textTransform: "uppercase" }}>{q.reference || q.ref || "—"}</p>
+              {q.isActive && <span style={{ fontSize: 11, color: "#4CAF50", fontWeight: 600 }}>● Live on homepage</span>}
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <button onClick={() => handleQuoteEdit(q)} style={{ padding: "6px 12px", background: "#2196F3", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12 }}>Edit</button>
+                <button onClick={() => handleQuoteDelete(q._id)} style={{ padding: "6px 12px", background: "#ff6b6b", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12 }}>Delete</button>
+              </div>
+            </div>
+          ))}
+          {!quotesLoading && quotes.length === 0 && <p style={{ color: "#999", fontSize: 13 }}>No quotes yet. Add one above.</p>}
+        </div>
+      </main>
+      ) : (
+      /* CENTER - TILE GRID */
       <main style={{ flex: 1, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
         {loading && <div style={{ padding: 12, background: '#fffbe6', borderRadius: 6, marginBottom: 12 }}>Loading tiles…</div>}
         {error && <div style={{ padding: 12, background: '#ffe6e6', color: '#900', borderRadius: 6, marginBottom: 12 }}>{error}</div>}
@@ -441,9 +591,10 @@ export default function AdminPage() {
           ))}
         </div>
       </main>
+      )}
 
       {/* RIGHT PANEL - DETAIL EDITOR */}
-      {editingId && (
+      {section === "tiles" && editingId && (
         <aside style={{ width: 400, background: "#fff", borderLeft: "1px solid #e0e0e0", overflowY: "auto", maxHeight: "100vh", padding: "80px 16px 20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <h3 style={{ margin: 0, fontSize: 16, color: "#4A0B1D" }}>Edit Content</h3>

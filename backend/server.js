@@ -79,6 +79,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import careerRoutes from "./routes/careerRoutes.js";
 import tilesRoutes from "./routes/tilesRoutes.js";
+import quotesRoutes from "./routes/quotesRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
@@ -92,6 +93,7 @@ const PORT = process.env.PORT || 5000;
 // ── Middleware ────────────────────────────────────────────────
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "http://localhost:3000",
   "https://bhava-fkv3.vercel.app",
   "https://bhava-beige.vercel.app",
@@ -133,6 +135,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/career", careerRoutes);
 app.use("/api/tiles", tilesRoutes);
+app.use("/api/quotes", quotesRoutes);
 app.use("/api/admin", adminRoutes);
 
 // Health check

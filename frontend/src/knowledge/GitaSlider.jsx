@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./GitaSlider.module.css";
 import { getTodaysQuote } from "./gitaQuotes";
 
-const quote = getTodaysQuote();
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const krishnaImage = "/krishna02.png";
 
 /** Wrap text to fit within maxWidth on a canvas context */
@@ -156,6 +156,43 @@ function GitaSlider() {
   const [shareOpen, setShareOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [quotes, setQuotes] = useState(() => [
+    { reflection: "", ...getTodaysQuote() },
+  ]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const quote = quotes[activeIndex % quotes.length];
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_BASE}/api/quotes/active`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!cancelled && json?.success && Array.isArray(json.data) && json.data.length > 0) {
+          setQuotes(
+            json.data.map((q) => ({
+              reflection: q.reflection || "",
+              text: q.text,
+              ref: q.reference,
+            }))
+          );
+          setActiveIndex(0);
+        }
+      })
+      .catch(() => {
+        // keep the static fallback quote on network error
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (quotes.length < 2) return;
+    const id = setInterval(() => {
+      setActiveIndex((i) => (i + 1) % quotes.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [quotes]);
 
   const shareText = `"${quote.text}" — ${quote.ref}`;
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
@@ -214,6 +251,9 @@ function GitaSlider() {
           <div className={styles.quoteCard}>
             <div className={styles.quoteLeft}>
               <div className={styles.quoteSectionLabel}>TODAY'S REFLECTION</div>
+              {quote.reflection && (
+                <p className={styles.reflectionText}>{quote.reflection}</p>
+              )}
               <p className={styles.quoteText}>
                 <span className={styles.quoteMark}>&ldquo;</span>
                 {quote.text}

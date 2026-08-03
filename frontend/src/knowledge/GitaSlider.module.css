@@ -151,6 +151,15 @@
   margin-bottom: 14px;
 }
 
+.reflectionText {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  margin-bottom: 16px;
+}
+
 .quoteIcon {
   font-size: 52px;
   color: var(--color-saffron);

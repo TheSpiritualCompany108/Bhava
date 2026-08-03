@@ -9,6 +9,13 @@ import {
   updateTile,
   deleteTile,
 } from "../controllers/tileController.js";
+import {
+  createQuote,
+  listQuotes,
+  getQuote,
+  updateQuote,
+  deleteQuote,
+} from "../controllers/quoteController.js";
 import protect, { adminOnly } from "../middleware/authMiddleware.js";
 import { adminLogin } from "../controllers/adminAuthController.js";
 
@@ -57,5 +64,12 @@ router.put(
   updateTile,
 );
 router.delete("/tiles/:id", protect, adminOnly, deleteTile);
+
+// Quotes (Today's Reflection) — admin protected
+router.get("/quotes", protect, adminOnly, listQuotes);
+router.post("/quotes", protect, adminOnly, createQuote);
+router.get("/quotes/:id", protect, adminOnly, getQuote);
+router.put("/quotes/:id", protect, adminOnly, updateQuote);
+router.delete("/quotes/:id", protect, adminOnly, deleteQuote);
 
 export default router;
