@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion"; // eslint-disable-line no-unused-vars
 import styles from "./HomeMain.module.css";
 import ScrollDown from "./ScrollDown";
@@ -13,6 +14,7 @@ const slides = [
     description:
       "Eleven intentional minutes each day can create remarkable clarity over time. Bhava helps you build a practice that quietly becomes part of who you are.",
     cta: "Begin Your Ritual",
+    ctaPath: "/about",
   },
   {
     image: "./Slide 02.png",
@@ -20,6 +22,7 @@ const slides = [
     description:
       "Every Bhava object has one purpose: to support your daily rhythm with simplicity, beauty, and intention.",
     cta: "Explore Ritual Systems",
+    ctaPath: "/products",
   },
   {
     image: "./Slide 03.png",
@@ -27,6 +30,7 @@ const slides = [
     description:
       "Guided journeys, reflections, and structured challenges help transform occasional devotion into lasting habits.",
     cta: "Explore Bhakti",
+    ctaPath: "/knowledge",
   },
   {
     image: "./Slide 04.png",
@@ -34,6 +38,7 @@ const slides = [
     description:
       "Short reflections, timeless teachings, and practical guidance designed to accompany modern living.",
     cta: "Read Today's Reflection",
+    ctaPath: "/knowledge",
   },
   {
     image: "./Slide 05.png",
@@ -41,6 +46,7 @@ const slides = [
     description:
       "Gentle reminders, progress tracking, and guided experiences that encourage consistency without distraction.",
     cta: "Explore the App",
+    ctaPath: "/app",
   },
   {
     image: "./Slide 06.png",
@@ -48,6 +54,7 @@ const slides = [
     description:
       "Quiet stories, shared experiences, and a community that values consistency over perfection.",
     cta: "Join Bhava",
+    ctaPath: "/community",
   },
 ];
 
@@ -80,6 +87,7 @@ const imageVariants = {
 };
 
 function HomeMain() {
+  const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
   const [dir, setDir] = useState(1);
 
@@ -138,8 +146,8 @@ function HomeMain() {
               <p className={styles.homeMainHeroDescription1}> Ritual is not reserved for special occasions. <br /> It is the quiet return to yourself, every single day. </p>
 
               <div className={styles.homeMainHeroButtons}>
-                <button className={styles.homeMainBtnPrimary}>Begin With Bhava</button>
-                <button className={styles.homeMainBtnSecondary}>Explore the System</button>
+                <button className={styles.homeMainBtnPrimary} onClick={() => navigate("/about")}>Begin With Bhava</button>
+                <button className={styles.homeMainBtnSecondary} onClick={() => navigate("/knowledge")}>Explore the System</button>
               </div>
 
               <ul className={styles.trustPillars}>
@@ -171,7 +179,7 @@ function HomeMain() {
                 ))}
               </h2>
               <p className={styles.slideDescription}>{slide.description}</p>
-              <button type="button" className={styles.slideCta}>
+              <button type="button" className={styles.slideCta} onClick={() => navigate(slide.ctaPath)}>
                 <span className="material-symbols-outlined">arrow_right_alt</span>
                 <span>{slide.cta}</span>
               </button>
