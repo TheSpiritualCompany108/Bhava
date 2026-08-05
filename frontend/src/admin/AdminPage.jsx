@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+// Tile images may be an absolute Vercel Blob URL (new uploads) or a
+// relative /uploads path (legacy files bundled with the backend).
+const resolveImageUrl = (url) => (url?.startsWith("http") ? url : API_BASE + url);
+
 export default function AdminPage() {
   const [tiles, setTiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -583,7 +587,7 @@ export default function AdminPage() {
               background: editingId === t._id ? "#fff3e8" : "#fff",
               boxShadow: editingId === t._id ? "0 4px 12px rgba(224,123,57,0.2)" : "0 1px 3px rgba(0,0,0,0.1)"
             }}>
-              {t.imageUrl && <img src={(import.meta.env.VITE_API_URL || '') + t.imageUrl} alt="" style={{ width: "100%", height: 140, objectFit: "cover", borderRadius: 6 }} />}
+              {t.imageUrl && <img src={resolveImageUrl(t.imageUrl)} alt="" style={{ width: "100%", height: 140, objectFit: "cover", borderRadius: 6 }} />}
               <h4 style={{ margin: "8px 0 4px 0", fontSize: 14 }}>{t.title}</h4>
               <p style={{ color: "#666", fontSize: 12, margin: 0 }}>{t.subtitle}</p>
               <button onClick={(e) => { e.stopPropagation(); handleDelete(t._id); }} style={{ marginTop: 8, padding: "6px 12px", background: "#ff6b6b", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12 }}>Delete</button>
@@ -645,7 +649,7 @@ export default function AdminPage() {
                 ) : selectedTile?.imageUrl ? (
                   <>
                     <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#666" }}>Current Image:</p>
-                    <img src={(import.meta.env.VITE_API_URL || '') + selectedTile.imageUrl} alt="current" style={{ maxWidth: "100%", maxHeight: 140, borderRadius: 6 }} />
+                    <img src={resolveImageUrl(selectedTile.imageUrl)} alt="current" style={{ maxWidth: "100%", maxHeight: 140, borderRadius: 6 }} />
                   </>
                 ) : (
                   <p style={{ margin: 0, fontSize: 12, color: "#999" }}>No image yet</p>

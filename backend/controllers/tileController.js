@@ -1,4 +1,5 @@
 import Tile from "../models/Tile.js";
+import { uploadToBlob } from "../utils/uploadToBlob.js";
 
 export const createTile = async (req, res, next) => {
   try {
@@ -13,7 +14,7 @@ export const createTile = async (req, res, next) => {
       fullDescription,
       lessons,
     } = req.body;
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+    const imageUrl = req.file ? await uploadToBlob(req.file) : undefined;
 
     // Parse lessons if it's a stringified JSON
     let parsedLessons = lessons;
@@ -80,7 +81,7 @@ export const updateTile = async (req, res, next) => {
       }
     }
 
-    if (req.file) updates.imageUrl = `/uploads/${req.file.filename}`;
+    if (req.file) updates.imageUrl = await uploadToBlob(req.file);
     const tile = await Tile.findByIdAndUpdate(req.params.id, updates, {
       new: true,
       runValidators: true,

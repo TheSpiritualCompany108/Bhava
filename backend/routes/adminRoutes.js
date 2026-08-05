@@ -1,7 +1,5 @@
 import express from "express";
 import multer from "multer";
-import path from "path";
-import { fileURLToPath } from "url";
 import {
   createTile,
   listTiles,
@@ -21,20 +19,9 @@ import { adminLogin } from "../controllers/adminAuthController.js";
 
 const router = express.Router();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const uploadsDir = path.join(__dirname, "..", "uploads");
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-    cb(null, name);
-  },
-});
-
-const upload = multer({ storage });
+// Memory storage: files are held as a buffer and uploaded to Vercel Blob
+// in the controller, since the serverless filesystem is read-only.
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Admin login (unprotected)
 router.get("/", (req, res) =>
