@@ -819,6 +819,14 @@
   letter-spacing: 0.3px;
 }
 
+.dayPurpose {
+  font-size: 0.78rem;
+  color: #6A625A;
+  font-family: 'Inter', sans-serif;
+  margin: 2px 0 0;
+  line-height: 1.4;
+}
+
 .dayInfo {
   flex: 1;
   display: flex;

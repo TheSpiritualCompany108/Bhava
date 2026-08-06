@@ -31,11 +31,33 @@
   max-width: 560px;
 }
 
+.homeMainBrandMark {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.homeMainDroplet {
+  width: 100px;
+  height: auto;
+  margin-bottom: 10px;
+  margin-left:100px;
+}
+
+.homeMainBrandLabel {
+  color: #C0671E;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin-left: 120px;
+}
+
 .homeMainHeroTitle {
-  font-size: 64px;
+  font-size: 34px;
   font-weight: 400;
   margin-bottom: 14px;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .homeMainElevateText {
@@ -43,7 +65,7 @@
   font-family: 'Canela', Cormorant, serif;
   font-weight: 900;
   display: block;
-  font-size: 68px;
+  font-size: 36px;
   letter-spacing: -1px;
 }
 
@@ -52,13 +74,13 @@
   font-family: 'Canela', Cormorant, serif;
   font-weight: 700;
   display: block;
-  font-size: 62px;
+  font-size: 32px;
 }
 
 .homeMainHeroDescription {
   font-size: 19px;
   gap: 10px;
-  color: #3d4d42;
+  color: #4A0B1D;
   margin-bottom: 20px;
   line-height: 1.6;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
@@ -67,7 +89,7 @@
 
 .homeMainHeroDescription1 {
   font-size: 16px;
-  color: #3d4d42;
+  color: #4A0B1D;
   margin-bottom: 20px;
   line-height: 1.6;
   font-family: "Neue Haas Grotesk", Inter, sans-serif;
@@ -151,7 +173,7 @@
 
 .slideDescription {
   font-size: 17px;
-  color: #3d4d42;
+  color: #4A0B1D;
   margin-bottom: 24px;
   line-height: 1.6;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;

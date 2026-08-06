@@ -2,67 +2,28 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DhyanChallenge21.module.css";
 
-const phases = [
-  {
-    name: "Foundation",
-    dayRange: "Days 1–7",
-    number: 1,
-    color: "#2A1845",
-    tagline: "Build the Seat, the Breath, the Intention",
-    description:
-      "Learn to sit still and observe without reacting. Establish the daily ritual and plant the seed of inner discipline.",
-    universalMessage:
-      "Every great practice begins with a single, honest moment of stillness.",
-    days: [
-      { day: 1,  theme: "Sankalpa — Sacred Intention",  mantra: "Om Tat Sat",                  duration: "15:00" },
-      { day: 2,  theme: "Breath Awareness",              mantra: "So Hum",                      duration: "17:00" },
-      { day: 3,  theme: "Posture & Stillness",           mantra: "Om Shanti Shanti Shanti",     duration: "15:00" },
-      { day: 4,  theme: "Counting the Breath",           mantra: "Om",                          duration: "21:00" },
-      { day: 5,  theme: "Introduction to Pranayama",     mantra: "Om Pranaya Namah",            duration: "15:00" },
-      { day: 6,  theme: "Observing Thoughts",            mantra: "Om Sakshi Bhavaya Namah",     duration: "15:00" },
-      { day: 7,  theme: "Silence Integration",           mantra: "Silent Meditation",           duration: "20:00" },
-    ],
-  },
-  {
-    name: "Deepening",
-    dayRange: "Days 8–14",
-    number: 2,
-    color: "#2A1845",
-    tagline: "Mantra, Chakra & Emotional Observation",
-    description:
-      "Introduce mantra and chakra awareness. Extend stillness to 20 minutes. Observe emotions without resistance.",
-    universalMessage:
-      "The mantra is a rope that leads the wandering mind back to the divine.",
-    days: [
-      { day: 8,  theme: "Mantra Introduction",           mantra: "Om Namah Shivaya",                 duration: "15:00" },
-      { day: 9,  theme: "Chakra Awareness",              mantra: "Om Hreem Namah",                   duration: "20:00" },
-      { day: 10, theme: "Extended Stillness",            mantra: "Mental OM Awareness",              duration: "20:00" },
-      { day: 11, theme: "Trataka — Candle Gazing",       mantra: "Om Jyotir Namah",                  duration: "15:00" },
-      { day: 12, theme: "Emotional Observation",         mantra: "Om Shreem",                        duration: "15:00" },
-      { day: 13, theme: "Gratitude Awareness",           mantra: "Om Krutagyaya Namah",              duration: "20:00" },
-      { day: 14, theme: "Deep Pranayama",                mantra: "Om Namo Bhagavate Vasudevaya",     duration: "20:00" },
-    ],
-  },
-  {
-    name: "Mastery",
-    dayRange: "Days 15–21",
-    number: 3,
-    color: "#2A1845",
-    tagline: "Self-Led Practice and Final Integration",
-    description:
-      "Longer silence, witness consciousness, and complete integration at 30 minutes. The practice becomes your own.",
-    universalMessage:
-      "When the student becomes still enough, the teacher within speaks.",
-    days: [
-      { day: 15, theme: "Longer Silence",                mantra: "Om (Long Chant)",             duration: "25:00" },
-      { day: 16, theme: "Witness Consciousness",         mantra: "Om Sakshi",                   duration: "25:00" },
-      { day: 17, theme: "Inner Sound Awareness",         mantra: "Silent Inner OM Listening",   duration: "25:00" },
-      { day: 18, theme: "Kundalini Awareness",           mantra: "Om Aim Hreem Kleem",          duration: "25:00" },
-      { day: 19, theme: "Non-Attachment Practice",       mantra: "Om Vairagyaya Namah",         duration: "25:00" },
-      { day: 20, theme: "Extended Stillness (30 Min)",   mantra: "Om Param Shantaye Namah",     duration: "30:00" },
-      { day: 21, theme: "Integration & Commitment",      mantra: "Om Purnamadah Purnamidam",    duration: "30:00" },
-    ],
-  },
+const mantras = [
+  { number: 1,  name: "Gayatri Mantra",                                    deity: "Savitr (Rig Veda)",  duration: "34 min" },
+  { number: 2,  name: "Maha Mrityunjaya Mantra",                           deity: "Shiva (Rig Veda)",   duration: "34 min" },
+  { number: 3,  name: "Om (Pranava Mantra)",                               deity: "Supreme Brahman",    duration: "34 min" },
+  { number: 4,  name: "Shanti Mantras",                                    deity: "Upanishads",         duration: "34 min" },
+  { number: 5,  name: "Guru Mantra (Guru Brahma...)",                      deity: "Guru",               duration: "34 min" },
+  { number: 6,  name: "Ganesha Mantra – Om Gam Ganapataye Namah",          deity: "Ganesha",            duration: "34 min" },
+  { number: 7,  name: "Shiva Panchakshari – Om Namah Shivaya",             deity: "Shiva",              duration: "34 min" },
+  { number: 8,  name: "Vishnu Mantra – Om Namo Narayanaya",                deity: "Vishnu",             duration: "34 min" },
+  { number: 9,  name: "Hare Krishna Maha Mantra",                          deity: "Krishna",            duration: "34 min" },
+  { number: 10, name: "Rama Taraka Mantra – Shri Ram Jai Ram Jai Jai Ram", deity: "Rama",               duration: "34 min" },
+  { number: 11, name: "Hanuman Mantra – Om Hanumate Namah",                deity: "Hanuman",            duration: "34 min" },
+  { number: 12, name: "Durga Mantra – Om Dum Durgayei Namah",              deity: "Durga",              duration: "34 min" },
+  { number: 13, name: "Lakshmi Mantra – Om Shreem Mahalakshmyai Namah",    deity: "Lakshmi",            duration: "34 min" },
+  { number: 14, name: "Saraswati Mantra – Om Aim Saraswatyai Namah",       deity: "Saraswati",          duration: "34 min" },
+  { number: 15, name: "Navagraha Mantra",                                  deity: "Nine Planets",       duration: "34 min" },
+  { number: 16, name: "Surya Mantra – Om Suryaya Namah",                   deity: "Surya",              duration: "34 min" },
+  { number: 17, name: "Aditya Hridayam",                                   deity: "Ramayana",           duration: "34 min" },
+  { number: 18, name: "Vishnu Sahasranama",                                deity: "Mahabharata",        duration: "34 min" },
+  { number: 19, name: "Shiva Tandava Stotram",                             deity: "Ravana",             duration: "34 min" },
+  { number: 20, name: "Hanuman Chalisa",                                   deity: "Tulsidas",           duration: "34 min" },
+  { number: 21, name: "Bhagavad Gita Prayer (Sarva Dharma Verse – 18.66)", deity: "Krishna",            duration: "34 min" },
 ];
 
 const completionBenefits = [
@@ -75,16 +36,11 @@ const completionBenefits = [
 
 function DhyanChallenge21() {
   const navigate = useNavigate();
-  const [expandedPhase, setExpandedPhase] = useState(null);
   const [playingDay, setPlayingDay] = useState(null);
 
-  const togglePhase = (idx) => {
-    setExpandedPhase(expandedPhase === idx ? null : idx);
-  };
-
-  const togglePlay = (dayKey, e) => {
+  const togglePlay = (num, e) => {
     e.stopPropagation();
-    setPlayingDay(playingDay === dayKey ? null : dayKey);
+    setPlayingDay(playingDay === num ? null : num);
   };
 
   return (
@@ -134,85 +90,44 @@ function DhyanChallenge21() {
 
         {/* Right Side */}
         <div className={styles.rightWrapper}>
-          <p className={styles.sessionsCount}>3 Phases · 21 Days</p>
+          <p className={styles.sessionsCount}>21 Sacred Mantras</p>
 
           <div className={styles.rightPanel}>
-            {phases.map((phase, idx) => (
-              <div key={phase.name} className={styles.sessionBlock}>
-
-                {/* Phase Header — clickable */}
-                <button
-                  className={styles.stageHeader}
-                  onClick={() => togglePhase(idx)}
-                >
-                  <span
-                    className={styles.stageBadge}
-                    style={{ background: phase.color }}
+            <div className={styles.dayList}>
+              {mantras.map((m) => {
+                const isPlaying = playingDay === m.number;
+                return (
+                  <div
+                    key={m.number}
+                    className={`${styles.dayRow} ${isPlaying ? styles.dayRowActive : ""}`}
                   >
-                    Phase {phase.number}
-                  </span>
-                  <div className={styles.stageHeaderInfo}>
-                    <span className={styles.stageHeaderName}>{phase.name}</span>
-                    <span className={styles.stageHeaderDays}>{phase.dayRange}</span>
-                  </div>
-                  <span className={styles.stageHeaderTagline}>
-                    "{phase.tagline}"
-                  </span>
-                  <span className={styles.chevron}>
-                    {expandedPhase === idx ? "▲" : "▼"}
-                  </span>
-                </button>
+                    <span className={styles.dayBadge}>Day {m.number}</span>
 
-                {/* Expanded Day-wise Audio List */}
-                {expandedPhase === idx && (
-                  <div className={styles.dayListWrapper}>
-                    <p className={styles.stagePurposeInline}>{phase.description}</p>
-
-                    <div className={styles.dayList}>
-                      {phase.days.map((d) => {
-                        const key = `${phase.number}-${d.day}`;
-                        const isPlaying = playingDay === key;
-                        return (
-                          <div
-                            key={d.day}
-                            className={`${styles.dayRow} ${isPlaying ? styles.dayRowActive : ""}`}
-                          >
-                            <span className={styles.dayBadge}>Day {d.day}</span>
-
-                            <div className={styles.dayInfo}>
-                              <p className={styles.dayTheme}>{d.theme}</p>
-                              <p className={styles.dayVerse}>{d.mantra}</p>
-                            </div>
-
-                            <div className={styles.audioRight}>
-                              {isPlaying && (
-                                <div className={styles.waveBar}>
-                                  <span /><span /><span /><span /><span />
-                                </div>
-                              )}
-                              <span className={styles.dayDuration}>{d.duration}</span>
-                              <button
-                                className={`${styles.playCircleDay} ${isPlaying ? styles.playCircleDayActive : ""}`}
-                                onClick={(e) => togglePlay(key, e)}
-                              >
-                                <span className="material-symbols-outlined">
-                                  {isPlaying ? "pause" : "play_arrow"}
-                                </span>
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
+                    <div className={styles.dayInfo}>
+                      <p className={styles.dayTheme}>{m.name}</p>
+                      <p className={styles.dayVerse}>{m.deity}</p>
                     </div>
 
-                    <p className={styles.universalMsgInline}>
-                      "{phase.universalMessage}"
-                    </p>
+                    <div className={styles.audioRight}>
+                      {isPlaying && (
+                        <div className={styles.waveBar}>
+                          <span /><span /><span /><span /><span />
+                        </div>
+                      )}
+                      <span className={styles.dayDuration}>{m.duration}</span>
+                      <button
+                        className={`${styles.playCircleDay} ${isPlaying ? styles.playCircleDayActive : ""}`}
+                        onClick={(e) => togglePlay(m.number, e)}
+                      >
+                        <span className="material-symbols-outlined">
+                          {isPlaying ? "pause" : "play_arrow"}
+                        </span>
+                      </button>
+                    </div>
                   </div>
-                )}
-
-              </div>
-            ))}
+                );
+              })}
+            </div>
           </div>
         </div>
 

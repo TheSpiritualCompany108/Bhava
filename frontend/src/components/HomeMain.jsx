@@ -134,6 +134,11 @@ function HomeMain() {
               animate="center"
               exit="exit"
             >
+              <div className={styles.homeMainBrandMark}>
+                <img src="/drop.logo.png" alt="Bhava" className={styles.homeMainDroplet} />
+                <span className={styles.homeMainBrandLabel}>BHAVA</span>
+              </div>
+
               <h1 className={styles.homeMainHeroTitle}>
                 <span className={styles.homeMainElevateText}> Awaken Bhava : Live Divine</span>
                 <span className={styles.homeMainHighlight}>Every Day</span>
