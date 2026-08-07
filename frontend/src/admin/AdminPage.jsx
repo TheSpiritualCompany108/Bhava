@@ -19,13 +19,21 @@ export default function AdminPage() {
     "Products"
   ];
   const [activeCategory, setActiveCategory] = useState(categories[0]);
-  const [section, setSection] = useState("tiles"); // "tiles" | "quotes"
+  const [section, setSection] = useState("tiles"); // "tiles" | "quotes" | "mantraAudio" | "dhyanAudio"
   const [quotes, setQuotes] = useState([]);
   const [quotesLoading, setQuotesLoading] = useState(true);
   const [quotesError, setQuotesError] = useState("");
   const [quoteForm, setQuoteForm] = useState({ reflection: "", text: "", reference: "", isActive: false });
   const [editingQuoteId, setEditingQuoteId] = useState(null);
   const [showQuoteForm, setShowQuoteForm] = useState(false);
+  const [mantraAudioMap, setMantraAudioMap] = useState({});
+  const [mantraAudioLoading, setMantraAudioLoading] = useState(true);
+  const [mantraAudioError, setMantraAudioError] = useState("");
+  const [uploadingDay, setUploadingDay] = useState(null);
+  const [dhyanAudioMap, setDhyanAudioMap] = useState({});
+  const [dhyanAudioLoading, setDhyanAudioLoading] = useState(true);
+  const [dhyanAudioError, setDhyanAudioError] = useState("");
+  const [uploadingDhyanDay, setUploadingDhyanDay] = useState(null);
   const [form, setForm] = useState({ 
     title: "", 
     subtitle: "", 
@@ -64,6 +72,8 @@ export default function AdminPage() {
     const token = localStorage.getItem("bhava_token");
     if (!token) { navigate("/admin/login"); return; }
     if (section === "quotes") fetchQuotes();
+    if (section === "mantraAudio") fetchMantraAudio();
+    if (section === "dhyanAudio") fetchDhyanAudio();
   }, [section]);
 
   const fetchQuotes = async () => {
@@ -133,6 +143,128 @@ export default function AdminPage() {
     const res = await fetch(`${API_BASE}/api/admin/quotes/${id}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
     const json = await res.json();
     if (json.success) fetchQuotes(); else alert(json.message || "Error");
+  };
+
+  const fetchMantraAudio = async () => {
+    setMantraAudioLoading(true);
+    setMantraAudioError("");
+    try {
+      const token = localStorage.getItem("bhava_token");
+      const res = await fetch(`${API_BASE}/api/admin/mantra-audio`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const map = {};
+        (json.data || []).forEach((item) => { map[item.day] = item; });
+        setMantraAudioMap(map);
+      } else if (res.status === 401 || res.status === 403) {
+        navigate("/admin/login");
+      } else {
+        setMantraAudioError(json.message || "Failed to load mantra audio");
+      }
+    } catch (err) {
+      setMantraAudioError(err.message || "Network error");
+    } finally {
+      setMantraAudioLoading(false);
+    }
+  };
+
+  const handleMantraAudioUpload = async (day, file) => {
+    if (!file) return;
+    setUploadingDay(day);
+    setMantraAudioError("");
+    const token = localStorage.getItem("bhava_token");
+    const fd = new FormData();
+    fd.append("audio", file);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/mantra-audio/${day}`, {
+        method: "PUT",
+        body: fd,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setMantraAudioMap((prev) => ({ ...prev, [day]: json.data }));
+      } else {
+        setMantraAudioError(json.message || `Error ${res.status}`);
+      }
+    } catch (err) {
+      setMantraAudioError(err.message || "Network error");
+    } finally {
+      setUploadingDay(null);
+    }
+  };
+
+  const handleMantraAudioDelete = async (day) => {
+    if (!confirm(`Delete the audio for Day ${day}?`)) return;
+    const token = localStorage.getItem("bhava_token");
+    const res = await fetch(`${API_BASE}/api/admin/mantra-audio/${day}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    const json = await res.json();
+    if (json.success) {
+      setMantraAudioMap((prev) => { const next = { ...prev }; delete next[day]; return next; });
+    } else {
+      alert(json.message || "Error");
+    }
+  };
+
+  const fetchDhyanAudio = async () => {
+    setDhyanAudioLoading(true);
+    setDhyanAudioError("");
+    try {
+      const token = localStorage.getItem("bhava_token");
+      const res = await fetch(`${API_BASE}/api/admin/dhyan-audio`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const map = {};
+        (json.data || []).forEach((item) => { map[item.day] = item; });
+        setDhyanAudioMap(map);
+      } else if (res.status === 401 || res.status === 403) {
+        navigate("/admin/login");
+      } else {
+        setDhyanAudioError(json.message || "Failed to load dhyan audio");
+      }
+    } catch (err) {
+      setDhyanAudioError(err.message || "Network error");
+    } finally {
+      setDhyanAudioLoading(false);
+    }
+  };
+
+  const handleDhyanAudioUpload = async (day, file) => {
+    if (!file) return;
+    setUploadingDhyanDay(day);
+    setDhyanAudioError("");
+    const token = localStorage.getItem("bhava_token");
+    const fd = new FormData();
+    fd.append("audio", file);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/dhyan-audio/${day}`, {
+        method: "PUT",
+        body: fd,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setDhyanAudioMap((prev) => ({ ...prev, [day]: json.data }));
+      } else {
+        setDhyanAudioError(json.message || `Error ${res.status}`);
+      }
+    } catch (err) {
+      setDhyanAudioError(err.message || "Network error");
+    } finally {
+      setUploadingDhyanDay(null);
+    }
+  };
+
+  const handleDhyanAudioDelete = async (day) => {
+    if (!confirm(`Delete the audio for Day ${day}?`)) return;
+    const token = localStorage.getItem("bhava_token");
+    const res = await fetch(`${API_BASE}/api/admin/dhyan-audio/${day}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    const json = await res.json();
+    if (json.success) {
+      setDhyanAudioMap((prev) => { const next = { ...prev }; delete next[day]; return next; });
+    } else {
+      alert(json.message || "Error");
+    }
   };
 
   const fetchTiles = async () => {
@@ -355,7 +487,7 @@ export default function AdminPage() {
     <div style={{ display: "flex", minHeight: "100vh", background: "#f7f4f0" }}>
       {/* TOP NAV */}
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "12px 20px", zIndex: 100, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {section === "quotes" ? "Quotes" : activeCategory}</h2>
+        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {section === "quotes" ? "Quotes" : section === "mantraAudio" ? "108-Day Mantra" : section === "dhyanAudio" ? "21-Day Dhyān" : activeCategory}</h2>
         <button onClick={logout} style={{ padding: "8px 16px", background: "#E07B39", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}>Logout</button>
       </div>
 
@@ -371,6 +503,8 @@ export default function AdminPage() {
         <h3 style={{ marginTop: 20, color: "#4A0B1D", fontSize: 14, borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>Content</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
           <li onClick={() => setSection("quotes")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "quotes" ? "#E07B39" : 'transparent', color: section === "quotes" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>📜 Quotes</li>
+          <li onClick={() => setSection("mantraAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "mantraAudio" ? "#E07B39" : 'transparent', color: section === "mantraAudio" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🎵 108-Day Mantra</li>
+          <li onClick={() => setSection("dhyanAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "dhyanAudio" ? "#E07B39" : 'transparent', color: section === "dhyanAudio" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🧘 21-Day Dhyān</li>
         </ul>
       </aside>
 
@@ -434,6 +568,86 @@ export default function AdminPage() {
             </div>
           ))}
           {!quotesLoading && quotes.length === 0 && <p style={{ color: "#999", fontSize: 13 }}>No quotes yet. Add one above.</p>}
+        </div>
+      </main>
+      ) : section === "mantraAudio" ? (
+      /* CENTER - 108-DAY MANTRA AUDIO */
+      <main style={{ flex: 1, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
+        {mantraAudioLoading && <div style={{ padding: 12, background: '#fffbe6', borderRadius: 6, marginBottom: 12 }}>Loading mantra audio…</div>}
+        {mantraAudioError && <div style={{ padding: 12, background: '#ffe6e6', color: '#900', borderRadius: 6, marginBottom: 12 }}>{mantraAudioError}</div>}
+
+        <h3 style={{ marginTop: 0, color: "#4A0B1D" }}>108-Day Mantra Sādhana — Audio</h3>
+        <p style={{ color: "#666", fontSize: 13, marginTop: -8, marginBottom: 16 }}>Upload one audio file per day. Uploading a new file for a day replaces the existing one.</p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {Array.from({ length: 108 }, (_, i) => i + 1).map((day) => {
+            const entry = mantraAudioMap[day];
+            const isUploading = uploadingDay === day;
+            return (
+              <div key={day} style={{ background: "#fff", padding: 14, borderRadius: 8, border: entry ? "1px solid #4CAF50" : "1px solid #ddd", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+                <span style={{ minWidth: 60, fontWeight: 700, color: "#4A0B1D", fontSize: 13 }}>Day {day}</span>
+
+                {entry ? (
+                  <>
+                    <audio controls src={resolveImageUrl(entry.audioUrl)} style={{ height: 34, flex: "1 1 260px" }} />
+                    <label style={{ padding: "6px 12px", background: "#2196F3", color: "#fff", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
+                      {isUploading ? "Uploading…" : "Replace"}
+                      <input type="file" accept="audio/*" style={{ display: "none" }} disabled={isUploading} onChange={(e) => handleMantraAudioUpload(day, e.target.files[0])} />
+                    </label>
+                    <button onClick={() => handleMantraAudioDelete(day)} style={{ padding: "6px 12px", background: "#ff6b6b", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12 }}>Delete</button>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ flex: "1 1 260px", color: "#999", fontSize: 12 }}>No audio uploaded</span>
+                    <label style={{ padding: "6px 12px", background: "#E07B39", color: "#fff", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
+                      {isUploading ? "Uploading…" : "Upload"}
+                      <input type="file" accept="audio/*" style={{ display: "none" }} disabled={isUploading} onChange={(e) => handleMantraAudioUpload(day, e.target.files[0])} />
+                    </label>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </main>
+      ) : section === "dhyanAudio" ? (
+      /* CENTER - 21-DAY DHYAN AUDIO */
+      <main style={{ flex: 1, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
+        {dhyanAudioLoading && <div style={{ padding: 12, background: '#fffbe6', borderRadius: 6, marginBottom: 12 }}>Loading dhyan audio…</div>}
+        {dhyanAudioError && <div style={{ padding: 12, background: '#ffe6e6', color: '#900', borderRadius: 6, marginBottom: 12 }}>{dhyanAudioError}</div>}
+
+        <h3 style={{ marginTop: 0, color: "#4A0B1D" }}>21-Day Dhyān Challenge — Audio</h3>
+        <p style={{ color: "#666", fontSize: 13, marginTop: -8, marginBottom: 16 }}>Upload one audio file per day. Uploading a new file for a day replaces the existing one.</p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {Array.from({ length: 21 }, (_, i) => i + 1).map((day) => {
+            const entry = dhyanAudioMap[day];
+            const isUploading = uploadingDhyanDay === day;
+            return (
+              <div key={day} style={{ background: "#fff", padding: 14, borderRadius: 8, border: entry ? "1px solid #4CAF50" : "1px solid #ddd", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+                <span style={{ minWidth: 60, fontWeight: 700, color: "#4A0B1D", fontSize: 13 }}>Day {day}</span>
+
+                {entry ? (
+                  <>
+                    <audio controls src={resolveImageUrl(entry.audioUrl)} style={{ height: 34, flex: "1 1 260px" }} />
+                    <label style={{ padding: "6px 12px", background: "#2196F3", color: "#fff", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
+                      {isUploading ? "Uploading…" : "Replace"}
+                      <input type="file" accept="audio/*" style={{ display: "none" }} disabled={isUploading} onChange={(e) => handleDhyanAudioUpload(day, e.target.files[0])} />
+                    </label>
+                    <button onClick={() => handleDhyanAudioDelete(day)} style={{ padding: "6px 12px", background: "#ff6b6b", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12 }}>Delete</button>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ flex: "1 1 260px", color: "#999", fontSize: 12 }}>No audio uploaded</span>
+                    <label style={{ padding: "6px 12px", background: "#E07B39", color: "#fff", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
+                      {isUploading ? "Uploading…" : "Upload"}
+                      <input type="file" accept="audio/*" style={{ display: "none" }} disabled={isUploading} onChange={(e) => handleDhyanAudioUpload(day, e.target.files[0])} />
+                    </label>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       </main>
       ) : (

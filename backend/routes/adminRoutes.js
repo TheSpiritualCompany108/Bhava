@@ -14,6 +14,16 @@ import {
   updateQuote,
   deleteQuote,
 } from "../controllers/quoteController.js";
+import {
+  upsertMantraAudio,
+  listMantraAudio,
+  deleteMantraAudio,
+} from "../controllers/mantraAudioController.js";
+import {
+  upsertDhyanAudio,
+  listDhyanAudio,
+  deleteDhyanAudio,
+} from "../controllers/dhyanAudioController.js";
 import protect, { adminOnly } from "../middleware/authMiddleware.js";
 import { adminLogin } from "../controllers/adminAuthController.js";
 
@@ -58,5 +68,27 @@ router.post("/quotes", protect, adminOnly, createQuote);
 router.get("/quotes/:id", protect, adminOnly, getQuote);
 router.put("/quotes/:id", protect, adminOnly, updateQuote);
 router.delete("/quotes/:id", protect, adminOnly, deleteQuote);
+
+// 108-Day Mantra Sādhana audio — admin protected
+router.get("/mantra-audio", protect, adminOnly, listMantraAudio);
+router.put(
+  "/mantra-audio/:day",
+  protect,
+  adminOnly,
+  upload.single("audio"),
+  upsertMantraAudio,
+);
+router.delete("/mantra-audio/:day", protect, adminOnly, deleteMantraAudio);
+
+// 21-Day Dhyan Challenge audio — admin protected
+router.get("/dhyan-audio", protect, adminOnly, listDhyanAudio);
+router.put(
+  "/dhyan-audio/:day",
+  protect,
+  adminOnly,
+  upload.single("audio"),
+  upsertDhyanAudio,
+);
+router.delete("/dhyan-audio/:day", protect, adminOnly, deleteDhyanAudio);
 
 export default router;

@@ -1,6 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MantraSadhana108.module.css";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const resolveAudioUrl = (url) => (url?.startsWith("http") ? url : API_BASE + url);
+
+const formatDuration = (seconds) => {
+  if (!Number.isFinite(seconds)) return "";
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+};
 
 const phases = [
   {
@@ -242,14 +252,61 @@ function MantraSadhana108() {
   const navigate = useNavigate();
   const [expandedPhase, setExpandedPhase] = useState(null);
   const [playingDay, setPlayingDay] = useState(null);
+  const [audioMap, setAudioMap] = useState({});
+  const [durationMap, setDurationMap] = useState({});
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio();
+    audioRef.current.addEventListener("ended", () => setPlayingDay(null));
+
+    let cancelled = false;
+    fetch(`${API_BASE}/api/mantra-audio`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!cancelled && json?.success && Array.isArray(json.data)) {
+          const map = {};
+          json.data.forEach((item) => { map[item.day] = item.audioUrl; });
+          setAudioMap(map);
+
+          // Probe each file's real length so the list shows actual runtime
+          json.data.forEach((item) => {
+            const probe = new Audio(resolveAudioUrl(item.audioUrl));
+            probe.addEventListener("loadedmetadata", () => {
+              if (cancelled) return;
+              setDurationMap((prev) => ({ ...prev, [item.day]: probe.duration }));
+            });
+          });
+        }
+      })
+      .catch(() => {
+        // no audio available yet — play buttons stay inert
+      });
+
+    return () => {
+      cancelled = true;
+      audioRef.current?.pause();
+    };
+  }, []);
 
   const togglePhase = (idx) => {
     setExpandedPhase(expandedPhase === idx ? null : idx);
   };
 
-  const togglePlay = (dayKey, e) => {
+  const togglePlay = (day, e) => {
     e.stopPropagation();
-    setPlayingDay(playingDay === dayKey ? null : dayKey);
+    const url = audioMap[day];
+    if (!url) return;
+
+    if (playingDay === day) {
+      audioRef.current.pause();
+      setPlayingDay(null);
+      return;
+    }
+
+    audioRef.current.src = resolveAudioUrl(url);
+    audioRef.current.play();
+    setPlayingDay(day);
   };
 
   return (
@@ -335,8 +392,8 @@ function MantraSadhana108() {
 
                     <div className={styles.dayList}>
                       {item.days.map((d) => {
-                        const key = `${item.id}-${d.day}`;
-                        const isPlaying = playingDay === key;
+                        const isPlaying = playingDay === d.day;
+                        const hasAudio = Boolean(audioMap[d.day]);
                         return (
                           <div
                             key={d.day}
@@ -355,10 +412,13 @@ function MantraSadhana108() {
                                   <span /><span /><span /><span /><span />
                                 </div>
                               )}
-                              <span className={styles.dayDuration}>{d.duration}</span>
+                              <span className={styles.dayDuration}>{formatDuration(durationMap[d.day])}</span>
                               <button
                                 className={`${styles.playCircleDay} ${isPlaying ? styles.playCircleDayActive : ""}`}
-                                onClick={(e) => togglePlay(key, e)}
+                                onClick={(e) => togglePlay(d.day, e)}
+                                disabled={!hasAudio}
+                                title={hasAudio ? "" : "Audio not uploaded yet"}
+                                style={!hasAudio ? { opacity: 0.35, cursor: "not-allowed" } : undefined}
                               >
                                 <span className="material-symbols-outlined">
                                   {isPlaying ? "pause" : "play_arrow"}

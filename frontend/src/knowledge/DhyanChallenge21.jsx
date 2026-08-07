@@ -1,6 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DhyanChallenge21.module.css";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const resolveAudioUrl = (url) => (url?.startsWith("http") ? url : API_BASE + url);
+
+const formatDuration = (seconds) => {
+  if (!Number.isFinite(seconds)) return "";
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+};
 
 const mantras = [
   { number: 1,  name: "Gayatri Mantra",                                    deity: "Savitr (Rig Veda)",  duration: "34 min" },
@@ -37,10 +47,57 @@ const completionBenefits = [
 function DhyanChallenge21() {
   const navigate = useNavigate();
   const [playingDay, setPlayingDay] = useState(null);
+  const [audioMap, setAudioMap] = useState({});
+  const [durationMap, setDurationMap] = useState({});
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio();
+    audioRef.current.addEventListener("ended", () => setPlayingDay(null));
+
+    let cancelled = false;
+    fetch(`${API_BASE}/api/dhyan-audio`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!cancelled && json?.success && Array.isArray(json.data)) {
+          const map = {};
+          json.data.forEach((item) => { map[item.day] = item.audioUrl; });
+          setAudioMap(map);
+
+          // Probe each file's real length so the list shows actual runtime
+          json.data.forEach((item) => {
+            const probe = new Audio(resolveAudioUrl(item.audioUrl));
+            probe.addEventListener("loadedmetadata", () => {
+              if (cancelled) return;
+              setDurationMap((prev) => ({ ...prev, [item.day]: probe.duration }));
+            });
+          });
+        }
+      })
+      .catch(() => {
+        // no audio available yet — play buttons stay inert
+      });
+
+    return () => {
+      cancelled = true;
+      audioRef.current?.pause();
+    };
+  }, []);
 
   const togglePlay = (num, e) => {
     e.stopPropagation();
-    setPlayingDay(playingDay === num ? null : num);
+    const url = audioMap[num];
+    if (!url) return;
+
+    if (playingDay === num) {
+      audioRef.current.pause();
+      setPlayingDay(null);
+      return;
+    }
+
+    audioRef.current.src = resolveAudioUrl(url);
+    audioRef.current.play();
+    setPlayingDay(num);
   };
 
   return (
@@ -96,6 +153,7 @@ function DhyanChallenge21() {
             <div className={styles.dayList}>
               {mantras.map((m) => {
                 const isPlaying = playingDay === m.number;
+                const hasAudio = Boolean(audioMap[m.number]);
                 return (
                   <div
                     key={m.number}
@@ -114,10 +172,13 @@ function DhyanChallenge21() {
                           <span /><span /><span /><span /><span />
                         </div>
                       )}
-                      <span className={styles.dayDuration}>{m.duration}</span>
+                      <span className={styles.dayDuration}>{formatDuration(durationMap[m.number])}</span>
                       <button
                         className={`${styles.playCircleDay} ${isPlaying ? styles.playCircleDayActive : ""}`}
                         onClick={(e) => togglePlay(m.number, e)}
+                        disabled={!hasAudio}
+                        title={hasAudio ? "" : "Audio not uploaded yet"}
+                        style={!hasAudio ? { opacity: 0.35, cursor: "not-allowed" } : undefined}
                       >
                         <span className="material-symbols-outlined">
                           {isPlaying ? "pause" : "play_arrow"}

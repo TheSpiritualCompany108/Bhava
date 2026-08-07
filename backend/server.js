@@ -80,6 +80,8 @@ import orderRoutes from "./routes/orderRoutes.js";
 import careerRoutes from "./routes/careerRoutes.js";
 import tilesRoutes from "./routes/tilesRoutes.js";
 import quotesRoutes from "./routes/quotesRoutes.js";
+import mantraAudioRoutes from "./routes/mantraAudioRoutes.js";
+import dhyanAudioRoutes from "./routes/dhyanAudioRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
@@ -136,6 +138,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/career", careerRoutes);
 app.use("/api/tiles", tilesRoutes);
 app.use("/api/quotes", quotesRoutes);
+app.use("/api/mantra-audio", mantraAudioRoutes);
+app.use("/api/dhyan-audio", dhyanAudioRoutes);
 app.use("/api/admin", adminRoutes);
 
 // Health check
