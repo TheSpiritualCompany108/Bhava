@@ -175,6 +175,11 @@ const phases = [
   },
 ];
 
+const allDays = phases.flatMap((p) => p.days.map((d) => ({ ...d, phaseIdx: phases.indexOf(p) })));
+
+const SAVED_KEY = "bhava_saved_practices";
+const PRACTICE_SLUG = "mantra-sadhana-108";
+
 const completionBenefits = [
   {
     title: "Unshakeable Discipline",
@@ -254,11 +259,55 @@ function MantraSadhana108() {
   const [playingDay, setPlayingDay] = useState(null);
   const [audioMap, setAudioMap] = useState({});
   const [durationMap, setDurationMap] = useState({});
+  const [currentTime, setCurrentTime] = useState(0);
+  const [trackDuration, setTrackDuration] = useState(0);
+  const [isSaved, setIsSaved] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SAVED_KEY) || "[]");
+      return saved.includes(PRACTICE_SLUG);
+    } catch {
+      return false;
+    }
+  });
+  const [linkCopied, setLinkCopied] = useState(false);
   const audioRef = useRef(null);
+  const sequentialRef = useRef(false);
+  const playingDayRef = useRef(null);
+  const audioMapRef = useRef({});
+  audioMapRef.current = audioMap;
+
+  const playDay = (day) => {
+    const url = audioMapRef.current[day];
+    if (!url) return;
+    audioRef.current.src = resolveAudioUrl(url);
+    audioRef.current.play();
+    playingDayRef.current = day;
+    setPlayingDay(day);
+
+    const entry = allDays.find((d) => d.day === day);
+    if (entry) setExpandedPhase(entry.phaseIdx);
+  };
+
+  const stopPlayback = () => {
+    sequentialRef.current = false;
+    playingDayRef.current = null;
+    setPlayingDay(null);
+  };
 
   useEffect(() => {
     audioRef.current = new Audio();
-    audioRef.current.addEventListener("ended", () => setPlayingDay(null));
+    audioRef.current.addEventListener("timeupdate", () => setCurrentTime(audioRef.current.currentTime));
+    audioRef.current.addEventListener("loadedmetadata", () => setTrackDuration(audioRef.current.duration));
+    audioRef.current.addEventListener("ended", () => {
+      const nextDay = sequentialRef.current
+        ? allDays.find((d) => d.day > playingDayRef.current && audioMapRef.current[d.day])?.day
+        : null;
+      if (nextDay) {
+        playDay(nextDay);
+      } else {
+        stopPlayback();
+      }
+    });
 
     let cancelled = false;
     fetch(`${API_BASE}/api/mantra-audio`)
@@ -295,18 +344,70 @@ function MantraSadhana108() {
 
   const togglePlay = (day, e) => {
     e.stopPropagation();
-    const url = audioMap[day];
-    if (!url) return;
+    if (!audioMap[day]) return;
+
+    sequentialRef.current = false; // manual single-track play breaks out of "play all"
 
     if (playingDay === day) {
       audioRef.current.pause();
-      setPlayingDay(null);
+      stopPlayback();
       return;
     }
 
-    audioRef.current.src = resolveAudioUrl(url);
-    audioRef.current.play();
-    setPlayingDay(day);
+    playDay(day);
+  };
+
+  const playAll = () => {
+    if (playingDay) {
+      audioRef.current.pause();
+      stopPlayback();
+      return;
+    }
+    const firstDay = allDays.find((d) => audioMap[d.day])?.day;
+    if (!firstDay) return;
+    sequentialRef.current = true;
+    playDay(firstDay);
+  };
+
+  const handleSeek = (e) => {
+    const time = Number(e.target.value);
+    audioRef.current.currentTime = time;
+    setCurrentTime(time);
+  };
+
+  const toggleSave = () => {
+    let saved = [];
+    try {
+      saved = JSON.parse(localStorage.getItem(SAVED_KEY) || "[]");
+    } catch {
+      saved = [];
+    }
+    const next = isSaved ? saved.filter((s) => s !== PRACTICE_SLUG) : [...saved, PRACTICE_SLUG];
+    localStorage.setItem(SAVED_KEY, JSON.stringify(next));
+    setIsSaved(!isSaved);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: "108-Day Mantra Sādhana — BHAVA",
+      text: "Chant sacred mantras for 108 consecutive days and experience profound inner transformation through sound and devotion.",
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch {
+        // user cancelled the native share sheet — no action needed
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // clipboard unavailable — nothing more we can do silently
+    }
   };
 
   return (
@@ -332,17 +433,17 @@ function MantraSadhana108() {
               className={styles.heroImg}
             />
             <div className={styles.controls}>
-              <button className={styles.controlBtn}>
-                <span className="material-symbols-outlined">play_arrow</span>
-                <span className={styles.controlLabel}>Play</span>
+              <button className={styles.controlBtn} onClick={playAll}>
+                <span className="material-symbols-outlined">{playingDay ? "pause" : "play_arrow"}</span>
+                <span className={styles.controlLabel}>{playingDay ? "Pause" : "Play"}</span>
               </button>
-              <button className={styles.controlBtn}>
-                <span className="material-symbols-outlined">add_circle</span>
-                <span className={styles.controlLabel}>Save</span>
+              <button className={styles.controlBtn} onClick={toggleSave}>
+                <span className="material-symbols-outlined">{isSaved ? "check_circle" : "add_circle"}</span>
+                <span className={styles.controlLabel}>{isSaved ? "Saved" : "Save"}</span>
               </button>
-              <button className={styles.controlBtn}>
-                <span className="material-symbols-outlined">share</span>
-                <span className={styles.controlLabel}>Share</span>
+              <button className={styles.controlBtn} onClick={handleShare}>
+                <span className="material-symbols-outlined">{linkCopied ? "check" : "share"}</span>
+                <span className={styles.controlLabel}>{linkCopied ? "Copied!" : "Share"}</span>
               </button>
             </div>
           </div>
@@ -399,32 +500,47 @@ function MantraSadhana108() {
                             key={d.day}
                             className={`${styles.dayRow} ${isPlaying ? styles.dayRowActive : ""}`}
                           >
-                            <span className={styles.dayBadge}>Day {d.day}</span>
+                            <div className={styles.dayRowTop}>
+                              <span className={styles.dayBadge}>Day {d.day}</span>
 
-                            <div className={styles.dayInfo}>
-                              <p className={styles.dayTheme}>{d.theme}</p>
-                              <p className={styles.dayVerse}>{d.mantra}</p>
-                            </div>
+                              <div className={styles.dayInfo}>
+                                <p className={styles.dayTheme}>{d.theme}</p>
+                                <p className={styles.dayVerse}>{d.mantra}</p>
+                              </div>
 
-                            <div className={styles.audioRight}>
-                              {isPlaying && (
-                                <div className={styles.waveBar}>
-                                  <span /><span /><span /><span /><span />
-                                </div>
-                              )}
-                              <span className={styles.dayDuration}>{formatDuration(durationMap[d.day])}</span>
-                              <button
-                                className={`${styles.playCircleDay} ${isPlaying ? styles.playCircleDayActive : ""}`}
-                                onClick={(e) => togglePlay(d.day, e)}
-                                disabled={!hasAudio}
-                                title={hasAudio ? "" : "Audio not uploaded yet"}
-                                style={!hasAudio ? { opacity: 0.35, cursor: "not-allowed" } : undefined}
-                              >
-                                <span className="material-symbols-outlined">
-                                  {isPlaying ? "pause" : "play_arrow"}
+                              <div className={styles.audioRight}>
+                                <span className={styles.dayDuration}>
+                                  {isPlaying ? formatDuration(trackDuration) : formatDuration(durationMap[d.day])}
                                 </span>
-                              </button>
+                                <button
+                                  className={`${styles.playCircleDay} ${isPlaying ? styles.playCircleDayActive : ""}`}
+                                  onClick={(e) => togglePlay(d.day, e)}
+                                  disabled={!hasAudio}
+                                  title={hasAudio ? "" : "Audio not uploaded yet"}
+                                  style={!hasAudio ? { opacity: 0.35, cursor: "not-allowed" } : undefined}
+                                >
+                                  <span className="material-symbols-outlined">
+                                    {isPlaying ? "pause" : "play_arrow"}
+                                  </span>
+                                </button>
+                              </div>
                             </div>
+
+                            {isPlaying && (
+                              <div className={styles.seekRow}>
+                                <span className={styles.seekTime}>{formatDuration(currentTime)}</span>
+                                <input
+                                  type="range"
+                                  className={styles.seekBar}
+                                  min={0}
+                                  max={trackDuration || 0}
+                                  value={currentTime}
+                                  onChange={handleSeek}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className={styles.seekTime}>{formatDuration(trackDuration)}</span>
+                              </div>
+                            )}
                           </div>
                         );
                       })}

@@ -794,8 +794,8 @@
 
 .dayRow {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  gap: 8px;
   padding: 10px 12px;
   border-radius: 10px;
   background: rgba(42, 24, 69, 0.04);
@@ -807,6 +807,56 @@
 .dayRowActive {
   background: rgba(198, 161, 74, 0.10) !important;
   border: 1px solid rgba(198, 161, 74, 0.30);
+}
+
+.dayRowTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.seekRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 66px;
+}
+
+.seekTime {
+  font-size: 0.7rem;
+  color: #7B5EA7;
+  font-family: 'Inter', sans-serif;
+  min-width: 32px;
+  flex-shrink: 0;
+}
+
+.seekBar {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(42, 24, 69, 0.15);
+  cursor: pointer;
+}
+
+.seekBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #C6A14A;
+  cursor: pointer;
+}
+
+.seekBar::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: #C6A14A;
+  cursor: pointer;
 }
 
 .dayBadge {

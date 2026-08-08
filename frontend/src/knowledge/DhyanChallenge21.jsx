@@ -5,6 +5,9 @@ import styles from "./DhyanChallenge21.module.css";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const resolveAudioUrl = (url) => (url?.startsWith("http") ? url : API_BASE + url);
 
+const SAVED_KEY = "bhava_saved_practices";
+const PRACTICE_SLUG = "dhyan-challenge-21";
+
 const formatDuration = (seconds) => {
   if (!Number.isFinite(seconds)) return "";
   const m = Math.floor(seconds / 60);
@@ -49,11 +52,52 @@ function DhyanChallenge21() {
   const [playingDay, setPlayingDay] = useState(null);
   const [audioMap, setAudioMap] = useState({});
   const [durationMap, setDurationMap] = useState({});
+  const [currentTime, setCurrentTime] = useState(0);
+  const [trackDuration, setTrackDuration] = useState(0);
+  const [isSaved, setIsSaved] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SAVED_KEY) || "[]");
+      return saved.includes(PRACTICE_SLUG);
+    } catch {
+      return false;
+    }
+  });
+  const [linkCopied, setLinkCopied] = useState(false);
   const audioRef = useRef(null);
+  const sequentialRef = useRef(false);
+  const playingDayRef = useRef(null);
+  const audioMapRef = useRef({});
+  audioMapRef.current = audioMap;
+
+  const playDay = (day) => {
+    const url = audioMapRef.current[day];
+    if (!url) return;
+    audioRef.current.src = resolveAudioUrl(url);
+    audioRef.current.play();
+    playingDayRef.current = day;
+    setPlayingDay(day);
+  };
+
+  const stopPlayback = () => {
+    sequentialRef.current = false;
+    playingDayRef.current = null;
+    setPlayingDay(null);
+  };
 
   useEffect(() => {
     audioRef.current = new Audio();
-    audioRef.current.addEventListener("ended", () => setPlayingDay(null));
+    audioRef.current.addEventListener("timeupdate", () => setCurrentTime(audioRef.current.currentTime));
+    audioRef.current.addEventListener("loadedmetadata", () => setTrackDuration(audioRef.current.duration));
+    audioRef.current.addEventListener("ended", () => {
+      const nextDay = sequentialRef.current
+        ? mantras.find((m) => m.number > playingDayRef.current && audioMapRef.current[m.number])?.number
+        : null;
+      if (nextDay) {
+        playDay(nextDay);
+      } else {
+        stopPlayback();
+      }
+    });
 
     let cancelled = false;
     fetch(`${API_BASE}/api/dhyan-audio`)
@@ -86,18 +130,70 @@ function DhyanChallenge21() {
 
   const togglePlay = (num, e) => {
     e.stopPropagation();
-    const url = audioMap[num];
-    if (!url) return;
+    if (!audioMap[num]) return;
+
+    sequentialRef.current = false; // manual single-track play breaks out of "play all"
 
     if (playingDay === num) {
       audioRef.current.pause();
-      setPlayingDay(null);
+      stopPlayback();
       return;
     }
 
-    audioRef.current.src = resolveAudioUrl(url);
-    audioRef.current.play();
-    setPlayingDay(num);
+    playDay(num);
+  };
+
+  const playAll = () => {
+    if (playingDay) {
+      audioRef.current.pause();
+      stopPlayback();
+      return;
+    }
+    const firstDay = mantras.find((m) => audioMap[m.number])?.number;
+    if (!firstDay) return;
+    sequentialRef.current = true;
+    playDay(firstDay);
+  };
+
+  const handleSeek = (e) => {
+    const time = Number(e.target.value);
+    audioRef.current.currentTime = time;
+    setCurrentTime(time);
+  };
+
+  const toggleSave = () => {
+    let saved = [];
+    try {
+      saved = JSON.parse(localStorage.getItem(SAVED_KEY) || "[]");
+    } catch {
+      saved = [];
+    }
+    const next = isSaved ? saved.filter((s) => s !== PRACTICE_SLUG) : [...saved, PRACTICE_SLUG];
+    localStorage.setItem(SAVED_KEY, JSON.stringify(next));
+    setIsSaved(!isSaved);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: "21-Day Dhyān Challenge — BHAVA",
+      text: "Twenty-one days of guided meditation to transform your consciousness and cultivate lasting stillness.",
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch {
+        // user cancelled the native share sheet — no action needed
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // clipboard unavailable — nothing more we can do silently
+    }
   };
 
   return (
@@ -123,17 +219,17 @@ function DhyanChallenge21() {
               className={styles.heroImg}
             />
             <div className={styles.controls}>
-              <button className={styles.controlBtn}>
-                <span className="material-symbols-outlined">play_arrow</span>
-                <span className={styles.controlLabel}>Play</span>
+              <button className={styles.controlBtn} onClick={playAll}>
+                <span className="material-symbols-outlined">{playingDay ? "pause" : "play_arrow"}</span>
+                <span className={styles.controlLabel}>{playingDay ? "Pause" : "Play"}</span>
               </button>
-              <button className={styles.controlBtn}>
-                <span className="material-symbols-outlined">add_circle</span>
-                <span className={styles.controlLabel}>Save</span>
+              <button className={styles.controlBtn} onClick={toggleSave}>
+                <span className="material-symbols-outlined">{isSaved ? "check_circle" : "add_circle"}</span>
+                <span className={styles.controlLabel}>{isSaved ? "Saved" : "Save"}</span>
               </button>
-              <button className={styles.controlBtn}>
-                <span className="material-symbols-outlined">share</span>
-                <span className={styles.controlLabel}>Share</span>
+              <button className={styles.controlBtn} onClick={handleShare}>
+                <span className="material-symbols-outlined">{linkCopied ? "check" : "share"}</span>
+                <span className={styles.controlLabel}>{linkCopied ? "Copied!" : "Share"}</span>
               </button>
             </div>
           </div>
@@ -159,32 +255,47 @@ function DhyanChallenge21() {
                     key={m.number}
                     className={`${styles.dayRow} ${isPlaying ? styles.dayRowActive : ""}`}
                   >
-                    <span className={styles.dayBadge}>Day {m.number}</span>
+                    <div className={styles.dayRowTop}>
+                      <span className={styles.dayBadge}>Day {m.number}</span>
 
-                    <div className={styles.dayInfo}>
-                      <p className={styles.dayTheme}>{m.name}</p>
-                      <p className={styles.dayVerse}>{m.deity}</p>
-                    </div>
+                      <div className={styles.dayInfo}>
+                        <p className={styles.dayTheme}>{m.name}</p>
+                        <p className={styles.dayVerse}>{m.deity}</p>
+                      </div>
 
-                    <div className={styles.audioRight}>
-                      {isPlaying && (
-                        <div className={styles.waveBar}>
-                          <span /><span /><span /><span /><span />
-                        </div>
-                      )}
-                      <span className={styles.dayDuration}>{formatDuration(durationMap[m.number])}</span>
-                      <button
-                        className={`${styles.playCircleDay} ${isPlaying ? styles.playCircleDayActive : ""}`}
-                        onClick={(e) => togglePlay(m.number, e)}
-                        disabled={!hasAudio}
-                        title={hasAudio ? "" : "Audio not uploaded yet"}
-                        style={!hasAudio ? { opacity: 0.35, cursor: "not-allowed" } : undefined}
-                      >
-                        <span className="material-symbols-outlined">
-                          {isPlaying ? "pause" : "play_arrow"}
+                      <div className={styles.audioRight}>
+                        <span className={styles.dayDuration}>
+                          {isPlaying ? formatDuration(trackDuration) : formatDuration(durationMap[m.number])}
                         </span>
-                      </button>
+                        <button
+                          className={`${styles.playCircleDay} ${isPlaying ? styles.playCircleDayActive : ""}`}
+                          onClick={(e) => togglePlay(m.number, e)}
+                          disabled={!hasAudio}
+                          title={hasAudio ? "" : "Audio not uploaded yet"}
+                          style={!hasAudio ? { opacity: 0.35, cursor: "not-allowed" } : undefined}
+                        >
+                          <span className="material-symbols-outlined">
+                            {isPlaying ? "pause" : "play_arrow"}
+                          </span>
+                        </button>
+                      </div>
                     </div>
+
+                    {isPlaying && (
+                      <div className={styles.seekRow}>
+                        <span className={styles.seekTime}>{formatDuration(currentTime)}</span>
+                        <input
+                          type="range"
+                          className={styles.seekBar}
+                          min={0}
+                          max={trackDuration || 0}
+                          value={currentTime}
+                          onChange={handleSeek}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <span className={styles.seekTime}>{formatDuration(trackDuration)}</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
