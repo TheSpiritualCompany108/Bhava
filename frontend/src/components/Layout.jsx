@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import GuruChat from "./GuruChat";
 import { useEffect } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
 import styles from "./Layout.module.css";
@@ -61,6 +62,7 @@ function Layout() {
       <ScrollToTopOnPush />
       <Outlet />
       {!isAdminRoute && <Footer />}
+      {!isAdminRoute && <GuruChat />}
     </>
   );
 }

@@ -87,6 +87,19 @@ function Navbar() {
           <div className={`${styles.col9} ${menuOpen ? styles.mobileMenuOpen : ""}`}>
             <ul className={`${styles.nav} justify-content-end align-items-center`}>
               <li className={styles.navItem}>
+                <button
+                  type="button"
+                  className={`${styles.navLink} ${styles.askBhava}`}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    window.dispatchEvent(new Event("guru:open"));
+                  }}
+                >
+                  <span className={styles.askBhavaSparkle}>✨</span>
+                  Ask Bhava
+                </button>
+              </li>
+              <li className={styles.navItem}>
                 <Link
                   className={`${styles.navLink} ${isActive("/products") ? styles.navLinkActive : ""}`}
                   to="/products"
