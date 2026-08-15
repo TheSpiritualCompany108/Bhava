@@ -176,7 +176,7 @@ function Footer() {
     },
     {
       heading: "Sacred Resources",
-      links: ["Vedic Blog", "Rituals Guide", "Temple Partners", "Community"],
+      links: ["Vedic Blog", "Rituals Guide", "Temple Partners", "Community", "Services"],
     },
     {
       heading: "About Bhava:",
@@ -257,7 +257,9 @@ function Footer() {
             <ul className={styles.footerLinks}>
               {column.links.map((link, linkIndex) => (
                 <li key={linkIndex}>
-                  {link === "Contact Us" ? (
+                  {link === "Services" ? (
+                    <Link to="/explore-services" className={styles.contactLink}>{link}</Link>
+                  ) : link === "Contact Us" ? (
                     <Link to="/contact" className={styles.contactLink}>{link}</Link>
                   ) : link === "FAQ" ? (
                     <Link to="/faq" className={styles.contactLink}>{link}</Link>

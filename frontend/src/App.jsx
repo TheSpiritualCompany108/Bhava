@@ -8,6 +8,7 @@ import Knowledge from "./knowledge/Knowledge";
 import KnowledgeRoutes from "./knowledge/KnowledgeRoutes";
 import Products from "./products/Products";
 import Services from "./services/Services";
+import ExploreServices from "./services/ExploreServices";
 import AppPage from "./app/AppPage";
 import CommunityPage from "./community/CommunityPage";
 import ContactUs from "./pages/ContactUs";
@@ -42,6 +43,7 @@ function App() {
             <Route path="/account/addresses" element={<AddressesPage />} />
 
             <Route path="/services"   element={<Services />} />
+            <Route path="/explore-services" element={<ExploreServices />} />
             <Route path="/app"        element={<AppPage />} />
             <Route path="/community"  element={<CommunityPage />} />
             <Route path="/contact"    element={<ContactUs />} />

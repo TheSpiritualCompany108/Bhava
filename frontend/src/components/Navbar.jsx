@@ -101,6 +101,15 @@ function Navbar() {
               </li>
               <li className={styles.navItem}>
                 <Link
+                  className={`${styles.navLink} ${isActive("/explore-services") ? styles.navLinkActive : ""}`}
+                  to="/explore-services"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Services
+                </Link>
+              </li>
+              <li className={styles.navItem}>
+                <Link
                   className={`${styles.navLink} ${isActive("/products") ? styles.navLinkActive : ""}`}
                   to="/products"
                   onClick={() => setMenuOpen(false)}
