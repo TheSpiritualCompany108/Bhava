@@ -1,6 +1,7 @@
 import React from "react";
 import HomeMain from "../components/HomeMain";
 import WhyRituals from "../components/WhyRituals";
+import SacredKnowledge from "../components/SacredKnowledge";
 
 import SacredCollection from "../components/SacredCollection";
 import ProductSpecification from "../components/ProductSpecification";
@@ -21,6 +22,7 @@ function Home() {
       {/* Phase I — The Awakening */}
       <HomeMain />
       <WhyRituals />
+      <SacredKnowledge />
       <GitaSlider />
       <SacredCollection />
       <FeaturedRituals />
