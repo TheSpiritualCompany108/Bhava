@@ -2,6 +2,7 @@ import React from "react";
 import HomeMain from "../components/HomeMain";
 import WhyRituals from "../components/WhyRituals";
 import SacredKnowledge from "../components/SacredKnowledge";
+import AstrologyTools from "../components/AstrologyTools";
 
 import SacredCollection from "../components/SacredCollection";
 import ProductSpecification from "../components/ProductSpecification";
@@ -26,6 +27,7 @@ function Home() {
       <GitaSlider />
       <SacredCollection />
       <FeaturedRituals />
+      <AstrologyTools />
       <ProductSpecification />
 
       {/* Phase II — The Daily Practice */}

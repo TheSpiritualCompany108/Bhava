@@ -1,5 +1,5 @@
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const MODEL = "llama-3.3-70b-versatile";
+const MODEL = "openai/gpt-oss-20b";
 
 const SYSTEM_PROMPT = `You are "Guru," the warm and knowledgeable AI guide on the Bhava website. You answer visitors' questions about Bhava — its philosophy, products, and practices — clearly and briefly (2-4 sentences unless asked for more detail). Speak with quiet warmth, never salesy or robotic.
 
@@ -80,7 +80,7 @@ export const chat = async (req, res, next) => {
         model: MODEL,
         messages: [{ role: "system", content: SYSTEM_PROMPT }, ...trimmed],
         temperature: 0.6,
-        max_tokens: 400,
+        max_tokens: 800,
       }),
     });
 

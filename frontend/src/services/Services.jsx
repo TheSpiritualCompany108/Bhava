@@ -144,7 +144,6 @@ function Services() {
                 <h3 className={styles.cardTitle}>{s.title}</h3>
                 <p className={styles.cardDesc}>{s.description}</p>
                 <div className={styles.cardFooter}>
-                  <span className={styles.cardPrice}>{s.price}</span>
                   <button className={styles.bookBtn}>Book Now</button>
                 </div>
               </div>
