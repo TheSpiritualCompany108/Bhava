@@ -7,6 +7,143 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 // relative /uploads path (legacy files bundled with the backend).
 const resolveImageUrl = (url) => (url?.startsWith("http") ? url : API_BASE + url);
 
+// ── Homepage content editor config ──────────────────────────────────────
+// These mirror the hardcoded defaults in the frontend components so the
+// admin form can show meaningful placeholders. Leaving a field blank keeps
+// the site's default for that field.
+const SACRED_KNOWLEDGE_ITEMS = [
+  { id: "texts-temples", label: "Sacred Texts + Temples", defaultTitle: "Sacred Texts + Temples", defaultDescription: "Explore timeless scriptures, sacred temples and profound teachings.", defaultCta: "Explore" },
+  { id: "stories-mythology", label: "Stories (Mythology)", defaultTitle: "Stories (Mythology)", defaultDescription: "Dive into inspiring stories from our rich heritage and ancient wisdom.", defaultCta: "Explore" },
+  { id: "thought-of-day", label: "Thought of the Day", defaultTitle: "Thought of the Day", defaultDescription: "18 Gita reflections to guide and inspire your day with clarity and purpose.", defaultCta: "Read Today's Thought" },
+];
+
+const ASTROLOGY_TOOLS_ITEMS = [
+  { id: "kundli-generator", label: "Kundli Generator", defaultTitle: "Kundli Generator", defaultDescription: "Generate your detailed birth chart and explore the positions of planets in your life.", defaultCta: "Generate Now" },
+  { id: "astrology-calculator", label: "Astrology Calculator", defaultTitle: "Astrology Calculator", defaultDescription: "Calculate your sun sign, moon sign, ascendant and more with accurate insights.", defaultCta: "Calculate Now" },
+  { id: "kundli-matching", label: "Kundli Matching", defaultTitle: "Kundli Matching", defaultDescription: "Check compatibility with detailed Ashtakoot matching for a strong bond.", defaultCta: "Match Now" },
+  { id: "numerology-calculator", label: "Numerology Calculator", defaultTitle: "Numerology Calculator", defaultDescription: "Discover your life path, destiny number and hidden patterns in your life.", defaultCta: "Calculate Now" },
+];
+
+const HERO_SLIDES = [
+  {
+    id: "slide-0",
+    label: "Slide 1 (main hero)",
+    type: "hero",
+    defaultHeadline: "Awaken Bhava : Live Divine",
+    defaultHighlight: "Every Day",
+    defaultDescription: "A Simple Daily Ritual System For Modern Homes.",
+    defaultDescription1: "Ritual is not reserved for special occasions. It is the quiet return to yourself, every single day.",
+    defaultPrimaryCta: "Begin With Bhava",
+    defaultSecondaryCta: "Explore the System",
+  },
+  {
+    id: "slide-1",
+    label: "Slide 2",
+    type: "slide",
+    defaultTitle0: "A Daily Ritual.",
+    defaultTitle1: "A Different Life.",
+    defaultDescription: "Eleven intentional minutes each day can create remarkable clarity over time. Bhava helps you build a practice that quietly becomes part of who you are.",
+    defaultCta: "Begin Your Ritual",
+  },
+  {
+    id: "slide-2",
+    label: "Slide 3",
+    type: "slide",
+    defaultTitle0: "Objects Made",
+    defaultTitle1: "For Practice.",
+    defaultDescription: "Every Bhava object has one purpose: to support your daily rhythm with simplicity, beauty, and intention.",
+    defaultCta: "Explore Ritual Systems",
+  },
+  {
+    id: "slide-3",
+    label: "Slide 4",
+    type: "slide",
+    defaultTitle0: "Stay With",
+    defaultTitle1: "The Practice.",
+    defaultDescription: "Guided journeys, reflections, and structured challenges help transform occasional devotion into lasting habits.",
+    defaultCta: "Explore Bhakti",
+  },
+  {
+    id: "slide-4",
+    label: "Slide 5",
+    type: "slide",
+    defaultTitle0: "Ancient Wisdom.",
+    defaultTitle1: "Daily Life.",
+    defaultDescription: "Short reflections, timeless teachings, and practical guidance designed to accompany modern living.",
+    defaultCta: "Read Today's Reflection",
+  },
+  {
+    id: "slide-5",
+    label: "Slide 6",
+    type: "slide",
+    defaultTitle0: "Your Ritual,",
+    defaultTitle1: "Supported Daily.",
+    defaultDescription: "Gentle reminders, progress tracking, and guided experiences that encourage consistency without distraction.",
+    defaultCta: "Explore the App",
+  },
+];
+
+const HOMEPAGE_TABS = [
+  {
+    key: "hero",
+    label: "Hero / Top Banner",
+    hint: "The big rotating banner at the very top of the homepage — the first thing every visitor sees.",
+  },
+  {
+    key: "sacredKnowledge",
+    label: "Sacred Knowledge",
+    hint: "The 2nd section on the homepage: the 3-card \"Timeless Wisdom for Everyday Life\" row (Sacred Texts + Temples, Stories, Thought of the Day).",
+    defaultKicker: "Sacred Knowledge",
+    defaultTitle: "Timeless Wisdom for Everyday Life",
+    defaultSubtitle: "Explore ancient scriptures, inspiring stories, and daily reflections to nourish your mind and soul.",
+  },
+  {
+    key: "astrologyTools",
+    label: "Astrology Tools",
+    hint: "Further down the homepage: the 4-card \"Discover Your Cosmic Blueprint\" row (Kundli Generator, Astrology Calculator, Kundli Matching, Numerology Calculator).",
+    defaultKicker: "Astrology & Spiritual Tools",
+    defaultTitle: "Discover Your Cosmic Blueprint",
+    defaultSubtitle: "Powerful astrology tools to understand yourself, make better decisions and live with clarity.",
+  },
+  {
+    key: "community",
+    label: "Community",
+    hint: "Near the bottom of the homepage: the \"Living with Bhava\" testimonials row.",
+    defaultKicker: "Community Stories",
+    defaultTitle: "Living with Bhava :",
+  },
+];
+
+// A text field that shows the site's default text (dimmed) when no admin
+// override has been saved, instead of an empty box next to a placeholder
+// that only hints at the default — so what you see here matches what's
+// live on the homepage. Typing anything saves it as your override.
+function HomepageField({ label, value, defaultValue, onChange, placeholder, textarea }) {
+  const hasValue = value !== undefined && value !== null && value !== "";
+  const shared = {
+    placeholder: placeholder || label,
+    value: value ?? defaultValue ?? "",
+    onChange: (e) => onChange(e.target.value),
+    style: {
+      width: "100%",
+      padding: 10,
+      borderRadius: 4,
+      border: "1px solid #ddd",
+      fontSize: 13,
+      color: hasValue ? "#000" : "#888",
+      ...(textarea ? { minHeight: 50, resize: "vertical" } : {}),
+    },
+  };
+  return (
+    <div>
+      <label style={{ display: "block", marginBottom: 4, fontSize: 11, fontWeight: 600, color: hasValue ? "#4A0B1D" : "#999" }}>
+        {label} {!hasValue && "(showing default — edit to override)"}
+      </label>
+      {textarea ? <textarea {...shared} /> : <input {...shared} />}
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [tiles, setTiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +156,15 @@ export default function AdminPage() {
     "Products"
   ];
   const [activeCategory, setActiveCategory] = useState(categories[0]);
-  const [section, setSection] = useState("tiles"); // "tiles" | "quotes" | "mantraAudio" | "dhyanAudio"
+  const [section, setSection] = useState("tiles"); // "tiles" | "quotes" | "mantraAudio" | "dhyanAudio" | "homepage"
+  const [homepageTab, setHomepageTab] = useState("sacredKnowledge");
+  const [homepageData, setHomepageData] = useState({});
+  const [homepageLoading, setHomepageLoading] = useState(false);
+  const [homepageError, setHomepageError] = useState("");
+  const [homepageSaving, setHomepageSaving] = useState(false);
+  const [homepageSaved, setHomepageSaved] = useState(false);
+  const [homepageImages, setHomepageImages] = useState({});
+  const [homepageImagePreviews, setHomepageImagePreviews] = useState({});
   const [quotes, setQuotes] = useState([]);
   const [quotesLoading, setQuotesLoading] = useState(true);
   const [quotesError, setQuotesError] = useState("");
@@ -79,6 +224,164 @@ export default function AdminPage() {
     if (section === "mantraAudio") fetchMantraAudio();
     if (section === "dhyanAudio") fetchDhyanAudio();
   }, [section]);
+
+  useEffect(() => {
+    if (section !== "homepage") return;
+    setHomepageLoading(true);
+    setHomepageError("");
+    setHomepageImages({});
+    setHomepageImagePreviews({});
+    setHomepageSaved(false);
+    fetch(`${API_BASE}/api/homepage/${homepageTab}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success) setHomepageData(json.data || {});
+        else setHomepageError(json.message || "Failed to load homepage content");
+      })
+      .catch((err) => setHomepageError(err.message || "Network error"))
+      .finally(() => setHomepageLoading(false));
+  }, [section, homepageTab]);
+
+  const handleHomepageFieldChange = (field, value) => {
+    setHomepageSaved(false);
+    setHomepageData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleHomepageItemChange = (itemId, field, value) => {
+    setHomepageSaved(false);
+    setHomepageData((prev) => ({
+      ...prev,
+      items: { ...(prev.items || {}), [itemId]: { ...((prev.items || {})[itemId] || {}), [field]: value } },
+    }));
+  };
+
+  const handleHomepageImageSelect = (itemId, file) => {
+    if (!file) return;
+    setHomepageSaved(false);
+    setHomepageImages((prev) => ({ ...prev, [itemId]: file }));
+    const reader = new FileReader();
+    reader.onloadend = () => setHomepageImagePreviews((prev) => ({ ...prev, [itemId]: reader.result }));
+    reader.readAsDataURL(file);
+  };
+
+  const handleHomepageTestimonialChange = (idx, field, value) => {
+    setHomepageSaved(false);
+    setHomepageData((prev) => {
+      const list = Array.isArray(prev.testimonials) ? [...prev.testimonials] : [];
+      list[idx] = { ...(list[idx] || {}), [field]: value };
+      return { ...prev, testimonials: list };
+    });
+  };
+
+  const addHomepageTestimonial = () => {
+    setHomepageSaved(false);
+    setHomepageData((prev) => ({
+      ...prev,
+      testimonials: [...(Array.isArray(prev.testimonials) ? prev.testimonials : []), { text: "", author: "", location: "" }],
+    }));
+  };
+
+  const removeHomepageTestimonial = (idx) => {
+    setHomepageSaved(false);
+    setHomepageData((prev) => ({ ...prev, testimonials: (prev.testimonials || []).filter((_, i) => i !== idx) }));
+  };
+
+  const clearHomepagePendingImage = (id) => {
+    setHomepageImages((prev) => { const next = { ...prev }; delete next[id]; return next; });
+    setHomepageImagePreviews((prev) => { const next = { ...prev }; delete next[id]; return next; });
+  };
+
+  // Cards — used by both Sacred Knowledge and Astrology Tools, which share
+  // the same items/hiddenIds/extraIds shape.
+  const addHomepageCard = () => {
+    setHomepageSaved(false);
+    const id = `custom-${Date.now()}-${Math.round(Math.random() * 1e5)}`;
+    setHomepageData((prev) => ({
+      ...prev,
+      extraIds: [...(Array.isArray(prev.extraIds) ? prev.extraIds : []), id],
+      items: { ...(prev.items || {}), [id]: { title: "", description: "", cta: "" } },
+    }));
+  };
+
+  const removeHomepageCard = (id, isExtra) => {
+    setHomepageSaved(false);
+    clearHomepagePendingImage(id);
+    setHomepageData((prev) => {
+      if (isExtra) {
+        const items = { ...(prev.items || {}) };
+        delete items[id];
+        return { ...prev, extraIds: (prev.extraIds || []).filter((x) => x !== id), items };
+      }
+      return { ...prev, hiddenIds: [...(prev.hiddenIds || []), id] };
+    });
+  };
+
+  const restoreHomepageCard = (id) => {
+    setHomepageSaved(false);
+    setHomepageData((prev) => ({ ...prev, hiddenIds: (prev.hiddenIds || []).filter((x) => x !== id) }));
+  };
+
+  // Hero slides — same idea, separate keys since a slide's fields differ
+  // from a card's (title0/title1 vs title, plus its own hidden/extra lists).
+  const addHomepageSlide = () => {
+    setHomepageSaved(false);
+    const id = `custom-slide-${Date.now()}-${Math.round(Math.random() * 1e5)}`;
+    setHomepageData((prev) => ({
+      ...prev,
+      extraSlideIds: [...(Array.isArray(prev.extraSlideIds) ? prev.extraSlideIds : []), id],
+      items: { ...(prev.items || {}), [id]: { title0: "", title1: "", description: "", cta: "" } },
+    }));
+  };
+
+  const removeHomepageSlide = (id, isExtra) => {
+    setHomepageSaved(false);
+    clearHomepagePendingImage(id);
+    setHomepageData((prev) => {
+      if (isExtra) {
+        const items = { ...(prev.items || {}) };
+        delete items[id];
+        return { ...prev, extraSlideIds: (prev.extraSlideIds || []).filter((x) => x !== id), items };
+      }
+      return { ...prev, hiddenSlideIds: [...(prev.hiddenSlideIds || []), id] };
+    });
+  };
+
+  const restoreHomepageSlide = (id) => {
+    setHomepageSaved(false);
+    setHomepageData((prev) => ({ ...prev, hiddenSlideIds: (prev.hiddenSlideIds || []).filter((x) => x !== id) }));
+  };
+
+  const saveHomepageSection = async () => {
+    setHomepageSaving(true);
+    setHomepageError("");
+    setHomepageSaved(false);
+    const token = localStorage.getItem("bhava_token");
+    const fd = new FormData();
+    fd.append("data", JSON.stringify(homepageData));
+    Object.entries(homepageImages).forEach(([itemId, file]) => {
+      fd.append(`image__${itemId}`, file);
+    });
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/homepage/${homepageTab}`, {
+        method: "PUT",
+        body: fd,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setHomepageData(json.data || {});
+        setHomepageImages({});
+        setHomepageImagePreviews({});
+        setHomepageSaved(true);
+      } else {
+        setHomepageError(json.message || `Error ${res.status}`);
+      }
+    } catch (err) {
+      setHomepageError(err.message || "Network error");
+    } finally {
+      setHomepageSaving(false);
+    }
+  };
 
   const fetchQuotes = async () => {
     setQuotesLoading(true);
@@ -557,7 +860,7 @@ export default function AdminPage() {
     <div style={{ display: "flex", minHeight: "100vh", background: "#f7f4f0" }}>
       {/* TOP NAV */}
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "12px 20px", zIndex: 100, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {section === "quotes" ? "Quotes" : section === "mantraAudio" ? "108-Day Mantra" : section === "dhyanAudio" ? "21-Day Dhyān" : activeCategory}</h2>
+        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {section === "homepage" ? "Homepage" : section === "quotes" ? "Quotes" : section === "mantraAudio" ? "108-Day Mantra" : section === "dhyanAudio" ? "21-Day Dhyān" : activeCategory}</h2>
         <button onClick={logout} style={{ padding: "8px 16px", background: "#E07B39", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}>Logout</button>
       </div>
 
@@ -572,6 +875,7 @@ export default function AdminPage() {
 
         <h3 style={{ marginTop: 20, color: "#4A0B1D", fontSize: 14, borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>Content</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
+          <li onClick={() => setSection("homepage")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "homepage" ? "#E07B39" : 'transparent', color: section === "homepage" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🏠 Homepage</li>
           <li onClick={() => setSection("quotes")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "quotes" ? "#E07B39" : 'transparent', color: section === "quotes" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>📜 Quotes</li>
           <li onClick={() => setSection("mantraAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "mantraAudio" ? "#E07B39" : 'transparent', color: section === "mantraAudio" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🎵 108-Day Mantra</li>
           <li onClick={() => setSection("dhyanAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "dhyanAudio" ? "#E07B39" : 'transparent', color: section === "dhyanAudio" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🧘 21-Day Dhyān</li>
@@ -778,6 +1082,314 @@ export default function AdminPage() {
               </div>
             );
           })}
+        </div>
+      </main>
+      ) : section === "homepage" ? (
+      /* CENTER - HOMEPAGE CONTENT EDITOR */
+      <main style={{ flex: 1, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
+        <h3 style={{ marginTop: 0, color: "#4A0B1D" }}>Homepage Content</h3>
+        <p style={{ color: "#666", fontSize: 13, marginTop: -8, marginBottom: 16 }}>
+          Edit the text and images shown on the homepage. Leave a field blank to keep the site's default.
+        </p>
+
+        <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+          {HOMEPAGE_TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setHomepageTab(t.key)}
+              style={{
+                padding: "8px 16px",
+                background: homepageTab === t.key ? "#4A0B1D" : "#fff",
+                color: homepageTab === t.key ? "#fff" : "#4A0B1D",
+                border: "1px solid #4A0B1D",
+                borderRadius: 999,
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {(() => {
+          const activeTab = HOMEPAGE_TABS.find((t) => t.key === homepageTab);
+          return (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, background: "#FBF6EE", border: "1px solid #eee", borderRadius: 8, padding: "10px 14px", marginBottom: 16, flexWrap: "wrap" }}>
+              <p style={{ margin: 0, fontSize: 13, color: "#5a4a3a" }}>
+                📍 <strong>Where this shows:</strong> {activeTab?.hint}
+              </p>
+              <a href="/" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, fontWeight: 600, color: "#E07B39", whiteSpace: "nowrap", textDecoration: "none" }}>
+                View Homepage ↗
+              </a>
+            </div>
+          );
+        })()}
+
+        {homepageLoading && <div style={{ padding: 12, background: '#fffbe6', borderRadius: 6, marginBottom: 12 }}>Loading…</div>}
+        {homepageError && <div style={{ padding: 12, background: '#ffe6e6', color: '#900', borderRadius: 6, marginBottom: 12 }}>{homepageError}</div>}
+        {homepageSaved && (
+          <div style={{ padding: 12, background: '#e8f7ec', color: '#1e7a3a', borderRadius: 6, marginBottom: 12, fontSize: 13, fontWeight: 600 }}>
+            ✓ Saved — this change is now live in the {HOMEPAGE_TABS.find((t) => t.key === homepageTab)?.label} section of the homepage.
+          </div>
+        )}
+
+        <div style={{ background: "#fff", padding: 20, borderRadius: 8, border: "1px solid #eee", maxWidth: 760 }}>
+          {(homepageTab === "sacredKnowledge" || homepageTab === "astrologyTools" || homepageTab === "community") && (() => {
+            const activeTab = HOMEPAGE_TABS.find((t) => t.key === homepageTab);
+            return (
+              <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f0f0f0" }}>
+                <h4 style={{ margin: "0 0 12px 0", color: "#4A0B1D", fontSize: 14 }}>Section Header</h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <HomepageField
+                    label="Kicker label"
+                    value={homepageData.kicker}
+                    defaultValue={activeTab?.defaultKicker}
+                    onChange={(v) => handleHomepageFieldChange("kicker", v)}
+                  />
+                  <HomepageField
+                    label="Title"
+                    value={homepageData.title}
+                    defaultValue={activeTab?.defaultTitle}
+                    onChange={(v) => handleHomepageFieldChange("title", v)}
+                  />
+                  {homepageTab !== "community" && (
+                    <HomepageField
+                      label="Subtitle"
+                      value={homepageData.subtitle}
+                      defaultValue={activeTab?.defaultSubtitle}
+                      onChange={(v) => handleHomepageFieldChange("subtitle", v)}
+                      textarea
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {(homepageTab === "sacredKnowledge" || homepageTab === "astrologyTools") &&
+            (() => {
+              const baseItems = homepageTab === "sacredKnowledge" ? SACRED_KNOWLEDGE_ITEMS : ASTROLOGY_TOOLS_ITEMS;
+              const hiddenIds = homepageData.hiddenIds || [];
+              const extraIds = Array.isArray(homepageData.extraIds) ? homepageData.extraIds : [];
+              const visibleBase = baseItems.filter((item) => !hiddenIds.includes(item.id));
+              const hiddenBase = baseItems.filter((item) => hiddenIds.includes(item.id));
+              const allCards = [
+                ...visibleBase.map((item) => ({ ...item, isExtra: false })),
+                ...extraIds.map((id) => ({ id, label: "New Card", defaultTitle: "", defaultDescription: "", defaultCta: "Explore", isExtra: true })),
+              ];
+
+              return (
+                <>
+                  {allCards.map((item, idx) => {
+                    const o = (homepageData.items || {})[item.id] || {};
+                    const preview = homepageImagePreviews[item.id];
+                    return (
+                      <div key={item.id} style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f0f0f0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                          <h4 style={{ margin: 0, color: "#4A0B1D", fontSize: 14 }}>
+                            {item.label} <span style={{ color: "#999", fontWeight: 400, fontSize: 12 }}>(card {idx + 1} of {allCards.length}, left to right)</span>
+                          </h4>
+                          <button
+                            onClick={() => removeHomepageCard(item.id, item.isExtra)}
+                            style={{ padding: "4px 10px", background: "#fff", color: "#ff6b6b", border: "1px solid #ff6b6b", borderRadius: 4, cursor: "pointer", fontSize: 11, fontWeight: 600 }}
+                          >
+                            {item.isExtra ? "🗑 Delete Card" : "Hide This Card"}
+                          </button>
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                          <HomepageField
+                            label="Title"
+                            value={o.title}
+                            defaultValue={item.defaultTitle}
+                            onChange={(v) => handleHomepageItemChange(item.id, "title", v)}
+                          />
+                          <HomepageField
+                            label="Description"
+                            value={o.description}
+                            defaultValue={item.defaultDescription}
+                            onChange={(v) => handleHomepageItemChange(item.id, "description", v)}
+                            textarea
+                          />
+                          <HomepageField
+                            label="Button text"
+                            value={o.cta}
+                            defaultValue={item.defaultCta}
+                            onChange={(v) => handleHomepageItemChange(item.id, "cta", v)}
+                          />
+                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            {(preview || o.image) && (
+                              <img src={preview || resolveImageUrl(o.image)} alt="" style={{ width: 70, height: 70, objectFit: "cover", borderRadius: 6 }} />
+                            )}
+                            <label style={{ padding: "8px 14px", background: "#E07B39", color: "#fff", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
+                              {o.image || preview ? "Replace Image" : "Upload Image"}
+                              <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleHomepageImageSelect(item.id, e.target.files[0])} />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  <button onClick={addHomepageCard} style={{ display: "block", padding: "10px 16px", background: "#4CAF50", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+                    + Add New Card
+                  </button>
+
+                  {hiddenBase.length > 0 && (
+                    <div style={{ marginTop: 8 }}>
+                      <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#999" }}>Hidden cards:</p>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        {hiddenBase.map((item) => (
+                          <button
+                            key={item.id}
+                            onClick={() => restoreHomepageCard(item.id)}
+                            style={{ padding: "4px 10px", background: "#fff", color: "#4A0B1D", border: "1px solid #ddd", borderRadius: 999, cursor: "pointer", fontSize: 12 }}
+                          >
+                            ↺ Restore "{item.label}"
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+
+          {homepageTab === "community" && (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <h4 style={{ margin: 0, color: "#4A0B1D", fontSize: 14 }}>Testimonials</h4>
+                <button onClick={addHomepageTestimonial} style={{ padding: "6px 12px", background: "#4CAF50", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
+                  + Add Testimonial
+                </button>
+              </div>
+              {(Array.isArray(homepageData.testimonials) ? homepageData.testimonials : []).map((t, idx) => (
+                <div key={idx} style={{ marginBottom: 14, padding: 12, border: "1px solid #eee", borderRadius: 6, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <textarea
+                    placeholder="Testimonial text"
+                    value={t.text || ""}
+                    onChange={(e) => handleHomepageTestimonialChange(idx, "text", e.target.value)}
+                    style={{ padding: 10, borderRadius: 4, border: "1px solid #ddd", fontSize: 13, minHeight: 50, resize: "vertical" }}
+                  />
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input
+                      placeholder="Author"
+                      value={t.author || ""}
+                      onChange={(e) => handleHomepageTestimonialChange(idx, "author", e.target.value)}
+                      style={{ flex: 1, padding: 8, borderRadius: 4, border: "1px solid #ddd", fontSize: 13 }}
+                    />
+                    <input
+                      placeholder="Location"
+                      value={t.location || ""}
+                      onChange={(e) => handleHomepageTestimonialChange(idx, "location", e.target.value)}
+                      style={{ flex: 1, padding: 8, borderRadius: 4, border: "1px solid #ddd", fontSize: 13 }}
+                    />
+                    <button onClick={() => removeHomepageTestimonial(idx)} style={{ padding: "8px 12px", background: "#ff6b6b", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12 }}>×</button>
+                  </div>
+                </div>
+              ))}
+              {(!homepageData.testimonials || homepageData.testimonials.length === 0) && (
+                <p style={{ color: "#999", fontSize: 13 }}>No overrides yet — the site is showing its default testimonials. Add one to replace them.</p>
+              )}
+            </div>
+          )}
+
+          {homepageTab === "hero" && (
+            <p style={{ margin: "0 0 16px 0", fontSize: 12, color: "#999" }}>
+              These slides rotate automatically on the homepage banner (one at a time, every few seconds) — they don't show side by side. Use the dots at the bottom of the banner on the live site to jump to a specific slide and check your changes.
+            </p>
+          )}
+          {homepageTab === "hero" &&
+            (() => {
+              const hiddenSlideIds = homepageData.hiddenSlideIds || [];
+              const extraSlideIds = Array.isArray(homepageData.extraSlideIds) ? homepageData.extraSlideIds : [];
+              const visibleBase = HERO_SLIDES.filter((s) => !hiddenSlideIds.includes(s.id));
+              const hiddenBase = HERO_SLIDES.filter((s) => hiddenSlideIds.includes(s.id));
+              const allSlides = [
+                ...visibleBase.map((s) => ({ ...s, isExtra: false })),
+                ...extraSlideIds.map((id, i) => ({ id, label: `New Slide ${i + 1}`, type: "slide", isExtra: true })),
+              ];
+
+              return (
+                <>
+                  {allSlides.map((s) => {
+                    const o = (homepageData.items || {})[s.id] || {};
+                    const preview = homepageImagePreviews[s.id];
+                    return (
+                      <div key={s.id} style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f0f0f0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                          <h4 style={{ margin: 0, color: "#4A0B1D", fontSize: 14 }}>{s.label}</h4>
+                          <button
+                            onClick={() => removeHomepageSlide(s.id, s.isExtra)}
+                            style={{ padding: "4px 10px", background: "#fff", color: "#ff6b6b", border: "1px solid #ff6b6b", borderRadius: 4, cursor: "pointer", fontSize: 11, fontWeight: 600 }}
+                          >
+                            {s.isExtra ? "🗑 Delete Slide" : "Hide This Slide"}
+                          </button>
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                          {s.type === "hero" ? (
+                            <>
+                              <HomepageField label="Headline" value={o.headline} defaultValue={s.defaultHeadline} onChange={(v) => handleHomepageItemChange(s.id, "headline", v)} />
+                              <HomepageField label="Highlighted word(s)" value={o.highlight} defaultValue={s.defaultHighlight} onChange={(v) => handleHomepageItemChange(s.id, "highlight", v)} />
+                              <HomepageField label="Description line" value={o.description} defaultValue={s.defaultDescription} onChange={(v) => handleHomepageItemChange(s.id, "description", v)} />
+                              <HomepageField label="Second description line" value={o.description1} defaultValue={s.defaultDescription1} onChange={(v) => handleHomepageItemChange(s.id, "description1", v)} />
+                              <HomepageField label="Primary button text" value={o.primaryCta} defaultValue={s.defaultPrimaryCta} onChange={(v) => handleHomepageItemChange(s.id, "primaryCta", v)} />
+                              <HomepageField label="Secondary button text" value={o.secondaryCta} defaultValue={s.defaultSecondaryCta} onChange={(v) => handleHomepageItemChange(s.id, "secondaryCta", v)} />
+                            </>
+                          ) : (
+                            <>
+                              <HomepageField label="Title line 1" value={o.title0} defaultValue={s.defaultTitle0} onChange={(v) => handleHomepageItemChange(s.id, "title0", v)} />
+                              <HomepageField label="Title line 2" value={o.title1} defaultValue={s.defaultTitle1} onChange={(v) => handleHomepageItemChange(s.id, "title1", v)} />
+                              <HomepageField label="Description" value={o.description} defaultValue={s.defaultDescription} onChange={(v) => handleHomepageItemChange(s.id, "description", v)} textarea />
+                              <HomepageField label="Button text" value={o.cta} defaultValue={s.defaultCta} onChange={(v) => handleHomepageItemChange(s.id, "cta", v)} />
+                            </>
+                          )}
+                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            {(preview || o.image) && (
+                              <img src={preview || resolveImageUrl(o.image)} alt="" style={{ width: 90, height: 60, objectFit: "cover", borderRadius: 6 }} />
+                            )}
+                            <label style={{ padding: "8px 14px", background: "#E07B39", color: "#fff", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
+                              {o.image || preview ? "Replace Background Image" : "Upload Background Image"}
+                              <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleHomepageImageSelect(s.id, e.target.files[0])} />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  <button onClick={addHomepageSlide} style={{ display: "block", padding: "10px 16px", background: "#4CAF50", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+                    + Add New Slide
+                  </button>
+
+                  {hiddenBase.length > 0 && (
+                    <div style={{ marginTop: 8 }}>
+                      <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#999" }}>Hidden slides:</p>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        {hiddenBase.map((s) => (
+                          <button
+                            key={s.id}
+                            onClick={() => restoreHomepageSlide(s.id)}
+                            style={{ padding: "4px 10px", background: "#fff", color: "#4A0B1D", border: "1px solid #ddd", borderRadius: 999, cursor: "pointer", fontSize: 12 }}
+                          >
+                            ↺ Restore "{s.label}"
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+
+          <button
+            onClick={saveHomepageSection}
+            disabled={homepageSaving}
+            style={{ display: "block", marginTop: 20, padding: "12px 24px", background: "#4CAF50", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}
+          >
+            {homepageSaving ? "Saving…" : "✓ Save Changes"}
+          </button>
         </div>
       </main>
       ) : (

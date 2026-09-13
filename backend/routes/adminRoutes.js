@@ -24,6 +24,7 @@ import {
   listDhyanAudio,
   deleteDhyanAudio,
 } from "../controllers/dhyanAudioController.js";
+import { upsertSection } from "../controllers/homepageController.js";
 import protect, { adminOnly } from "../middleware/authMiddleware.js";
 import { adminLogin } from "../controllers/adminAuthController.js";
 
@@ -90,5 +91,8 @@ router.put(
   upsertDhyanAudio,
 );
 router.delete("/dhyan-audio/:day", protect, adminOnly, deleteDhyanAudio);
+
+// Homepage content overrides — admin protected
+router.put("/homepage/:key", protect, adminOnly, upload.any(), upsertSection);
 
 export default router;

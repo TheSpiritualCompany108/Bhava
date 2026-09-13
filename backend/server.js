@@ -85,6 +85,7 @@ import dhyanAudioRoutes from "./routes/dhyanAudioRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import kundliRoutes from "./routes/kundliRoutes.js";
 import horoscopeRoutes from "./routes/horoscopeRoutes.js";
+import homepageRoutes from "./routes/homepageRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
@@ -146,6 +147,7 @@ app.use("/api/dhyan-audio", dhyanAudioRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/kundli", kundliRoutes);
 app.use("/api/horoscope", horoscopeRoutes);
+app.use("/api/homepage", homepageRoutes);
 app.use("/api/admin", adminRoutes);
 
 // Health check

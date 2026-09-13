@@ -150,27 +150,27 @@
   transform: translateX(3px);
 }
 
-/* ── Themes ── */
-.purple {
-  background: linear-gradient(160deg, #EDE7F6 0%, #F7F4FB 100%);
+/* ── Themes (matched to site brand palette) ── */
+.maroon {
+  background: linear-gradient(160deg, #F3E3E1 0%, #FBF3F1 100%);
 }
-.purple .iconBadge { background: #4A2E7A; }
-.purple .cardTitle { color: #3A2060; }
-.purple .cardLink { color: #4A2E7A; }
+.maroon .iconBadge { background: #4A0B1D; }
+.maroon .cardTitle { color: #4A0B1D; }
+.maroon .cardLink { color: #4A0B1D; }
 
 .orange {
   background: linear-gradient(160deg, #FBE9DC 0%, #FDF4EC 100%);
 }
 .orange .iconBadge { background: #C0671E; }
-.orange .cardTitle { color: #A8531A; }
-.orange .cardLink { color: #C0671E; }
+.orange .cardTitle { color: #C0671E; }
+.orange .cardLink { color: #E07B39; }
 
 .green {
-  background: linear-gradient(160deg, #E4EEDF 0%, #F3F8F0 100%);
+  background: linear-gradient(160deg, #E1E7E1 0%, #F2F5F2 100%);
 }
-.green .iconBadge { background: #3D6B4F; }
-.green .cardTitle { color: #2E5A3E; }
-.green .cardLink { color: #3D6B4F; }
+.green .iconBadge { background: #1E2D1E; }
+.green .cardTitle { color: #1E2D1E; }
+.green .cardLink { color: #1E2D1E; }
 
 /* ── Responsive ── */
 @media (max-width: 900px) {

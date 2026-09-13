@@ -1,6 +1,7 @@
 import styles from "./Community.module.css";
+import useHomepageSection from "../hooks/useHomepageSection";
 
-const testimonials = [
+const defaultTestimonials = [
   {
     text: "Lighting a lamp has become the moment my family gathers before dinner. It lasts only a minute, yet changes the atmosphere of our home.",
     author: "Priya",
@@ -19,17 +20,23 @@ const testimonials = [
 ];
 
 function Community() {
+  const overrides = useHomepageSection("community");
+  const testimonials =
+    Array.isArray(overrides.testimonials) && overrides.testimonials.length > 0
+      ? overrides.testimonials
+      : defaultTestimonials;
+
   return (
     <section className={styles.communitySection}>
       <div className={styles.communityHeader}>
-        <p className={styles.kicker}>Community Stories</p>
-        <h2 className={styles.communityTitle}>Living with Bhava</h2>
+        <p className={styles.kicker}>{overrides.kicker || "Community Stories"}</p>
+        <h2 className={styles.communityTitle}>{overrides.title || "Living with Bhava :"}</h2>
       </div>
 
       <div className={styles.grid}>
         {testimonials.map((t, i) => (
           <article
-            key={t.author}
+            key={t.author + i}
             className={`${styles.testimonialCard} ${i === testimonials.length - 1 ? styles.testimonialCardAccent : ""}`}
           >
             <span className={styles.quoteMark}>&ldquo;</span>
