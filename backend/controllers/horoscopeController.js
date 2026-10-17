@@ -64,6 +64,34 @@ const CATEGORY_BLURBS = {
   ],
 };
 
+const FALLBACK_HOROSCOPES = {
+  aries: "Take the lead with patience today. A clear decision and steady action can open a promising path.",
+  taurus: "Stay grounded and trust your practical instincts. Small, consistent efforts bring meaningful progress.",
+  gemini: "Your curiosity is an asset today. Share your ideas clearly and leave room for a thoughtful response.",
+  cancer: "Create space for what restores you. A warm conversation may bring the reassurance you need.",
+  leo: "Let your confidence serve your purpose. Recognition follows when you focus on doing your best work.",
+  virgo: "Prioritise what matters most instead of perfecting everything. Your careful planning is already paying off.",
+  libra: "Balance comes through honest choices today. A calm discussion can help resolve a lingering question.",
+  scorpio: "Trust your inner clarity and avoid rushing. Quiet focus will help you notice an important opportunity.",
+  sagittarius: "Keep your outlook positive while checking the details. A little preparation will make an exciting step easier.",
+  capricorn: "Your discipline gives you an advantage. Set one realistic milestone and follow it through without distraction.",
+  aquarius: "An original idea deserves your attention. Explain it simply and you may find an unexpected ally.",
+  pisces: "Protect your peace and listen to your intuition. Gentle, deliberate action will serve you better than haste.",
+};
+
+function fallbackDailyHoroscope(sign, date = new Date().toISOString().slice(0, 10)) {
+  return {
+    date,
+    horoscope: FALLBACK_HOROSCOPES[sign],
+  };
+}
+
+function fallbackMonthlyHoroscope(sign) {
+  return {
+    horoscope: `This month invites ${sign} to move with intention. Focus on steady progress, meaningful connections, and choices that support your long-term wellbeing.`,
+  };
+}
+
 function seededHash(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
@@ -217,13 +245,28 @@ export const getDailyHoroscope = async (req, res, next) => {
     if (!VALID_SIGNS.includes(sign)) {
       return res.status(400).json({ success: false, message: "Invalid or missing zodiac sign" });
     }
-    if (!process.env.API_NINJAS_KEY) {
-      return res.status(500).json({ success: false, message: "Horoscope service is not configured" });
-    }
 
     const [daily, monthly] = await Promise.all([
-      cached(`daily-${sign}`, () => fetchDailyHoroscope(sign)),
-      cached(`monthly-${sign}`, () => fetchMonthlyHoroscope(sign)),
+      cached(`daily-${sign}`, async () => {
+        if (!process.env.API_NINJAS_KEY) {
+          console.warn("API_NINJAS_KEY is not configured; using the local horoscope fallback.");
+          return fallbackDailyHoroscope(sign);
+        }
+        try {
+          return await fetchDailyHoroscope(sign);
+        } catch (err) {
+          console.warn("Daily horoscope provider unavailable; using the local fallback:", err.message);
+          return fallbackDailyHoroscope(sign);
+        }
+      }),
+      cached(`monthly-${sign}`, async () => {
+        try {
+          return await fetchMonthlyHoroscope(sign);
+        } catch (err) {
+          console.warn("Monthly horoscope provider unavailable; using the local fallback:", err.message);
+          return fallbackMonthlyHoroscope(sign);
+        }
+      }),
     ]);
 
     const extras = buildDailyExtras(sign, daily.date);
