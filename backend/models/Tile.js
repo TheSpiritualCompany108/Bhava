@@ -10,6 +10,13 @@ const TileSchema = new mongoose.Schema(
     summary: { type: String },
     fullDescription: { type: String },
     imageUrl: { type: String },
+    handle: { type: String, index: true },
+    status: {
+      type: String,
+      enum: ["active", "draft", "archived"],
+      default: "active",
+      index: true,
+    },
     lessons: [
       {
         num: Number,

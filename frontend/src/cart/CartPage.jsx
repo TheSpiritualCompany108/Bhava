@@ -3,6 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import styles from "./CartPage.module.css";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const resolveCartImageUrl = (url) => {
+  if (!url) return "/Products/Home Page mala.png";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/uploads") || url.startsWith("uploads")) {
+    return `${API_BASE}${url.startsWith("/") ? "" : "/"}${url}`;
+  }
+  return url.startsWith("/") ? url : `/${url}`;
+};
+
 const parsePrice = (str) =>
   parseInt(String(str).replace(/[₹,]/g, ""), 10) || 0;
 
@@ -68,13 +79,15 @@ function CartPage() {
               <div key={item.productId} className={styles.cartItem}>
                 {/* Image */}
                 <div className={styles.itemImageWrap}>
-                  {item.image ? (
-                    <img src={item.image} alt={item.title} className={styles.itemImage} />
-                  ) : (
-                    <div className={styles.itemImagePlaceholder}>
-                      <span>🪔</span>
-                    </div>
-                  )}
+                  <img
+                    src={resolveCartImageUrl(item.image)}
+                    alt={item.title}
+                    className={styles.itemImage}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/Products/Home Page mala.png";
+                    }}
+                  />
                 </div>
 
                 {/* Info */}

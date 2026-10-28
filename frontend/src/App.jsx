@@ -24,6 +24,7 @@ import CareerPage from "./pages/carrerpage";
 import AboutUs from "./pages/AboutUs";
 import AdminLogin from "./admin/AdminLogin";
 import AdminPage from "./admin/AdminPage";
+import ProductDetail from "./products/ProductDetail";
 
 function App() {
   return (
@@ -37,6 +38,8 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<CartPage />} />
 
             {/* Account pages */}
