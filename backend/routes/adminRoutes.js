@@ -6,6 +6,9 @@ import {
   getTile,
   updateTile,
   deleteTile,
+  toggleTileStatus,
+  importTilesCsv,
+  downloadSampleCsv,
 } from "../controllers/tileController.js";
 import {
   createQuote,
@@ -52,6 +55,24 @@ router.post("/login", adminLogin);
 router.get("/tiles", protect, adminOnly, listTiles);
 router.post("/tiles", protect, adminOnly, upload.single("image"), createTile);
 
+// Bulk CSV Import & Sample Download
+router.get("/tiles/sample-csv", downloadSampleCsv);
+router.get("/products/sample-csv", downloadSampleCsv);
+router.post(
+  "/tiles/import-csv",
+  protect,
+  adminOnly,
+  upload.single("file"),
+  importTilesCsv
+);
+router.post(
+  "/products/import-csv",
+  protect,
+  adminOnly,
+  upload.single("file"),
+  importTilesCsv
+);
+
 // Read / Update / Delete
 router.get("/tiles/:id", protect, adminOnly, getTile);
 router.put(
@@ -61,6 +82,7 @@ router.put(
   upload.single("image"),
   updateTile,
 );
+router.patch("/tiles/:id/status", protect, adminOnly, toggleTileStatus);
 router.delete("/tiles/:id", protect, adminOnly, deleteTile);
 
 // Quotes (Today's Reflection) — admin protected

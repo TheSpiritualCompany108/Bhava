@@ -47,8 +47,9 @@ export const upsertSection = async (req, res, next) => {
     const files = req.files || [];
     for (const file of files) {
       const url = await uploadToBlob(file, `homepage/${key}`);
-      if (file.fieldname === "image") {
+      if (file.fieldname === "image" || file.fieldname === "bannerImage" || file.fieldname === "image__banner") {
         data.image = url;
+        data.bannerImage = url;
       } else if (file.fieldname.startsWith("image__")) {
         const itemKey = file.fieldname.slice("image__".length);
         data.items = data.items || {};
