@@ -75,6 +75,13 @@ export const login = async (req, res) => {
       });
     }
 
+    if (!user.password) {
+      return res.status(400).json({
+        success: false,
+        message: "This account uses Google sign-in. Please use 'Continue with Google'.",
+      });
+    }
+
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
@@ -84,6 +91,50 @@ export const login = async (req, res) => {
     }
 
     sendResponse(res, 200, user, "Logged in successfully");
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error. Please try again." });
+  }
+};
+
+// POST /api/auth/google  — body: { credential } (Google ID token from Google Identity Services)
+export const googleLogin = async (req, res) => {
+  try {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      return res.status(501).json({ success: false, message: "Google sign-in is not configured." });
+    }
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ success: false, message: "Missing Google credential" });
+    }
+
+    const verifyRes = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`
+    );
+    const info = await verifyRes.json();
+    if (!verifyRes.ok || info.aud !== clientId || String(info.email_verified) !== "true") {
+      return res.status(401).json({ success: false, message: "Google sign-in failed. Please try again." });
+    }
+
+    const email = String(info.email).toLowerCase();
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        name: info.name || email.split("@")[0],
+        email,
+        provider: "google",
+        googleId: info.sub,
+        avatar: info.picture || "",
+        isVerified: true,
+      });
+    } else if (!user.googleId) {
+      user.googleId = info.sub;
+      if (!user.avatar && info.picture) user.avatar = info.picture;
+      user.isVerified = true;
+      await user.save();
+    }
+
+    sendResponse(res, 200, user, "Logged in with Google");
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error. Please try again." });
   }

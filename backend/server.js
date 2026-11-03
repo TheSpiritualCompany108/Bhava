@@ -87,6 +87,7 @@ import kundliRoutes from "./routes/kundliRoutes.js";
 import horoscopeRoutes from "./routes/horoscopeRoutes.js";
 import homepageRoutes from "./routes/homepageRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 dotenv.config();
 
@@ -149,6 +150,7 @@ app.use("/api/kundli", kundliRoutes);
 app.use("/api/horoscope", horoscopeRoutes);
 app.use("/api/homepage", homepageRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {

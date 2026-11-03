@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
 import { useCart } from "../context/CartContext";
+import ReviewsSection, { Stars } from "./ReviewsSection";
+import { QuantityDecrease, QuantityValue, QuantityIncrease } from "../components/Quantity";
+import { playAddToCartAnimation } from "../utils/cartAnimation";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -12,10 +15,36 @@ const resolveImageUrl = (url) => {
   return `${API_BASE}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
+// Fades/slides its children in when scrolled into view
+function Reveal({ children, delay = 0 }) {
+  const ref = useRef(null);
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShown(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={`${styles.reveal} ${shown ? styles.revealIn : ""}`} style={{ transitionDelay: `${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart, itemCount } = useCart();
+  const { addToCart, itemCount, cartItems } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,8 +54,14 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [activeTab, setActiveTab] = useState("ritual");
   const [toastMessage, setToastMessage] = useState(null);
-  const [added, setAdded] = useState(false);
   const [failedImages, setFailedImages] = useState([]);
+  const [reviewSummary, setReviewSummary] = useState({ count: 0, average: 0 });
+  const handleReviewSummary = useCallback((s) => setReviewSummary(s), []);
+
+  const scrollToReviews = () => {
+    const el = document.getElementById("reviews");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // Reset failed images, index and load product data
   useEffect(() => {
@@ -116,6 +151,23 @@ export default function ProductDetail() {
     return scored.slice(0, 4).map((s) => s.product);
   }, [product, allProducts]);
 
+  // Short bullet highlights derived from the full description (shown beside the buy box)
+  const highlights = useMemo(() => {
+    const raw = (product?.fullDescription || "").trim();
+    if (!raw) return [];
+    let parts = raw.split(/\n+/);
+    if (parts.length < 2) parts = raw.split(/(?<=[.!?])\s+/);
+    return parts
+      .map((p) => p.replace(/^[\s•\-*]+/, "").trim())
+      .filter(Boolean)
+      .slice(0, 6);
+  }, [product]);
+
+  // Is this product already in the cart?
+  const cartLine = product
+    ? cartItems.find((i) => i.productId === (product._id || product.handle || product.title))
+    : null;
+
   // Handle Add To Cart
   const handleAddToCart = (e) => {
     if (e) e.stopPropagation();
@@ -130,8 +182,6 @@ export default function ProductDetail() {
       quantity: qty,
     });
 
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
     setToastMessage(`✓ Added ${qty} × "${product.title}" to your sacred cart`);
     setTimeout(() => setToastMessage(null), 3500);
   };
@@ -181,6 +231,14 @@ export default function ProductDetail() {
   const displayCategory = product.meta?.productType || product.subtitle || "Sacred Item";
   const displayPrice = product.badgeText || "₹999";
   const comparePrice = product.meta?.compareAtPrice ? `₹${product.meta.compareAtPrice}` : null;
+  const priceNum = parseInt(String(displayPrice).replace(/[^\d]/g, ""), 10) || 0;
+  const compareNum = parseInt(String(product.meta?.compareAtPrice || "").replace(/[^\d]/g, ""), 10) || 0;
+  const savingsPct = compareNum > priceNum && priceNum > 0 ? Math.round(((compareNum - priceNum) / compareNum) * 100) : 0;
+  const howToUse = (product.meta?.howToUse || "")
+    .split(/\n+/)
+    .map((s) => s.replace(/^[\s•\-*\d.]+/, "").trim())
+    .filter(Boolean);
+  const didYouKnow = (product.meta?.didYouKnow || "").trim();
 
   return (
     <div className={styles.page}>
@@ -210,6 +268,7 @@ export default function ProductDetail() {
           <div className={styles.galleryCol}>
             <div className={styles.mainImageWrapper}>
               <img
+                key={validImages[safeActiveIndex]}
                 src={resolveImageUrl(validImages[safeActiveIndex] || product.imageUrl)}
                 alt={product.title}
                 className={styles.mainImage}
@@ -246,16 +305,22 @@ export default function ProductDetail() {
             <span className={styles.categoryTag}>{displayCategory}</span>
             <h1 className={styles.title}>{product.title}</h1>
 
-            <div className={styles.ratingRow}>
-              <span className={styles.stars}>★★★★★</span>
-              <span>4.9 / 5.0 (48 Sacred Reviews)</span>
-            </div>
+            <button type="button" className={styles.ratingRow} onClick={scrollToReviews}>
+              <Stars value={Math.round(reviewSummary.average)} size={15} />
+              {reviewSummary.count > 0 ? (
+                <span>
+                  <strong>{reviewSummary.average.toFixed(1)}</strong> · {reviewSummary.count} review{reviewSummary.count > 1 ? "s" : ""}
+                </span>
+              ) : (
+                <span>No reviews yet · Be the first</span>
+              )}
+            </button>
 
             <div className={styles.priceSection}>
               <span className={styles.currentPrice}>{displayPrice}</span>
               {comparePrice && <span className={styles.comparePrice}>{comparePrice}</span>}
-              <span className={styles.discountBadge}>Authentic Consecration</span>
-              <span className={styles.taxNote}>Inclusive of all taxes · Sacred blessing included</span>
+              {savingsPct > 0 && <span className={styles.discountBadge}>Save {savingsPct}%</span>}
+              <span className={styles.taxNote}>Inclusive of all taxes</span>
             </div>
 
             <div className={styles.stockStatus}>
@@ -271,37 +336,57 @@ export default function ProductDetail() {
               </p>
             </div>
 
-            {/* Actions: Quantity + Add to Cart + Buy Now */}
-            <div className={styles.actionsRow}>
+            {/* Quantity */}
+            <div className={styles.qtyRow}>
+              <span className={styles.qtyLabel}>Quantity</span>
               <div className={styles.qtyWrapper}>
+                <QuantityDecrease value={qty} onClick={() => setQty((q) => Math.max(1, q - 1))} />
+                <QuantityValue>{qty}</QuantityValue>
+                <QuantityIncrease value={qty} max={99} onClick={() => setQty((q) => q + 1)} />
+              </div>
+            </div>
+
+            {/* Actions: Add to Cart + Buy Now */}
+            <div className={styles.actionsRow}>
+              <div className={styles.addWrap}>
                 <button
-                  className={styles.qtyBtn}
-                  onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  aria-label="Decrease quantity"
+                  className={`${styles.addToCartBtn} ${cartLine ? styles.addedBtn : ""}`}
+                  onClick={(e) => {
+                    if (cartLine) {
+                      navigate("/cart");
+                      return;
+                    }
+                    const btn = e.currentTarget;
+                    handleAddToCart(e);
+                    playAddToCartAnimation(btn, { image: resolveImageUrl(product.imageUrl || images[0] || "") });
+                  }}
                 >
-                  -
-                </button>
-                <span className={styles.qtyValue}>{qty}</span>
-                <button
-                  className={styles.qtyBtn}
-                  onClick={() => setQty((q) => q + 1)}
-                  aria-label="Increase quantity"
-                >
-                  +
+                  <span data-label style={{ display: "inline-block" }}>
+                    {cartLine ? `✓ In Cart (${cartLine.quantity}) · View Cart →` : "Add to Sacred Cart +"}
+                  </span>
                 </button>
               </div>
-
-              <button
-                className={`${styles.addToCartBtn} ${added ? styles.addedBtn : ""}`}
-                onClick={handleAddToCart}
-              >
-                {added ? "✓ Added to Sacred Cart" : "Add to Sacred Cart +"}
-              </button>
 
               <button className={styles.buyNowBtn} onClick={handleBuyNow}>
                 Buy Now →
               </button>
             </div>
+
+            {/* Delivery perks */}
+            <div className={styles.perks}>
+              <span>🚚 Free shipping</span>
+              <span>↩ 7-day returns</span>
+              <span>🔒 Secure payment</span>
+            </div>
+
+            {/* Highlights */}
+            {highlights.length > 0 && (
+              <ul className={styles.highlights}>
+                {highlights.map((h, i) => (
+                  <li key={i}>{h}</li>
+                ))}
+              </ul>
+            )}
 
             {/* Trust Badges */}
             <div className={styles.trustGrid}>
@@ -326,6 +411,7 @@ export default function ProductDetail() {
         </div>
 
         {/* Information Tabs */}
+        <Reveal>
         <section className={styles.infoSection}>
           <div className={styles.tabsHeader}>
             <button
@@ -403,9 +489,47 @@ export default function ProductDetail() {
             )}
           </div>
         </section>
+        </Reveal>
+
+        {/* How to Use / Did You Know */}
+        <Reveal>
+        <div className={styles.infoPair}>
+          <div className={styles.infoCard}>
+            <span className={styles.infoCardKicker}>Guidance</span>
+            <h3 className={styles.infoCardTitle}>How to Use</h3>
+            <ol className={styles.infoList}>
+              {(howToUse.length
+                ? howToUse
+                : [
+                    "Find a quiet corner of your home or altar and settle your breath.",
+                    "Set a simple sankalpa (intention) before you begin.",
+                    "Use the offering slowly and mindfully, staying present with the senses.",
+                    "Close with a moment of gratitude and store it in a dry, clean place.",
+                  ]
+              ).map((s, i) => (
+                <li key={i}>{s}</li>
+              ))}
+            </ol>
+          </div>
+          <div className={`${styles.infoCard} ${styles.infoCardAccent}`}>
+            <span className={styles.infoCardKicker}>Did You Know?</span>
+            <h3 className={styles.infoCardTitle}>Rooted in Tradition</h3>
+            <p className={styles.infoText}>
+              {didYouKnow ||
+                "Every Bhava offering is prepared by artisans following traditional temple methods, then blessed before it reaches your home. Small variations in colour and texture are natural signs of handcrafting."}
+            </p>
+          </div>
+        </div>
+        </Reveal>
+
+        {/* Customer Reviews */}
+        <Reveal>
+          <ReviewsSection productId={product._id} productTitle={product.title} onSummary={handleReviewSummary} />
+        </Reveal>
 
         {/* Similar Products Section */}
         {similarProducts.length > 0 && (
+          <Reveal>
           <section className={styles.similarSection}>
             <div className={styles.similarHeader}>
               <span className={styles.similarKicker}>Sacred Pairings</span>
@@ -492,6 +616,7 @@ export default function ProductDetail() {
               ))}
             </div>
           </section>
+          </Reveal>
         )}
       </div>
     </div>

@@ -17,6 +17,7 @@ import ContactUs from "./pages/ContactUs";
 import FAQPage from "./pages/FAQPage";
 import AuthPage from "./auth/AuthPage";
 import CartPage from "./cart/CartPage";
+import CheckoutPage from "./cart/CheckoutPage";
 import ProfilePage from "./account/ProfilePage";
 import OrdersPage from "./account/OrdersPage";
 import AddressesPage from "./account/AddressesPage";
@@ -41,6 +42,7 @@ function App() {
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
 
             {/* Account pages */}
             <Route path="/account/profile"   element={<ProfilePage />} />
