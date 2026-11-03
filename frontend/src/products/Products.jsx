@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./Products.module.css";
 import { useCart } from "../context/CartContext";
+import { playAddToCartAnimation } from "../utils/cartAnimation";
+import { QuantityDecrease, QuantityValue, QuantityIncrease } from "../components/Quantity";
 import RitualTierCards, {
   homeRitualTiers,
   premiumRitualTiers,
@@ -115,7 +117,7 @@ const CATEGORIES = [
 ];
 
 export default function Products() {
-  const { addToCart, itemCount } = useCart();
+  const { addToCart, itemCount, cartItems } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -127,7 +129,6 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modalQty, setModalQty] = useState(1);
   const [toastMessage, setToastMessage] = useState(null);
-  const [addedIds, setAddedIds] = useState({});
 
   // Dynamic banner & headings loaded from backend
   const bannerData = useHomepageSection("productsBanner");
@@ -164,6 +165,9 @@ export default function Products() {
     fetchProducts();
   }, []);
 
+  // Is this product already in the cart?
+  const isInCart = (item) => cartItems.some((i) => i.productId === (item._id || item.handle || item.title));
+
   // Handle Add To Cart with instant feedback
   const handleAddToCart = (item, qty = 1, e) => {
     if (e) e.stopPropagation();
@@ -177,18 +181,12 @@ export default function Products() {
       quantity: qty,
     });
 
-    // Button visual state
-    setAddedIds((prev) => ({ ...prev, [item._id]: true }));
-    setTimeout(() => {
-      setAddedIds((prev) => ({ ...prev, [item._id]: false }));
-    }, 2000);
-
     // Toast feedback
     setToastMessage(`✓ Added "${item.title}" to your sacred cart`);
     setTimeout(() => setToastMessage(null), 3500);
 
     // Close modal if open
-    if (selectedProduct) setSelectedProduct(null);
+    if (selectedProduct) setTimeout(() => setSelectedProduct(null), 1300);
   };
 
   // Filter & Sort Logic
@@ -419,7 +417,7 @@ export default function Products() {
         {!loading && filteredProducts.length > 0 && (
           <div className={styles.grid}>
             {filteredProducts.map((item) => {
-              const isAdded = addedIds[item._id];
+              const isAdded = isInCart(item);
               const displayCategory = item.meta?.productType || item.subtitle || "Sacred Item";
               const priceDisplay = item.badgeText || "₹999";
               const comparePrice = item.meta?.compareAtPrice ? `₹${item.meta.compareAtPrice}` : null;
@@ -474,10 +472,21 @@ export default function Products() {
 
                       <button
                         className={`${styles.addBtn} ${isAdded ? styles.addBtnAdded : ""}`}
-                        onClick={(e) => handleAddToCart(item, 1, e)}
-                        aria-label={`Add ${item.title} to cart`}
+                        onClick={(e) => {
+                          if (isAdded) {
+                            e.stopPropagation();
+                            navigate("/cart");
+                          } else {
+                            const btn = e.currentTarget;
+                            handleAddToCart(item, 1, e);
+                            playAddToCartAnimation(btn, { image: resolveImageUrl(item.imageUrl) });
+                          }
+                        }}
+                        aria-label={isAdded ? `${item.title} is in your cart. View cart` : `Add ${item.title} to cart`}
                       >
-                        {isAdded ? "✓ Added!" : "Add to Cart +"}
+                        <span data-label style={{ display: "inline-block" }}>
+                          {isAdded ? "✓ View Cart →" : "Add to Cart +"}
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -537,27 +546,28 @@ export default function Products() {
               <div className={styles.modalActions}>
                 {/* Quantity Controls */}
                 <div className={styles.qtyWrapper}>
-                  <button
-                    className={styles.qtyBtn}
-                    onClick={() => setModalQty((q) => Math.max(1, q - 1))}
-                  >
-                    -
-                  </button>
-                  <span className={styles.qtyValue}>{modalQty}</span>
-                  <button
-                    className={styles.qtyBtn}
-                    onClick={() => setModalQty((q) => q + 1)}
-                  >
-                    +
-                  </button>
+                  <QuantityDecrease value={modalQty} onClick={() => setModalQty((q) => Math.max(1, q - 1))} />
+                  <QuantityValue>{modalQty}</QuantityValue>
+                  <QuantityIncrease value={modalQty} max={99} onClick={() => setModalQty((q) => q + 1)} />
                 </div>
 
                 {/* Add to Cart */}
                 <button
-                  className={styles.modalAddBtn}
-                  onClick={() => handleAddToCart(selectedProduct, modalQty)}
+                  className={`${styles.modalAddBtn} ${isInCart(selectedProduct) ? styles.modalAddBtnDone : ""}`}
+                  onClick={(e) => {
+                    if (isInCart(selectedProduct)) {
+                      setSelectedProduct(null);
+                      navigate("/cart");
+                      return;
+                    }
+                    const btn = e.currentTarget;
+                    handleAddToCart(selectedProduct, modalQty);
+                    playAddToCartAnimation(btn, { image: resolveImageUrl(selectedProduct.imageUrl) });
+                  }}
                 >
-                  Add {modalQty} to Sacred Cart
+                  <span data-label style={{ display: "inline-block" }}>
+                    {isInCart(selectedProduct) ? "✓ In Cart · View Cart →" : `Add ${modalQty} to Sacred Cart`}
+                  </span>
                 </button>
               </div>
             </div>

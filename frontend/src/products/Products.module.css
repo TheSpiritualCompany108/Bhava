@@ -62,11 +62,11 @@
 }
 
 .bannerImg {
-  width: 100%;
-  height: auto;
-  max-width: 100%;
   display: block;
-  object-fit: contain;
+  width: 100%;
+  height: clamp(230px, 34vw, 620px); /* full width, no side gaps */
+  object-fit: cover;
+  object-position: center 38%; /* keeps the subjects (statue, box, mala) in frame */
 }
 
 /* ── Collection Headings & Search Outside Box, Above Categories ── */
@@ -440,7 +440,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .addBtn:hover {
@@ -450,7 +450,6 @@
 
 .addBtnAdded {
   background: #2e7d52 !important;
-  pointer-events: none;
 }
 
 /* ── Modal / Quick View ── */
@@ -592,6 +591,14 @@
   background: #e8e0d3;
 }
 
+/* Modal quantity box (animated Quantity component) */
+.modalActions .qtyWrapper {
+  border: 1.5px solid #dcd3c7;
+  border-radius: 10px;
+  background: #fbf9f6;
+  padding: 0 2px;
+}
+
 .qtyValue {
   width: 40px;
   text-align: center;
@@ -610,6 +617,9 @@
   font-weight: 700;
   cursor: pointer;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s ease;
 }
 
 .modalAddBtn:hover {
@@ -684,4 +694,9 @@
   .qtyWrapper {
     justify-content: center;
   }
+}
+
+.modalAddBtnDone,
+.modalAddBtnDone:hover {
+  background: #2e7d52;
 }

@@ -2,6 +2,7 @@ import express from "express";
 import {
   createPreorder,
   placeOrder,
+  checkout,
   getMyOrders,
   getAllOrders,
 } from "../controllers/orderController.js";
@@ -14,6 +15,9 @@ router.post("/preorder", createPreorder);
 
 // Protected: place order from cart
 router.post("/", protect, placeOrder);
+
+// Protected: secure checkout (server re-prices items)
+router.post("/checkout", protect, checkout);
 
 // Protected: get current user's orders
 router.get("/", protect, getMyOrders);

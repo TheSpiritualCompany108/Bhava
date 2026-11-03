@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const orderItemSchema = new mongoose.Schema({
-  productId: { type: Number, required: true },
+  productId: { type: mongoose.Schema.Types.Mixed, required: true }, // Number (legacy) or Tile ObjectId string
   title:     { type: String, required: true },
   price:     { type: String, required: true },
   priceNum:  { type: Number, required: true },
@@ -41,11 +41,25 @@ const orderSchema = new mongoose.Schema(
 
     // Shipping address (optional at pre-order stage)
     address: {
+      fullName: { type: String, default: "" },
+      phone:    { type: String, default: "" },
       line1:   { type: String, default: "" },
+      line2:   { type: String, default: "" },
       city:    { type: String, default: "" },
       state:   { type: String, default: "" },
       pincode: { type: String, default: "" },
     },
+
+    // Price breakdown for checkout orders
+    pricing: {
+      subtotal: { type: Number, default: 0 },
+      discount: { type: Number, default: 0 },
+      shipping: { type: Number, default: 0 },
+      total:    { type: Number, default: 0 },
+    },
+
+    paymentMethod: { type: String, enum: ["cod", "online"], default: "cod" },
+    paymentStatus: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
 
     notes: { type: String, default: "" },
   },

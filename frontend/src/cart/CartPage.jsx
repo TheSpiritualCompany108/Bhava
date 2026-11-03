@@ -51,10 +51,9 @@ function CartPage() {
   const handleCheckout = () => {
     const token = localStorage.getItem("bhava_token");
     if (!token) {
-      navigate("/auth");
+      navigate("/auth", { state: { from: "/checkout" } });
     } else {
-      // TODO: navigate to checkout/payment page
-      alert("Checkout coming soon! Your order has been noted.");
+      navigate("/checkout");
     }
   };
 
