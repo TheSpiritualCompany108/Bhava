@@ -29,7 +29,7 @@ function BhavaOptionDialog({ isOpen, onClose, onSelectChat, onSelectCall }) {
           <div className={styles.iconCircle}>
             <span className={styles.sparkle}>✨</span>
           </div>
-          <h3 className={styles.title}>Connect with Bhagwati</h3>
+          <h3 className={styles.title}>Connect with Bhava:</h3>
           <p className={styles.subtitle}>Choose how you would like to interact with the AI assistant.</p>
         </div>
 
@@ -41,7 +41,7 @@ function BhavaOptionDialog({ isOpen, onClose, onSelectChat, onSelectCall }) {
               </div>
               <span className={styles.badge}>Text AI</span>
             </div>
-            <h4 className={styles.cardTitle}>Chat with Bhagwati</h4>
+            <h4 className={styles.cardTitle}>Chat with Bhava:</h4>
             <p className={styles.cardDesc}>Text-based instant answers on rituals, sacred items, and practice wisdom.</p>
             <div className={styles.cardAction}>
               <span>Start Chat</span>
@@ -63,7 +63,7 @@ function BhavaOptionDialog({ isOpen, onClose, onSelectChat, onSelectCall }) {
               </div>
               <span className={styles.badgeLive}>Real-time Voice</span>
             </div>
-            <h4 className={styles.cardTitle}>Call with Bhagwati</h4>
+            <h4 className={styles.cardTitle}>Call with Bhava:</h4>
             <p className={styles.cardDesc}>Live low-latency voice call powered by speech recognition & Neural TTS.</p>
             <div className={styles.cardActionCall}>
               <span>Start Call</span>

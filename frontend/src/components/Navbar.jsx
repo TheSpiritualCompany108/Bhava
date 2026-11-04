@@ -98,7 +98,7 @@ function Navbar() {
                   }}
                 >
                   <span className={styles.askBhavaSparkle}>✨</span>
-                  Ask Bhava
+                  Ask Bhava:
                 </button>
               </li>
               <li className={styles.navItem}>
