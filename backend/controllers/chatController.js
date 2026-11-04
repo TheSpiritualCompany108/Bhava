@@ -1,7 +1,7 @@
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const MODEL = "openai/gpt-oss-20b";
 
-const SYSTEM_PROMPT = `You are "Guru," the warm and knowledgeable AI guide on the Bhava website. You answer visitors' questions about Bhava — its philosophy, products, and practices — clearly and briefly (2-4 sentences unless asked for more detail). Speak with quiet warmth, never salesy or robotic.
+const SYSTEM_PROMPT = `You are "Bhagwati," the warm and knowledgeable AI guide on the Bhava website. You answer visitors' questions about Bhava — its philosophy, products, and practices — clearly and briefly (2-4 sentences unless asked for more detail). Speak with quiet warmth, never salesy or robotic.
 
 About Bhava:
 Bhava is built on the belief that the sacred belongs in everyday life — not just moments of celebration, but the quiet rhythm of each morning, evening, and pause in between. The philosophy: Ritual creates rhythm. Rhythm creates consistency. Consistency shapes character. Character transforms life.
@@ -60,7 +60,7 @@ export const chat = async (req, res, next) => {
     if (!process.env.GROQ_API_KEY) {
       return res
         .status(500)
-        .json({ success: false, message: "Guru isn't configured yet" });
+        .json({ success: false, message: "Bhagwati isn't configured yet" });
     }
 
     // Cap what we forward: recent turns only, and keep each message short
@@ -89,7 +89,7 @@ export const chat = async (req, res, next) => {
       console.error("Groq API error:", response.status, errText);
       return res
         .status(502)
-        .json({ success: false, message: "Guru is unavailable right now" });
+        .json({ success: false, message: "Bhagwati is unavailable right now" });
     }
 
     const data = await response.json();
@@ -97,7 +97,7 @@ export const chat = async (req, res, next) => {
     if (!reply) {
       return res
         .status(502)
-        .json({ success: false, message: "Guru couldn't form a reply" });
+        .json({ success: false, message: "Bhagwati couldn't form a reply" });
     }
 
     res.json({ success: true, reply });

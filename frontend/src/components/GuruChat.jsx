@@ -4,7 +4,7 @@ import BhavaVoiceCall from "./BhavaVoiceCall";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-const GREETING = "Namaste 🙏 I'm Bhagwati. Ask me anything about Bhava — our rituals, products, or practices.";
+const GREETING = "Namaste 🙏 I'm Bhagwati. Ask me anything about Bhava: — our rituals, products, or practices.";
 
 function GuruChat() {
   const [open, setOpen] = useState(false);
@@ -53,10 +53,10 @@ function GuruChat() {
       if (res.ok && json.success) {
         setMessages((prev) => [...prev, { role: "assistant", content: json.reply }]);
       } else {
-        setError(json.message || "Guru couldn't reply just now.");
+        setError(json.message || "Bhagwati couldn't reply just now.");
       }
     } catch {
-      setError("Couldn't reach Guru — check your connection and try again.");
+      setError("Couldn't reach Bhagwati — check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -70,8 +70,8 @@ function GuruChat() {
             <div className={styles.headerTitle}>
               <span className={styles.headerIcon}>🕉️</span>
               <div>
-                <p className={styles.headerName}>Guru</p>
-                <p className={styles.headerSub}>Ask about Bhava</p>
+                <p className={styles.headerName}>Bhagwati</p>
+                <p className={styles.headerSub}>Ask about Bhava:</p>
               </div>
             </div>
             <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
@@ -110,7 +110,7 @@ function GuruChat() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Bhagwati anything about Bhava…"
+              placeholder="Ask Bhagwati anything about Bhava:…"
               className={styles.input}
               disabled={loading}
             />
