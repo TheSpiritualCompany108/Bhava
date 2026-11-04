@@ -8,7 +8,7 @@ import RitualTierCards, {
   homeRitualTiers,
   premiumRitualTiers,
 } from "../components/RitualTierCards";
-import useHomepageSection, { resolveHomepageImageUrl } from "../hooks/useHomepageSection";
+import { useHomepageSectionState, resolveHomepageImageUrl } from "../hooks/useHomepageSection";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -131,7 +131,7 @@ export default function Products() {
   const [toastMessage, setToastMessage] = useState(null);
 
   // Dynamic banner & headings loaded from backend
-  const bannerData = useHomepageSection("productsBanner");
+  const [bannerData, bannerLoaded] = useHomepageSectionState("productsBanner");
   const bannerImgSrc =
     bannerData?.bannerImage || bannerData?.image || bannerData?.items?.banner?.image
       ? resolveHomepageImageUrl(bannerData.bannerImage || bannerData.image || bannerData.items?.banner?.image)
@@ -297,6 +297,7 @@ export default function Products() {
             src={bannerImgSrc}
             alt="Bhava Sacred Collections Banner"
             className={styles.bannerImg}
+            style={{ visibility: bannerLoaded ? "visible" : "hidden" }}
           />
         </div>
       </section>

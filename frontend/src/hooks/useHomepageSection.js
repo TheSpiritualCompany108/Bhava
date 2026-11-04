@@ -23,12 +23,17 @@ const cache = {};
 // "sacredKnowledge"). Returns {} until loaded — callers should merge this
 // on top of their own hardcoded defaults rather than treating it as the
 // full content, so the site still renders correctly with nothing saved.
-export default function useHomepageSection(key) {
+// Same as the default export, but also reports whether the fetch has finished
+// ([data, loaded]) so callers can avoid flashing their hardcoded default
+// before the admin-saved content arrives.
+export function useHomepageSectionState(key) {
   const [data, setData] = useState(cache[key] || {});
+  const [loaded, setLoaded] = useState(!!cache[key]);
 
   useEffect(() => {
     if (cache[key]) {
       setData(cache[key]);
+      setLoaded(true);
       return;
     }
     let alive = true;
@@ -40,9 +45,14 @@ export default function useHomepageSection(key) {
         cache[key] = value;
         setData(value);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => { if (alive) setLoaded(true); });
     return () => { alive = false; };
   }, [key]);
 
-  return data;
+  return [data, loaded];
+}
+
+export default function useHomepageSection(key) {
+  return useHomepageSectionState(key)[0];
 }
