@@ -20,7 +20,7 @@ export default function BhavaVoiceCall({ isOpen: propIsOpen, onClose: propOnClos
   // Call States: 'IDLE' | 'SPEAK_NOW' | 'PLEASE_WAIT' | 'AI_SPEAKING' | 'MUTED'
   const [callState, setCallState] = useState("IDLE");
   const [callSeconds, setCallSeconds] = useState(0);
-  const [activeAgent, setActiveAgent] = useState("Bhagwati");
+  const [activeAgent, setActiveAgent] = useState("Bhava:");
   const [wsConnected, setWsConnected] = useState(false);
   const [statusNote, setStatusNote] = useState("Click mic to start call");
 
@@ -113,7 +113,7 @@ export default function BhavaVoiceCall({ isOpen: propIsOpen, onClose: propOnClos
 
       ws.onopen = () => {
         setWsConnected(true);
-        setStatusNote("Connected to Bhava Voice Pipeline");
+        setStatusNote("Connected to Bhava: Voice Pipeline");
       };
 
       ws.onclose = () => {
@@ -152,7 +152,7 @@ export default function BhavaVoiceCall({ isOpen: propIsOpen, onClose: propOnClos
 
       case "stt_result":
         setCallState("PLEASE_WAIT");
-        setStatusNote("Speech captured — consulting Bhagwati...");
+        setStatusNote("Speech captured — consulting Bhava:...");
         break;
 
       case "agent_chunk":
@@ -163,7 +163,7 @@ export default function BhavaVoiceCall({ isOpen: propIsOpen, onClose: propOnClos
 
       case "audio_start":
         setCallState("AI_SPEAKING");
-        setStatusNote(`${data.agent || "Bhagwati"} is speaking now...`);
+        setStatusNote(`${data.agent || "Bhava:"} is speaking now...`);
         break;
 
       case "audio_chunk":
@@ -463,7 +463,7 @@ export default function BhavaVoiceCall({ isOpen: propIsOpen, onClose: propOnClos
           icon: "🗣️",
           badge: "YOUR TURN",
           title: "SPEAK NOW",
-          sub: "Microphone active — speak clearly to Bhagwati.",
+          sub: "Microphone active — speak clearly to Bhava:.",
         };
       case "PLEASE_WAIT":
         return {
@@ -496,7 +496,7 @@ export default function BhavaVoiceCall({ isOpen: propIsOpen, onClose: propOnClos
           icon: "🎙️",
           badge: "LIVE VOICE CALL",
           title: "START VOICE CALL",
-          sub: "Tap Mic to connect with Bhagwati AI Guide.",
+          sub: "Tap Mic to connect with Bhava: AI Guide.",
         };
     }
   };
@@ -537,7 +537,7 @@ export default function BhavaVoiceCall({ isOpen: propIsOpen, onClose: propOnClos
             <div className={styles.avatarGlowRing} />
             <div className={styles.avatarOrb}>🕉️</div>
           </div>
-          <h2 className={styles.callerName}>Bhagwati</h2>
+          <h2 className={styles.callerName}>Bhava:</h2>
           <p className={styles.callerRole}>{activeAgent}</p>
           <div className={styles.callTimerBadge}>{formatTimer(callSeconds)}</div>
         </div>
