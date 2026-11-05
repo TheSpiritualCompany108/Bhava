@@ -26,7 +26,7 @@ const serviceCards = [
     image: "/sacred education.png",
     icon: "auto_stories",
     title: "Sacred Education",
-    color: "#2A1845",
+    color: "#4A0B1D",
     description:
       "Learn and explore India's sacred knowledge through courses, workshops and well-structured learning experiences.",
     route: "/knowledge",
@@ -36,7 +36,7 @@ const serviceCards = [
     image: "/retreats.png",
     icon: "self_improvement",
     title: "Retreats",
-    color: "#3D6B4F",
+    color: "#8A2642",
     description:
       "Step away from the everyday and reconnect within. Join immersive spiritual retreats and mindful experiences.",
     route: "/community",

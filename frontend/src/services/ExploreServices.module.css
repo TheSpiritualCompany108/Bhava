@@ -32,7 +32,7 @@
   font-family: 'Canela', 'Work Sans', serif;
   font-size: 1.6rem;
   font-weight: 700;
-  color: #2A1845;
+  color: #4A0B1D;
   margin: 0;
 }
 
@@ -88,7 +88,7 @@
   font-family: 'Canela', 'Work Sans', serif;
   font-size: 2.4rem;
   font-weight: 700;
-  color: #2A1845;
+  color: #4A0B1D;
   margin: 0 0 12px;
 }
 
@@ -230,7 +230,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: #2A1845;
+  background: #4A0B1D;
   color: #fff;
   border: none;
   padding: 14px 30px;
