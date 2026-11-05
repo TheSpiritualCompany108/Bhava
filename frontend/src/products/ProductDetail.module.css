@@ -90,7 +90,7 @@
   position: absolute;
   top: 16px;
   left: 16px;
-  background: rgba(30, 45, 30, 0.9);
+  background: rgba(74, 11, 29, 0.9);
   color: #fff;
   padding: 5px 12px;
   border-radius: 999px;
@@ -215,8 +215,8 @@
 }
 
 .discountBadge {
-  background: #e6f4ea;
-  color: #137333;
+  background: #FFF1E4;
+  color: #C0671E;
   font-size: 12px;
   font-weight: 700;
   padding: 3px 8px;
@@ -235,7 +235,7 @@
   align-items: center;
   gap: 8px;
   font-size: 13.5px;
-  color: #2e7d52;
+  color: #4A0B1D;
   font-weight: 600;
   margin-bottom: 18px;
 }
@@ -243,10 +243,10 @@
 .stockDot {
   width: 8px;
   height: 8px;
-  background: #2e7d52;
+  background: #E07B39;
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 0 3px rgba(46, 125, 82, 0.2);
+  box-shadow: 0 0 0 3px rgba(224, 123, 57, 0.25);
 }
 
 .intentionBox {
@@ -356,8 +356,8 @@
 }
 
 .addedBtn {
-  background: #2e7d52 !important;
-  border-color: #2e7d52 !important;
+  background: #4A0B1D !important;
+  border-color: #4A0B1D !important;
   color: #ffffff !important;
 }
 
@@ -742,8 +742,8 @@
   100% { transform: scale(1); }
 }
 @keyframes pulseDot {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(46, 125, 82, 0.2); }
-  50%      { box-shadow: 0 0 0 7px rgba(46, 125, 82, 0); }
+  0%, 100% { box-shadow: 0 0 0 3px rgba(224, 123, 57, 0.25); }
+  50%      { box-shadow: 0 0 0 7px rgba(224, 123, 57, 0); }
 }
 @keyframes shine {
   from { transform: translateX(-120%) skewX(-20deg); }
