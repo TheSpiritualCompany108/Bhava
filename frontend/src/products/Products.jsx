@@ -297,6 +297,7 @@ export default function Products() {
             src={bannerImgSrc}
             alt="Bhava Sacred Collections Banner"
             className={styles.bannerImg}
+            fetchPriority="high"
             style={{ visibility: bannerLoaded ? "visible" : "hidden" }}
           />
         </div>

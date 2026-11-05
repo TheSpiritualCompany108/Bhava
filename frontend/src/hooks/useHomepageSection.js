@@ -26,11 +26,26 @@ const cache = {};
 // Same as the default export, but also reports whether the fetch has finished
 // ([data, loaded]) so callers can avoid flashing their hardcoded default
 // before the admin-saved content arrives.
+// Last-seen content is also kept in localStorage, so on a page refresh we can
+// render instantly instead of waiting for the (cold-start-prone) API, then
+// refresh it in the background (stale-while-revalidate).
+const LS_PREFIX = "bhava_homepage_";
+const readStored = (key) => {
+  try {
+    const raw = localStorage.getItem(LS_PREFIX + key);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
 export function useHomepageSectionState(key) {
-  const [data, setData] = useState(cache[key] || {});
-  const [loaded, setLoaded] = useState(!!cache[key]);
+  const initial = cache[key] || readStored(key);
+  const [data, setData] = useState(initial || {});
+  const [loaded, setLoaded] = useState(!!initial);
 
   useEffect(() => {
+    // Already fetched during this page session — nothing more to do.
     if (cache[key]) {
       setData(cache[key]);
       setLoaded(true);
@@ -43,6 +58,7 @@ export function useHomepageSectionState(key) {
         if (!alive) return;
         const value = json.success ? json.data || {} : {};
         cache[key] = value;
+        try { localStorage.setItem(LS_PREFIX + key, JSON.stringify(value)); } catch { /* storage full/blocked */ }
         setData(value);
       })
       .catch(() => {})
