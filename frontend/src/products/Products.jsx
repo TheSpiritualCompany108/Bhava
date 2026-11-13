@@ -6,7 +6,11 @@ import { useCart } from "../context/CartContext";
 import useCatalog from "../hooks/useCatalog";
 import { useHomepageSectionState, resolveHomepageImageUrl } from "../hooks/useHomepageSection";
 import { ProductCard, BundleCard } from "../shop/Cards";
-import { shopTabs, productHasFragrance, bundleHasFragrance } from "../shop/shopUtils";
+import {
+  shopTabs, productHasFragrance, bundleHasFragrance, productInStock, bundleInStock,
+  FORMAT_FILTERS, PRICE_FILTERS, INTENTION_FILTERS, matchesFormat, matchesPrice, matchesIntention,
+} from "../shop/shopUtils";
+import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 
 const FRAGRANCE_FILTERS = ["guggal", "oud", "sandalwood"];
 
@@ -20,6 +24,10 @@ export default function Products() {
   const tab = tabs.some((t) => t.id === params.get("category")) ? params.get("category") : "all";
   const [showMore, setShowMore] = useState(false);
   const fragrance = FRAGRANCE_FILTERS.includes(params.get("fragrance")) ? params.get("fragrance") : "";
+  const format = FORMAT_FILTERS.some((f) => f.id === params.get("format")) ? params.get("format") : "";
+  const priceRange = PRICE_FILTERS.some((f) => f.id === params.get("price")) ? params.get("price") : "";
+  const intention = INTENTION_FILTERS.some((f) => f.id === params.get("intention")) ? params.get("intention") : "";
+  const availability = params.get("availability") === "in-stock" ? "in-stock" : "";
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("featured");
   const [toast, setToast] = useState(null);
@@ -64,6 +72,22 @@ export default function Products() {
       products = products.filter(({ p }) => productHasFragrance(catalog, p, fragrance));
       bundles = bundles.filter(({ b }) => bundleHasFragrance(catalog, b, fragrance));
     }
+    if (format) {
+      products = products.filter(({ p }) => matchesFormat(p, null, format));
+      bundles = bundles.filter(({ b }) => matchesFormat(null, b, format));
+    }
+    if (priceRange) {
+      products = products.filter(({ p }) => matchesPrice(p.price, priceRange));
+      bundles = bundles.filter(({ b }) => matchesPrice(b.price, priceRange));
+    }
+    if (intention) {
+      products = products.filter(({ p }) => matchesIntention(p, intention));
+      bundles = [];
+    }
+    if (availability === "in-stock") {
+      products = products.filter(({ p }) => productInStock(catalog, p));
+      bundles = bundles.filter(({ b }) => bundleInStock(catalog, b.slug));
+    }
     if (q) {
       products = products.filter(({ p }) => `${p.name} ${p.tagline} ${p.description} ${p.pack}`.toLowerCase().includes(q));
       bundles = bundles.filter(({ b }) => `${b.name} ${b.tagline} ${b.description}`.toLowerCase().includes(q));
@@ -83,12 +107,17 @@ export default function Products() {
       sortedB.sort((a, b) => (a.featured === b.featured ? (a.featured ? a.priority - b.priority : a.sortOrder - b.sortOrder) : a.featured ? -1 : 1));
     }
     return { products: sortedP, bundles: sortedB };
-  }, [catalog, tab, fragrance, q, q0, sortBy, showMore]);
+  }, [catalog, tab, fragrance, format, priceRange, intention, availability, q, q0, sortBy, showMore]);
 
   const total = items.products.length + items.bundles.length;
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Shop incense, Sambrani, camphor and sacred beads | Bhava"
+        description={clipDesc("Sacred Notes incense, Pure Ritual, Sacred Ember, Sambrani, camphor and six intention bracelets from Bhava by The Spiritual Company.")}
+        canonical={`${siteOrigin()}/products`}
+      />
       {toast && (
         <div className={styles.toast} role="status">
           <span>✓ Added “{toast}” to your cart</span>
@@ -171,6 +200,26 @@ export default function Products() {
           </div>
 
           <div className={styles.sortContainer}>
+            <label htmlFor="formatSelect" className={styles.sortLabel}>Format</label>
+            <select id="formatSelect" value={format} onChange={(e) => setParam("format", e.target.value)} className={styles.sortSelect}>
+              <option value="">All formats</option>
+              {FORMAT_FILTERS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
+            </select>
+            <label htmlFor="priceSelect" className={styles.sortLabel}>Price</label>
+            <select id="priceSelect" value={priceRange} onChange={(e) => setParam("price", e.target.value)} className={styles.sortSelect}>
+              <option value="">All prices</option>
+              {PRICE_FILTERS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
+            </select>
+            <label htmlFor="intentionSelect" className={styles.sortLabel}>Intention</label>
+            <select id="intentionSelect" value={intention} onChange={(e) => setParam("intention", e.target.value)} className={styles.sortSelect}>
+              <option value="">All intentions</option>
+              {INTENTION_FILTERS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
+            </select>
+            <label htmlFor="availSelect" className={styles.sortLabel}>Availability</label>
+            <select id="availSelect" value={availability} onChange={(e) => setParam("availability", e.target.value)} className={styles.sortSelect}>
+              <option value="">All</option>
+              <option value="in-stock">In stock</option>
+            </select>
             <label htmlFor="sortSelect" className={styles.sortLabel}>Sort By:</label>
             <select id="sortSelect" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className={styles.sortSelect}>
               <option value="featured">Featured</option>

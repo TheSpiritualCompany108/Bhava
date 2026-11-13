@@ -27,6 +27,7 @@ import AdminLogin from "./admin/AdminLogin";
 import AdminPage from "./admin/AdminPage";
 import ProductDetail from "./products/ProductDetail";
 import BundleDetail from "./products/BundleDetail";
+import PolicyPage from "./pages/PolicyPage";
 
 function App() {
   return (
@@ -59,6 +60,10 @@ function App() {
             <Route path="/community"  element={<CommunityPage />} />
             <Route path="/contact"    element={<ContactUs />} />
             <Route path="/faq"        element={<FAQPage />} />
+            <Route path="/shipping-policy" element={<PolicyPage />} />
+            <Route path="/returns-refund-policy" element={<PolicyPage />} />
+            <Route path="/privacy-policy" element={<PolicyPage />} />
+            <Route path="/terms" element={<PolicyPage />} />
             <Route path="/knowledge"  element={<Knowledge />} />
             <Route path="/knowledge/*" element={<KnowledgeRoutes />} />
               <Route path="/career"     element={<CareerPage />} />

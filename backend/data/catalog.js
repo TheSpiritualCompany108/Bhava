@@ -33,14 +33,36 @@ export function buildCtx({ products = [], bundles = [], categories = [] }) {
   };
 }
 
-/** Bundle price = sum of component prices (bracelet choice slots use the highest bracelet price). null if a component is missing. */
-export function bundlePrice(ctx, b) {
+const braceletPrices = (ctx) =>
+  ctx.bracelets.map((s) => ctx.getProduct(s)?.price).filter((n) => Number.isFinite(n));
+
+/** Lowest bracelet price — used as the listing / “from” price until a specific bracelet is chosen. */
+const cheapestBracelet = (ctx) => {
+  const prices = braceletPrices(ctx);
+  return prices.length ? Math.min(...prices) : null;
+};
+
+/**
+ * Bundle price = exact sum of component prices.
+ * Bracelet choice slots: selected SKU price when `selection.bracelets` is provided; otherwise the cheapest bracelet (listing “from” price).
+ * Returns null if a component is missing.
+ */
+export function bundlePrice(ctx, b, selection) {
   let total = 0;
+  let bi = 0;
+  const chosen = selection?.bracelets || [];
   for (const c of b.components) {
     if (c.bracelet) {
-      const prices = ctx.bracelets.map((s) => ctx.getProduct(s).price);
-      if (!prices.length) return null;
-      total += Math.max(...prices);
+      const slug = chosen[bi++];
+      if (slug) {
+        const p = ctx.getProduct(slug);
+        if (!p) return null;
+        total += p.price;
+      } else {
+        const from = cheapestBracelet(ctx);
+        if (from == null) return null;
+        total += from;
+      }
     } else {
       const p = ctx.getProduct(c.product);
       if (!p || !variantOf(p, c.via === "fixed" ? c.variant : p.variants[0]?.key)) return null;

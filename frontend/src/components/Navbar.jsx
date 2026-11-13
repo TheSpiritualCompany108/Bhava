@@ -21,6 +21,7 @@ function Navbar() {
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [shopOpen, setShopOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { itemCount } = useCart();
 
@@ -112,18 +113,20 @@ function Navbar() {
                   Ask Bhava:
                 </button>
               </li>
-              <li className={`${styles.navItem} ${styles.hasSubmenu}`}>
-                <Link
+              <li className={`${styles.navItem} ${styles.hasSubmenu} ${shopOpen ? styles.submenuOpen : ""}`}>
+                <button
+                  type="button"
                   className={`${styles.navLink} ${/^\/(products?|collection)(\/|$)/.test(location.pathname) ? styles.navLinkActive : ""}`}
-                  to="/products"
-                  onClick={() => setMenuOpen(false)}
+                  aria-expanded={shopOpen}
+                  aria-haspopup="true"
+                  onClick={() => setShopOpen((o) => !o)}
                 >
                   Products
-                </Link>
+                </button>
                 <ul className={styles.submenu} aria-label="Shop categories">
                   {SHOP_NAV.map((n) => (
                     <li key={n.label}>
-                      <Link to={n.to} className={styles.submenuLink} onClick={() => setMenuOpen(false)}>
+                      <Link to={n.to} className={styles.submenuLink} onClick={() => { setMenuOpen(false); setShopOpen(false); }}>
                         {n.label}
                       </Link>
                     </li>

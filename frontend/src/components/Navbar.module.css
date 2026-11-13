@@ -110,7 +110,9 @@
   padding: 8px 15px !important;
   transition: color 0.3s;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
-  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
 }
 
 .navLink:hover {
@@ -572,7 +574,8 @@
   z-index: 60;
 }
 .hasSubmenu:hover > .submenu,
-.hasSubmenu:focus-within > .submenu {
+.hasSubmenu:focus-within > .submenu,
+.hasSubmenu.submenuOpen > .submenu {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);

@@ -38,6 +38,17 @@ const shape = (r) => ({
   createdAt: r.createdAt,
 });
 
+// GET /api/reviews?verified=1&limit=6 — homepage (verified only)
+export const getVerifiedReviews = async (req, res) => {
+  try {
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 6, 1), 12);
+    const reviews = await Review.find({ verified: true }).sort({ createdAt: -1 }).limit(limit).lean();
+    res.json({ success: true, reviews: reviews.map(shape) });
+  } catch {
+    res.status(500).json({ success: false, message: "Could not load reviews" });
+  }
+};
+
 // GET /api/reviews/:productId?sort=recent|highest|lowest  (productId = catalog slug)
 export const getReviews = async (req, res) => {
   try {

@@ -20,7 +20,8 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
   const bracelets = products.filter((p) => p.mode === "none");
 
   // Live price + what the customer must choose (derived exactly like the server does)
-  const price = form.components.reduce((sum, c) => (c.bracelet ? sum + Math.max(0, ...bracelets.map((b) => b.price)) : sum + (pmap[c.product]?.price || 0)), 0);
+  const cheapestBead = bracelets.length ? Math.min(...bracelets.map((b) => b.price)) : 0;
+  const price = form.components.reduce((sum, c) => (c.bracelet ? sum + cheapestBead : sum + (pmap[c.product]?.price || 0)), 0);
   const needs = {
     fragrance: form.components.some((c) => c.via === "fragrance"),
     camphor: form.components.some((c) => c.via === "camphor"),
@@ -122,7 +123,7 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
       <p className={s.hint}>Each component is quantity 1 per collection. Fragrance-linked components share one customer choice (same fragrance across formats).</p>
 
       <div className={s.preview} style={{ marginTop: 12 }}>
-        <div>Computed price: <b>{money(price)}</b> <span className={s.muted}>— always the exact sum of the component prices (no discount, no compare-at price).</span></div>
+        <div>Computed price: <b>{money(price)}</b> <span className={s.muted}>{needs.bracelets ? "— listing “from” uses the cheapest bracelet; the customer pays the selected bracelets plus the other components." : "— always the exact sum of the component prices (no discount, no compare-at price)."}</span></div>
         <div>Customer selects: <b>{picks.length ? picks.join(", ") : "nothing — fixed collection"}</b></div>
       </div>
       <div className={s.field} style={{ marginTop: 12 }}>

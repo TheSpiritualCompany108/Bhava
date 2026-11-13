@@ -6,7 +6,9 @@ import { useCart } from "../context/CartContext";
 import useCatalog from "../hooks/useCatalog";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { FOOTNOTE_PRICE } from "../shop/content";
-import { inr, imgSrc, shippingCopy, getProduct, getBundle, bundleLine } from "../shop/shopUtils";
+import { inr, imgSrc, shippingCopy, getProduct, getBundle, bundleLine, liveBundlePrice, braceletsSamePrice } from "../shop/shopUtils";
+import { addToCartEvent, bundleView } from "../utils/analytics";
+import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 
 const CORE = ["guggal", "oud", "sandalwood"];
 const CAMPHOR = ["guggal", "sandalwood"];
@@ -37,6 +39,9 @@ function BundleDetailInner({ slug }) {
     const t = setTimeout(() => setToast(false), 3500);
     return () => clearTimeout(t);
   }, [toast]);
+  useEffect(() => {
+    if (bundle) bundleView(bundle, bundle.price);
+  }, [bundle]);
 
   if (loading) return <div className={styles.page}><div className={shop.loadingBox}>Loading…</div></div>;
   if (error || !catalog) {
@@ -72,8 +77,11 @@ function BundleDetailInner({ slug }) {
     setBracelets((cur) => (cur.includes(s) ? cur.filter((x) => x !== s) : cur.length < needN ? [...cur, s] : needN === 1 ? [s] : cur));
 
   const selection = { fragrance: fragrance || null, camphor: camphor || null, pair: pair || null, bracelets };
-  const line = ready ? bundleLine(bundle, selection, 1) : null;
+  const livePrice = liveBundlePrice(catalog, bundle, selection);
+  const line = ready ? bundleLine(bundle, selection, 1, livePrice) : null;
   const inCart = line && cartItems.find((i) => i.productId === line.productId);
+  const braceletSlots = bundle.needs.bracelets || 0;
+  const showFrom = braceletSlots > 0 && bracelets.length < braceletSlots && !braceletsSamePrice(catalog);
 
   // Live contents (exact components + quantities)
   let bi = 0;
@@ -95,12 +103,30 @@ function BundleDetailInner({ slug }) {
     if (!ready) return;
     const btn = e.currentTarget;
     addToCart(line);
+    addToCartEvent(line);
     playAddToCartAnimation(btn, { image: line.image });
     setToast(true);
   };
 
   return (
     <div className={styles.page}>
+      <Seo
+        title={`${bundle.name} – Curated collection | Bhava`}
+        description={clipDesc(bundle.description, bundle.tagline)}
+        canonical={`${siteOrigin()}/collection/${bundle.slug}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: bundle.name,
+          description: bundle.description,
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "INR",
+            price: livePrice,
+            availability: avail?.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          },
+        }}
+      />
       {toast && (
         <div className={styles.toast} role="status">
           <span>✓ Added “{bundle.name}” to your cart</span>
@@ -138,7 +164,7 @@ function BundleDetailInner({ slug }) {
           {/* Selectors + purchase */}
           <div className={styles.detailsCol}>
             <div className={styles.priceSection}>
-              <span className={styles.currentPrice}>{inr(bundle.price)}</span>
+              <span className={styles.currentPrice}>{showFrom ? `From ${inr(livePrice)}` : inr(livePrice)}</span>
               <span className={styles.taxNote}>{FOOTNOTE_PRICE}</span>
             </div>
 
@@ -217,6 +243,7 @@ function BundleDetailInner({ slug }) {
                         {on && <span className={shop.tick}>✓</span>}
                         <img src={imgSrc(p.image)} alt="" loading="lazy" />
                         {p.name.replace(" Bracelet", "")}
+                        <div style={{ fontWeight: 400, fontSize: 11 }}>{inr(p.price)}</div>
                         {!stocked && <div style={{ fontWeight: 400, fontSize: 11 }}>Out of stock</div>}
                       </button>
                     );
@@ -230,14 +257,14 @@ function BundleDetailInner({ slug }) {
                 <button className={`${styles.addToCartBtn} ${inCart ? styles.addedBtn : ""}`} disabled={!ready}
                   onClick={(e) => (inCart ? navigate("/cart") : add(e))}>
                   <span data-label style={{ display: "inline-block" }}>
-                    {!avail?.available ? "Unavailable" : missing.length ? `Select ${missing[0]}` : inCart ? "✓ In Cart · View Cart →" : `Add to Cart · ${inr(bundle.price)}`}
+                    {!avail?.available ? "Unavailable" : missing.length ? `Select ${missing[0]}` : inCart ? "✓ In Cart · View Cart →" : `Add to Cart · ${inr(livePrice)}`}
                   </span>
                 </button>
               </div>
             </div>
             <div className={styles.perks} style={{ flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
               <span>🚚 {shippingCopy(catalog.shipping)}</span>
-              {bundle.price >= catalog.shipping.freeAbove && <span>✓ This collection qualifies for free shipping.</span>}
+              {livePrice >= catalog.shipping.freeAbove && <span>✓ This collection qualifies for free shipping.</span>}
             </div>
           </div>
         </div>
