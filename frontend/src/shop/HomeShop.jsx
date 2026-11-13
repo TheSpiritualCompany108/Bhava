@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import s from "./Shop.module.css";
 import useCatalog from "../hooks/useCatalog";
 import { ProductCard, BundleCard } from "./Cards";
-import { getProduct, shippingCopy } from "./shopUtils";
+import { getProduct, shippingCopy, bundleInStock } from "./shopUtils";
 
 // Homepage commerce modules, in the order set by the master playbook (Section 9.3):
 // 2 Shop by format · 3 Discover the fragrances · 4 Start with a format · 5 Curated collections ·
@@ -33,10 +33,17 @@ export default function HomeShop() {
   if (!catalog) return null; // never block the rest of the homepage
 
   const starters = ["sacred-notes-discovery", "pure-ritual-single", "sacred-ember"].map((x) => getProduct(catalog, x)).filter(Boolean);
-  const byModule = (m) => catalog.bundles.filter((b) => b.homeModule === m).sort((a, b) => (a.priority || 99) - (b.priority || 99));
-  const collections = byModule("curated");
+  const byModule = (m) => catalog.bundles
+    .filter((b) => b.homeModule === m)
+    .sort((a, b) => {
+      const aOk = bundleInStock(catalog, a.slug) ? 0 : 1;
+      const bOk = bundleInStock(catalog, b.slug) ? 0 : 1;
+      if (aOk !== bOk) return aOk - bOk;
+      return (a.priority || 99) - (b.priority || 99);
+    });
+  const collections = byModule("curated").filter((b) => bundleInStock(catalog, b.slug));
   const bracelets = catalog.products.filter((p) => p.category === "sacred-beads");
-  const complete = byModule("complete");
+  const complete = byModule("complete").filter((b) => bundleInStock(catalog, b.slug));
 
   return (
     <>

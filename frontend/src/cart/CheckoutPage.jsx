@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import useCartValidation from "../hooks/useCartValidation";
 import { imgSrc } from "../shop/shopUtils";
+import { beginCheckout, purchaseOnce } from "../utils/analytics";
 import styles from "./CheckoutPage.module.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -53,6 +54,9 @@ export default function CheckoutPage() {
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
+  useEffect(() => {
+    if (priced?.allOk) beginCheckout(cartItems, priced.total);
+  }, [priced?.allOk, priced?.total, cartItems]);
 
   // Server-priced totals only (no client-side discounts or shipping maths)
   const subtotal = priced?.subtotal ?? 0;
@@ -123,6 +127,7 @@ export default function CheckoutPage() {
         setSubmitError(json.message || "Could not place your order. Please try again.");
         if (res.status === 409) setErrors({});
       } else {
+        purchaseOnce(json.orderId, { value: json.total, shipping: json.shipping, items: json.items || [] });
         setPlaced({ orderId: json.orderId, total: json.total });
         clearCart();
         window.scrollTo({ top: 0, behavior: "smooth" });

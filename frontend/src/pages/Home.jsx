@@ -10,33 +10,29 @@ import LivingWisdom from "../components/LivingWisdom";
 import SacredMissionSection from "../components/SacredMissionSection";
 import FundRaiser from "../components/FundRaiser";
 import Community from "../components/Community";
-import AppSection from "../components/AppSection";
-import FAQ from "../components/FAQ";
 import SacredJourney from "../components/SacredJourney";
 import GitaSlider from "../knowledge/GitaSlider";
+import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 
 function Home() {
   return (
     <>
-      {/* Phase I — The Awakening */}
+      <Seo
+        title="Bhava by The Spiritual Company – Incense, Sambrani, Camphor & Sacred Bead Bracelets"
+        description={clipDesc("Shop Sacred Notes incense, Pure Ritual, Sacred Ember cones, Guggal Sambrani, ritual camphor and six intention bracelets from Bhava.")}
+        canonical={`${siteOrigin()}/`}
+      />
       <HomeMain />
-      {/* Shop modules in playbook order: format → fragrances → start → collections → beads → complete → info */}
       <HomeShop />
+      <Community />
       <WhyRituals />
       <SacredKnowledge />
       <GitaSlider />
       <AstrologyTools />
-
-      {/* Phase II — The Daily Practice */}
       <DailySacredRhythm />
       <LivingWisdom />
-      <Community />
-
-      {/* Phase III — Deeper Connection */}
       <SacredMissionSection />
       <FundRaiser />
-      {/* <AppSection /> */}
-      {/* <FAQ /> */}
       <SacredJourney />
     </>
   );

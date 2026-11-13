@@ -160,7 +160,14 @@ function GitaSlider() {
     { reflection: "", ...getTodaysQuote() },
   ]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const quote = quotes[activeIndex % quotes.length];
+  const rawQuote = quotes[activeIndex % Math.max(quotes.length, 1)] || { text: "", ref: "", reflection: "" };
+  const quote = (() => {
+    const text = rawQuote?.text || "";
+    let ref = String(rawQuote?.ref || "").replace(/BHAGWAT/gi, "Bhagavad");
+    if (!/Bhagavad Gita/i.test(ref) && /gita/i.test(ref)) ref = ref.replace(/gita/i, "Gita");
+    if (/karmanye|right to (the )?work|never to the fruit/i.test(text)) ref = "Bhagavad Gita 2.47";
+    return { ...rawQuote, ref };
+  })();
 
   useEffect(() => {
     let cancelled = false;

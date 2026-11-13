@@ -172,15 +172,28 @@ function Footer() {
   const footerColumns = [
     {
       heading: "Bhava: Store",
-      links: ["Shop All Products", "Curated Collections"],
+      links: [
+        { label: "Shop All Products", to: "/products" },
+        { label: "Curated Collections", to: "/products?category=curated-collections" },
+      ],
     },
     {
-      heading: "Sacred Resources",
-      links: ["Vedic Blog", "Rituals Guide", "Temple Partners", "Community", "Services"],
+      heading: "Help",
+      links: [
+        { label: "Shipping", to: "/shipping-policy" },
+        { label: "Returns / Refund", to: "/returns-refund-policy" },
+        { label: "Contact", to: "/contact" },
+        { label: "FAQ", to: "/faq" },
+      ],
     },
     {
       heading: "About Bhava:",
-      links: ["Our Mission", "Sustainability", "Partnerships", "Careers", "Contact Us", "FAQ"],
+      links: [
+        { label: "Our Mission", action: "mission" },
+        { label: "Careers", to: "/career" },
+        { label: "Privacy", to: "/privacy-policy" },
+        { label: "Terms", to: "/terms" },
+      ],
     },
   ];
 
@@ -255,40 +268,19 @@ function Footer() {
           <div key={index} className={styles.footerColumn}>
             <h3 className={styles.footerHeading}>{column.heading}</h3>
             <ul className={styles.footerLinks}>
-              {column.links.map((link, linkIndex) => (
-                <li key={linkIndex}>
-                  {link === "Services" ? (
-                    <Link to="/explore-services" className={styles.contactLink}>{link}</Link>
-                  ) : link === "Contact Us" ? (
-                    <Link to="/contact" className={styles.contactLink}>{link}</Link>
-                  ) : link === "FAQ" ? (
-                    <Link to="/faq" className={styles.contactLink}>{link}</Link>
-                  ) : link === "Careers" ? (
-                    <Link to="/career" className={styles.contactLink}>{link}</Link>
-                  ) : link === "Our Mission" ? (
+              {column.links.map((link) => (
+                <li key={link.label}>
+                  {link.action === "mission" ? (
                     <button
                       type="button"
                       className={styles.contactLink}
                       onClick={handleFooterMissionClick}
                       aria-label="View Sacred Mission"
                     >
-                      {link}
+                      {link.label}
                     </button>
-                  ) : link === "Shop All Products" ? (
-                    <button
-                      type="button"
-                      className={styles.contactLink}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        navigate('/products', { state: { scrollToId: 'products-hero' } })
-                      }}
-                    >
-                      {link}
-                    </button>
-                  ) : link === "Curated Collections" ? (
-                    <Link to="/products?category=curated-collections" className={styles.contactLink}>{link}</Link>
                   ) : (
-                    <a href="#">{link}</a>
+                    <Link to={link.to} className={styles.contactLink}>{link.label}</Link>
                   )}
                 </li>
               ))}
@@ -323,7 +315,7 @@ function Footer() {
 
       <div className={styles.footerBottom}>
         <p className={styles.footerCopyright}>
-          2025 Bhava: The Spiritual Company. All rights reserved. Honoring tradition, serving devotion.
+          {new Date().getFullYear()} Bhava: The Spiritual Company. All rights reserved. Honoring tradition, serving devotion.
         </p>
       </div>
     </footer>

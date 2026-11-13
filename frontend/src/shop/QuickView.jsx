@@ -6,6 +6,7 @@ import { useCart } from "../context/CartContext";
 import { QuantityDecrease, QuantityValue, QuantityIncrease } from "../components/Quantity";
 import { FOOTNOTE_PRICE } from "./content";
 import { inr, imgSrc, variantInStock, productInStock, productMaxQty, productLine } from "./shopUtils";
+import { addToCartEvent } from "../utils/analytics";
 
 // Quick View popup for a product card: choose the (valid) variant, pick a stock-limited quantity
 // and add to cart without leaving the page. Same rules as the product page.
@@ -39,7 +40,9 @@ export default function QuickView({ product: p, catalog, onClose, onAdded }) {
 
   const add = () => {
     if (!canAdd) return;
-    addToCart(productLine(p, variant.key, qtyEff));
+    const line = productLine(p, variant.key, qtyEff);
+    addToCart(line);
+    addToCartEvent(line);
     onAdded?.(p.name);
     onClose();
   };

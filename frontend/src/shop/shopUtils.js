@@ -27,18 +27,78 @@ export const variantInStock = (catalog, slug, key) => !!catalog?.availability.pr
 export const productInStock = (catalog, p) => p.variants.some((v) => variantInStock(catalog, p.slug, v.key));
 export const bundleInStock = (catalog, slug) => !!catalog?.availability.bundles[slug]?.available;
 
-// Does a product offer fragrance f (only fragrances actually in stock)?
+// Offered fragrance (stock-independent — OOS items still match a filter, with a badge)
 export const productHasFragrance = (catalog, p, f) =>
-  p.variants.some((v) => v.fragrances.includes(f) && variantInStock(catalog, p.slug, v.key));
+  p.variants.some((v) => v.fragrances.includes(f) || v.key === f);
 
-// Bundle supports fragrance f if a customer can pick it (shared fragrance / camphor) or it is fixed to it
 export const bundleHasFragrance = (catalog, b, f) => {
-  const a = catalog.availability.bundles[b.slug];
-  if (!a?.available) return false;
-  if (b.needs.fragrance) return !!a.fragrance?.[f];
-  if (b.needs.camphor) return !!a.camphor?.[f];
-  if (b.needs.pair) return !!a.pair && Object.entries(a.pair).some(([k, ok]) => ok && k.split("-").includes(f));
-  return b.components.some((c) => c.via === "fixed" && c.variant === f);
+  if (b.needs.fragrance) {
+    return b.components.some((c) => c.via === "fragrance" && productHasFragrance(catalog, getProduct(catalog, c.product) || { variants: [] }, f));
+  }
+  if (b.needs.camphor) {
+    return b.components.some((c) => c.via === "camphor" && productHasFragrance(catalog, getProduct(catalog, c.product) || { variants: [] }, f));
+  }
+  if (b.needs.pair) {
+    return b.components.some((c) => c.via === "pair" && (getProduct(catalog, c.product)?.variants || []).some((v) => v.key.split("-").includes(f)));
+  }
+  return b.components.some((c) => {
+    if (c.via === "fixed" && (c.variant === f || c.variant === "all" || (c.variant || "").split("-").includes(f))) {
+      const p = getProduct(catalog, c.product);
+      if (p?.mode === "fixed") return c.variant === f; // Sambrani: Guggal only
+      return true;
+    }
+    return false;
+  });
+};
+
+export const braceletsSamePrice = (catalog) => {
+  const beads = (catalog?.products || []).filter((p) => p.mode === "none");
+  return beads.length > 0 && beads.every((p) => p.price === beads[0].price);
+};
+
+export const FORMAT_FILTERS = [
+  { id: "sticks", label: "Sticks", category: "incense-sticks" },
+  { id: "bamboo-less", label: "Bamboo-less", category: "bamboo-less-incense" },
+  { id: "cones", label: "Cones", category: "incense-cones" },
+  { id: "cups", label: "Cups", slugs: ["sacred-sambrani-offering-cups"] },
+  { id: "tablets", label: "Tablets", slugs: ["camphor-ritual-duo"] },
+  { id: "bracelets", label: "Bracelets", category: "sacred-beads" },
+  { id: "collections", label: "Collections", bundles: true },
+];
+
+export const PRICE_FILTERS = [
+  { id: "under-501", label: "Under ₹501", test: (n) => n < 501 },
+  { id: "501-1000", label: "₹501–₹1,000", test: (n) => n >= 501 && n <= 1000 },
+  { id: "1001-2000", label: "₹1,001–₹2,000", test: (n) => n >= 1001 && n <= 2000 },
+  { id: "2000-plus", label: "₹2,000+", test: (n) => n > 2000 },
+];
+
+export const INTENTION_FILTERS = [
+  { id: "courage", label: "Courage", slugs: ["tiger-eye-bracelet"] },
+  { id: "protection", label: "Protection symbolism", slugs: ["evil-eye-bracelet"] },
+  { id: "prosperity", label: "Prosperity", slugs: ["dhan-yog-bracelet"] },
+  { id: "calm", label: "Calm", slugs: ["freshwater-pearl-bracelet"] },
+  { id: "love", label: "Love", slugs: ["rose-quartz-bracelet"] },
+  { id: "compassion", label: "Compassion", slugs: ["rhodonite-bracelet"] },
+];
+
+export const matchesFormat = (p, b, format) => {
+  const f = FORMAT_FILTERS.find((x) => x.id === format);
+  if (!f) return true;
+  if (f.bundles) return !!b;
+  if (p) return f.category ? p.category === f.category : (f.slugs || []).includes(p.slug);
+  return false;
+};
+
+export const matchesPrice = (price, rangeId) => {
+  const r = PRICE_FILTERS.find((x) => x.id === rangeId);
+  return !r || r.test(Number(price) || 0);
+};
+
+export const matchesIntention = (p, intention) => {
+  const r = INTENTION_FILTERS.find((x) => x.id === intention);
+  if (!r) return true;
+  return p ? r.slugs.includes(p.slug) : false;
 };
 
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -54,10 +114,29 @@ export const productLine = (p, variantKey, quantity = 1) => {
   };
 };
 
-export const bundleLine = (b, selection, quantity = 1) => ({
+/** Exact collection total: selected bracelets + fixed components. Unchosen bracelet slots use the cheapest bracelet (listing “from”). */
+export function liveBundlePrice(catalog, b, selection) {
+  if (!catalog || !b) return b?.price || 0;
+  const beads = catalog.products.filter((p) => p.mode === "none");
+  const cheapest = beads.length ? Math.min(...beads.map((p) => p.price)) : 0;
+  let total = 0;
+  let bi = 0;
+  const chosen = selection?.bracelets || [];
+  for (const c of b.components) {
+    if (c.bracelet) {
+      const p = getProduct(catalog, chosen[bi++]);
+      total += p ? p.price : cheapest;
+    } else {
+      total += getProduct(catalog, c.product)?.price || 0;
+    }
+  }
+  return total;
+}
+
+export const bundleLine = (b, selection, quantity = 1, unitPrice) => ({
   productId: `bundle:${b.slug}:${selection.fragrance || ""}|${selection.camphor || ""}|${selection.pair || ""}|${[...(selection.bracelets || [])].sort().join("+")}`,
   kind: "bundle", slug: b.slug, selection, quantity,
-  title: b.name, priceNum: b.price, image: "/Products/Home Page Incense.png",
+  title: b.name, priceNum: unitPrice ?? b.price, image: "/Products/Home Page Incense.png",
   variantLabel: [selection.fragrance && cap(selection.fragrance), selection.pair && selection.pair.split("-").map(cap).join(" + "), selection.camphor && `Camphor: ${cap(selection.camphor)}`].filter(Boolean).join(" · "),
 });
 

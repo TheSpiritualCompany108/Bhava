@@ -167,6 +167,15 @@ export const checkout = async (req, res) => {
       orderId: order._id,
       total: priced.total,
       shipping: priced.shipping,
+      subtotal: priced.subtotal,
+      items: orderItems.map((l) => ({
+        item_id: l.kind === "bundle" ? `bundle:${l.slug}` : l.slug,
+        item_name: l.title,
+        item_variant: l.variantLabel,
+        price: l.priceNum,
+        quantity: l.quantity,
+        sku: (l.components || []).map((c) => c.sku).filter(Boolean),
+      })),
     });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error. Please try again." });

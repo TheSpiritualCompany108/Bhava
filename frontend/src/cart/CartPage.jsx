@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import useCartValidation from "../hooks/useCartValidation";
@@ -8,6 +8,7 @@ import {
   productInStock,
 } from "../shop/shopUtils";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
+import { viewCart } from "../utils/analytics";
 import styles from "./CartPage.module.css";
 import x from "./CartLayout.module.css";
 
@@ -25,6 +26,19 @@ const BURST = Array.from({ length: 26 }, (_, i) => {
   };
 });
 
+// Incense first, Sacred Beads last (chips + product order)
+const LIKE_CAT_ORDER = [
+  "incense-sticks",
+  "incense-cones",
+  "bamboo-less-incense",
+  "sambrani-camphor",
+  "sacred-beads",
+];
+const catRank = (id) => {
+  const i = LIKE_CAT_ORDER.indexOf(id);
+  return i === -1 ? 50 : i;
+};
+
 export default function CartPage() {
   const navigate = useNavigate();
   const { cartItems, removeFromCart, updateQuantity, clearCart, addToCart, itemCount } = useCart();
@@ -35,10 +49,52 @@ export default function CartPage() {
   const unlocked = !!data && data.allOk && data.shipping === 0;
   const [wasUnlocked, setWasUnlocked] = useState(null);
   const [burst, setBurst] = useState(0);
+  const [likeCat, setLikeCat] = useState("all");
   if (data && wasUnlocked !== unlocked) {
     setWasUnlocked(unlocked);
     if (wasUnlocked === false && unlocked) setBurst((b) => b + 1);
   }
+
+  const alsoLike = useMemo(() => {
+    if (!catalog?.products?.length) return [];
+    const inBag = new Set(cartItems.filter((i) => i.kind === "product").map((i) => i.slug));
+    const ranked = [];
+    const push = (p) => {
+      if (!p || inBag.has(p.slug) || ranked.some((r) => r.slug === p.slug)) return;
+      ranked.push(p);
+    };
+    cartItems.forEach((item) => {
+      const p = item.kind === "product" ? getProduct(catalog, item.slug) : null;
+      (p?.related?.crossSell || []).forEach((slug) => push(getProduct(catalog, slug)));
+      if (p?.related?.upsell) push(getProduct(catalog, p.related.upsell));
+      if (p?.related?.upsellAlt) push(getProduct(catalog, p.related.upsellAlt));
+    });
+    catalog.products.forEach(push);
+    ranked.sort((a, b) => {
+      const byCat = catRank(a.category) - catRank(b.category);
+      if (byCat) return byCat;
+      return Number(productInStock(catalog, b)) - Number(productInStock(catalog, a));
+    });
+    const incense = ranked.filter((p) => p.category !== "sacred-beads");
+    const beads = ranked.filter((p) => p.category === "sacred-beads");
+    return [...incense.slice(0, 8), ...beads.slice(0, 4)];
+  }, [catalog, cartItems]);
+
+  useEffect(() => {
+    if (cartItems.length && data) viewCart(cartItems, data.total);
+  }, [cartItems, data]);
+
+  const likeCategories = useMemo(() => {
+    const ids = [...new Set(alsoLike.map((p) => p.category))];
+    ids.sort((a, b) => catRank(a) - catRank(b));
+    return [
+      { id: "all", label: "All" },
+      ...ids.map((id) => ({
+        id,
+        label: catalog?.categories?.find((c) => c.id === id)?.label || id,
+      })),
+    ];
+  }, [alsoLike, catalog]);
 
   if (cartItems.length === 0) {
     return (
@@ -69,61 +125,6 @@ export default function CartPage() {
   const payableCount = data ? data.lines.reduce((n, l) => n + (l.ok ? l.quantity : 0), 0) : itemCount;
   const addOn = catalog ? suggestAddOn(catalog, cartItems) : null;
   const addOnProduct = addOn && getProduct(catalog, addOn.slug);
-  const [likeCat, setLikeCat] = useState("all");
-
-  // Incense first, Sacred Beads last (chips + product order)
-  const LIKE_CAT_ORDER = [
-    "incense-sticks",
-    "incense-cones",
-    "bamboo-less-incense",
-    "sambrani-camphor", // cups / camphor
-    "sacred-beads",
-  ];
-  const catRank = (id) => {
-    const i = LIKE_CAT_ORDER.indexOf(id);
-    return i === -1 ? 50 : i;
-  };
-
-  const alsoLike = useMemo(() => {
-    if (!catalog?.products?.length) return [];
-    const inBag = new Set(cartItems.filter((i) => i.kind === "product").map((i) => i.slug));
-    const ranked = [];
-    const push = (p) => {
-      if (!p || inBag.has(p.slug) || ranked.some((r) => r.slug === p.slug)) return;
-      ranked.push(p);
-    };
-    // Prefer products related to what's already in the bag
-    cartItems.forEach((item) => {
-      const p = item.kind === "product" ? getProduct(catalog, item.slug) : null;
-      (p?.related?.crossSell || []).forEach((slug) => push(getProduct(catalog, slug)));
-      if (p?.related?.upsell) push(getProduct(catalog, p.related.upsell));
-      if (p?.related?.upsellAlt) push(getProduct(catalog, p.related.upsellAlt));
-    });
-    catalog.products.forEach(push);
-    // Category first (incense → cups → beads last), then in-stock within that category
-    ranked.sort((a, b) => {
-      const byCat = catRank(a.category) - catRank(b.category);
-      if (byCat) return byCat;
-      return Number(productInStock(catalog, b)) - Number(productInStock(catalog, a));
-    });
-    // Show more incense slots; keep beads toward the end of the strip
-    const incense = ranked.filter((p) => p.category !== "sacred-beads");
-    const beads = ranked.filter((p) => p.category === "sacred-beads");
-    return [...incense.slice(0, 8), ...beads.slice(0, 4)];
-  }, [catalog, cartItems]);
-
-  const likeCategories = useMemo(() => {
-    const ids = [...new Set(alsoLike.map((p) => p.category))];
-    ids.sort((a, b) => catRank(a) - catRank(b));
-    return [
-      { id: "all", label: "All" },
-      ...ids.map((id) => ({
-        id,
-        label: catalog?.categories?.find((c) => c.id === id)?.label || id,
-      })),
-    ];
-  }, [alsoLike, catalog]);
-
   const likeShown = likeCat === "all" ? alsoLike : alsoLike.filter((p) => p.category === likeCat);
 
   const quickAddLike = (e, p) => {

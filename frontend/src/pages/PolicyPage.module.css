@@ -1,0 +1,26 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+  color: #4A0B1D;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  line-height: 1.7;
+}
+.kicker {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: #E07B39;
+  margin: 0 0 8px;
+}
+.page h1 {
+  font-family: Canela, serif;
+  font-size: 36px;
+  margin: 0 0 24px;
+}
+.note {
+  margin-top: 28px;
+  font-size: 13px;
+  color: #7a6a6e;
+}
+.page a { color: #E07B39; }

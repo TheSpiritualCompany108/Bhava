@@ -80,6 +80,16 @@ t("every bundle price (computed from components) equals the document price", () 
   }
   assert.equal(Object.keys(DOCUMENT_BUNDLE_PRICES).length, 30);
 });
+t("bracelet-choice listing uses cheapest bracelet; checkout uses the selected SKUs", () => {
+  const products = ctx.products.map((p) => (p.slug === "freshwater-pearl-bracelet" ? { ...p, price: 2100 } : p));
+  const ctx2 = buildCtx({ products, bundles: SEED_BUNDLES, categories: SEED_CATEGORIES });
+  assert.equal(bundlePrice(ctx2, ctx2.getBundle("the-dual-intention")), 2202);
+  assert.equal(bundlePrice(ctx2, ctx2.getBundle("the-personal-ritual-pair")), 1352);
+  assert.equal(bundlePrice(ctx2, ctx2.getBundle("the-sacred-offering-set")), 1602);
+  assert.equal(resolveLine(B("the-dual-intention", { bracelets: ["tiger-eye-bracelet", "evil-eye-bracelet"] }), ctx2).line.unitPrice, 2202);
+  assert.equal(resolveLine(B("the-dual-intention", { bracelets: ["tiger-eye-bracelet", "freshwater-pearl-bracelet"] }), ctx2).line.unitPrice, 3201);
+  assert.equal(bundlePrice(ctx2, ctx2.getBundle("the-dual-intention"), { bracelets: ["tiger-eye-bracelet", "evil-eye-bracelet"] }), 2202);
+});
 t("fragrance propagates; sambrani Guggal; camphor independent; pairs; fixed components", () => {
   const sku = (slug, sel) => resolveLine(B(slug, sel), ctx).line.components.map((c) => c.sku);
   assert.deepEqual(sku("the-complete-home-ritual-set", { fragrance: "oud", camphor: "sandalwood" }), ["SN-DIS-OUD", "PR-SGL-OUD", "SE-OUD", "SSC-21-GUG", "CRD-44-SAN"]);

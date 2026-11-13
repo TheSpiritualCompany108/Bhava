@@ -4,7 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./Shop.module.css";
 import { useCart } from "../context/CartContext";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
-import { inr, imgSrc, productInStock, bundleInStock, variantInStock, productLine, bundleContentLines } from "./shopUtils";
+import { inr, imgSrc, productInStock, bundleInStock, variantInStock, productLine, bundleContentLines, braceletsSamePrice } from "./shopUtils";
+import { addToCartEvent } from "../utils/analytics";
 
 const FRAG_ORDER = ["guggal", "oud", "sandalwood"];
 
@@ -20,7 +21,9 @@ export function ProductCard({ product: p, catalog, onAdded }) {
   const quickAdd = (e) => {
     e.preventDefault();
     const btn = e.currentTarget;
-    addToCart(productLine(p, p.variants[0].key, 1));
+    const line = productLine(p, p.variants[0].key, 1);
+    addToCart(line);
+    addToCartEvent(line);
     playAddToCartAnimation(btn, { image: p.image });
     onAdded?.(p.name);
   };
@@ -82,7 +85,7 @@ export function BundleCard({ bundle: b, catalog }) {
         {bundleContentLines(catalog, b).map((l, i) => <li key={i}>{l}</li>)}
       </ul>
       <div className={styles.bundleFoot}>
-        <span className={styles.price}>{inr(b.price)}</span>
+        <span className={styles.price}>{b.needs?.bracelets && !braceletsSamePrice(catalog) ? `From ${inr(b.price)}` : inr(b.price)}</span>
         <span className={`${styles.btn} ${inStock ? styles.btnGhost : styles.btnDisabled}`}>{inStock ? "Choose & add →" : "Unavailable"}</span>
       </div>
     </Link>

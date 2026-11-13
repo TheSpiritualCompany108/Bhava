@@ -7,8 +7,11 @@ import useCatalog from "../hooks/useCatalog";
 import { QuantityDecrease, QuantityValue, QuantityIncrease } from "../components/Quantity";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { ProductCard } from "../shop/Cards";
-import { faqsFor, PENDING_USE_SAFETY, PENDING_RETURNS, PENDING_STORY, FOOTNOTE_PRICE } from "../shop/content";
+import { faqsFor, PENDING_USE_SAFETY, PENDING_RETURNS, FOOTNOTE_PRICE } from "../shop/content";
 import { inr, imgSrc, shippingCopy, bundleContentLines, productMaxQty, getProduct, getBundle, variantInStock, productInStock, productLine } from "../shop/shopUtils";
+import { RETURNS_POLICY_LIVE, DISPATCH_SLA } from "../shop/storeFlags";
+import { viewItem, selectItem, addToCartEvent } from "../utils/analytics";
+import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 import ReviewsSection, { Stars } from "./ReviewsSection";
 
 export default function ProductDetail() {
@@ -28,6 +31,7 @@ function ProductDetailInner({ slug }) {
   const [toast, setToast] = useState(false);
   const [addedQty, setAddedQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
   const [reviewSummary, setReviewSummary] = useState(null);
   const onReviewSummary = useCallback((s) => setReviewSummary(s), []);
 
@@ -42,17 +46,9 @@ function ProductDetailInner({ slug }) {
     return () => clearTimeout(t);
   }, [toast]);
 
-  // SEO fields managed in Admin (fall back to name / tagline)
   useEffect(() => {
-    if (!product) return undefined;
-    const prevTitle = document.title;
-    document.title = product.seoTitle || `${product.name} | Bhava`;
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) { meta = document.createElement("meta"); meta.name = "description"; document.head.appendChild(meta); }
-    const prevDesc = meta.content;
-    meta.content = product.seoDescription || product.tagline || "";
-    return () => { document.title = prevTitle; meta.content = prevDesc; };
-  }, [product]);
+    if (product) viewItem(product, variantKey);
+  }, [product, variantKey]);
 
   const variant = product?.variants.find((v) => v.key === variantKey);
   const lineId = product && variant ? `product:${product.slug}:${variant.key}` : "";
@@ -64,6 +60,20 @@ function ProductDetailInner({ slug }) {
   const atStockLimit = !!variant && inStock && maxQty < 20 && qtyEff >= maxQty;
   const gallery = product ? [product.image, ...(product.gallery || [])].filter(Boolean) : [];
   const faqs = useMemo(() => (product && catalog ? faqsFor(product, catalog) : []), [product, catalog]);
+  const alsoLike = useMemo(() => {
+    if (!product || !catalog?.products) return [];
+    const seen = new Set([product.slug]);
+    const out = [];
+    const push = (p) => {
+      if (!p || seen.has(p.slug) || out.length >= 4) return;
+      seen.add(p.slug);
+      out.push(p);
+    };
+    (product.related?.crossSell || []).forEach((s) => push(getProduct(catalog, s)));
+    catalog.products.filter((p) => p.category === product.category).forEach(push);
+    catalog.products.forEach(push);
+    return out;
+  }, [catalog, product]);
 
   if (loading) return <div className={styles.page}><div className={shop.loadingBox}>Loading…</div></div>;
   if (error || !catalog) {
@@ -98,40 +108,55 @@ function ProductDetailInner({ slug }) {
     rel.upsellAlt && { type: "product", slug: rel.upsellAlt, kicker: "A Sacred Companion" }, // neutral — not described as an upgrade
   ].filter(Boolean);
   const bundle = rel.bundle ? getBundle(catalog, rel.bundle) : null;
-  const alsoLike = useMemo(() => {
-    if (!product || !catalog?.products) return [];
-    const seen = new Set([product.slug]);
-    const out = [];
-    const push = (p) => {
-      if (!p || seen.has(p.slug) || out.length >= 4) return;
-      seen.add(p.slug);
-      out.push(p);
-    };
-    (product.related?.crossSell || []).forEach((slug) => push(getProduct(catalog, slug)));
-    catalog.products.filter((p) => p.category === product.category).forEach(push);
-    catalog.products.forEach(push);
-    return out;
-  }, [catalog, product]);
 
   const add = (e) => {
     if (needsChoice || !inStock) return;
     const btn = e?.currentTarget;
-    addToCart(productLine(product, variant.key, qtyEff));
+    const line = productLine(product, variant.key, qtyEff);
+    addToCart(line);
+    addToCartEvent(line);
     if (btn) playAddToCartAnimation(btn, { image: product.image });
     setAddedQty(qtyEff);
     setToast(true);
   };
   const buyNow = () => {
     if (needsChoice || !inStock) return;
-    addToCart(productLine(product, variant.key, qtyEff));
+    const line = productLine(product, variant.key, qtyEff);
+    addToCart(line);
+    addToCartEvent(line);
     navigate("/cart");
   };
 
   // Fragrance details to show for the current selection
   const shownFragrances = variant ? variant.fragrances : product.mode === "all" ? product.variants[0].fragrances : [];
 
+  const origin = siteOrigin();
+  const seoDesc = clipDesc(product.seoDescription || product.description, product.tagline || product.pack);
+  const seoTitle = product.seoTitle || `${product.name}${product.pack ? ` – ${product.pack}` : ""} | Bhava`;
+
   return (
     <div className={styles.page}>
+      <Seo
+        title={seoTitle}
+        description={seoDesc}
+        canonical={`${origin}/product/${product.slug}`}
+        image={origin + imgSrc(product.image).replace(origin, "")}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          image: `${origin}${product.image || ""}`,
+          description: seoDesc,
+          sku: product.slug,
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "INR",
+            price: product.price,
+            availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          },
+        }}
+      />
       {toast && (
         <div className={styles.toast} role="status">
           <span>✓ Added {addedQty} × “{product.name}”{variant?.label && product.mode !== "none" ? ` (${variant.label})` : ""}</span>
@@ -150,7 +175,23 @@ function ProductDetailInner({ slug }) {
         <div className={styles.productShowcase}>
           <div className={styles.galleryCol}>
             <div className={styles.mainImageWrapper}>
-              <img src={imgSrc(gallery[Math.min(activeImg, gallery.length - 1)])} alt={product.name} className={styles.mainImage} />
+              <img
+                src={imgSrc(gallery[Math.min(activeImg, gallery.length - 1)])}
+                alt={`${product.name}${product.pack ? ` – ${product.pack}` : ""}`}
+                className={styles.mainImage}
+                width={720}
+                height={720}
+                loading="eager"
+                onClick={() => setZoomed((z) => !z)}
+                style={zoomed ? { transform: "scale(1.45)", cursor: "zoom-out" } : { cursor: "zoom-in" }}
+                onTouchStart={(e) => { e.currentTarget.dataset.x = e.touches[0].clientX; }}
+                onTouchEnd={(e) => {
+                  const start = Number(e.currentTarget.dataset.x || 0);
+                  const dx = e.changedTouches[0].clientX - start;
+                  if (dx > 40) setActiveImg((i) => Math.max(0, i - 1));
+                  if (dx < -40) setActiveImg((i) => Math.min(gallery.length - 1, i + 1));
+                }}
+              />
             </div>
             {gallery.length > 1 && (
               <div className={styles.thumbnailRow}>
@@ -190,7 +231,9 @@ function ProductDetailInner({ slug }) {
             <div className={styles.stockStatus} aria-live="polite">
               <span className={styles.stockDot} style={inStock ? undefined : { background: "#a2331f" }}></span>
               <span className={inStock ? shop.stockOk : shop.stockOut}>
-                {inStock ? "In stock · Ready to ship" : variant ? "This option is out of stock" : "Currently out of stock"}
+                {inStock
+                  ? (DISPATCH_SLA ? "In stock · Ready to ship" : "In stock")
+                  : variant ? "This option is out of stock" : "Out of stock"}
               </span>
             </div>
 
@@ -234,7 +277,7 @@ function ProductDetailInner({ slug }) {
                         disabled={!ok}
                         title={ok ? "" : "Out of stock"}
                         className={`${shop.chip} ${variantKey === v.key ? shop.chipOn : ""}`}
-                        onClick={() => setPicked(v.key)}
+                        onClick={() => { setPicked(v.key); selectItem(product, v.key); }}
                       >
                         {v.label}
                       </button>
@@ -298,7 +341,7 @@ function ProductDetailInner({ slug }) {
             <div className={styles.trustGrid}>
               <div className={styles.trustItem}><span className={styles.trustIcon}>✦</span> Thoughtfully curated</div>
               <div className={styles.trustItem}><span className={styles.trustIcon}>◈</span> Secure checkout</div>
-              <div className={styles.trustItem}><span className={styles.trustIcon}>◎</span> Easy returns guidance</div>
+              {RETURNS_POLICY_LIVE && <div className={styles.trustItem}><span className={styles.trustIcon}>◎</span> Easy returns guidance</div>}
               <div className={styles.trustItem}><span className={styles.trustIcon}>◉</span> Packed with care</div>
             </div>
 
@@ -356,7 +399,7 @@ function ProductDetailInner({ slug }) {
           <div className={styles.tabBody}>
             {tab === "about" && (
               <div>
-                {product.description ? <p>{product.description}</p> : <p className={shop.pending}>{PENDING_STORY}</p>}
+                {product.description ? <p>{product.description}</p> : null}
                 {product.intention && (
                   <p style={{ marginTop: 14 }}><strong>Intention:</strong> <em>{product.intention}</em></p>
                 )}
@@ -398,7 +441,12 @@ function ProductDetailInner({ slug }) {
             {tab === "ship" && (
               <div>
                 <p>{shippingCopy(catalog.shipping)}.</p>
-                <p className={shop.pending} style={{ marginTop: 12 }}>{PENDING_RETURNS}</p>
+                <p style={{ marginTop: 12 }}>
+                  <Link to="/shipping-policy">Shipping policy</Link>
+                  {" · "}
+                  <Link to="/returns-refund-policy">Returns &amp; refund policy</Link>
+                </p>
+                {!RETURNS_POLICY_LIVE && <p className={shop.pending} style={{ marginTop: 12 }}>{PENDING_RETURNS}</p>}
               </div>
             )}
           </div>
