@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./AuthPage.module.css";
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
-const GSI_SRC = "https://accounts.google.com/gsi/client";
+// Temporarily disabled — uncomment when Google Client ID is ready
+// const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+// const GSI_SRC = "https://accounts.google.com/gsi/client";
 
 function AuthPage() {
   const navigate = useNavigate();
   const location = useLocation();
   // Where to go after auth (e.g. back to /cart when coming from checkout)
   const redirectTo = location.state?.from || "/";
-  const googleBtnRef = useRef(null);
+  // const googleBtnRef = useRef(null);
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [error, setError] = useState("");
@@ -134,70 +135,9 @@ function AuthPage() {
     setFormData((prev) => ({ ...prev, name: "", confirmPassword: "" }));
   };
 
-  // Google Sign-In (Google Identity Services). Only active when a client ID is configured.
-  const handleGoogleCredential = async (response) => {
-    setLoading(true);
-    setError("");
-    const BASE = import.meta.env.VITE_API_URL || "";
-    try {
-      const res = await fetch(`${BASE}/api/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential: response.credential }),
-      });
-      const data = await res.json();
-      if (!data.success) {
-        setError(data.message || "Google sign-in failed. Please try again.");
-      } else {
-        localStorage.setItem("bhava_token", data.token);
-        localStorage.setItem("bhava_user", JSON.stringify(data.user));
-        setSuccess(`Welcome, ${data.user.name}!`);
-        setTimeout(() => navigate(redirectTo, { replace: true }), 1000);
-      }
-    } catch {
-      setError("Unable to connect. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const googleCallbackRef = useRef(handleGoogleCredential);
-  googleCallbackRef.current = handleGoogleCredential;
-
-  useEffect(() => {
-    if (!GOOGLE_CLIENT_ID) return;
-
-    const init = () => {
-      if (!window.google?.accounts?.id || !googleBtnRef.current) return;
-      window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: (r) => googleCallbackRef.current(r),
-      });
-      googleBtnRef.current.innerHTML = "";
-      window.google.accounts.id.renderButton(googleBtnRef.current, {
-        theme: "outline",
-        size: "large",
-        text: "continue_with",
-        shape: "rectangular",
-        width: 400,
-      });
-    };
-
-    if (window.google?.accounts?.id) {
-      init();
-      return;
-    }
-    let script = document.querySelector(`script[src="${GSI_SRC}"]`);
-    if (!script) {
-      script = document.createElement("script");
-      script.src = GSI_SRC;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    }
-    script.addEventListener("load", init);
-    return () => script.removeEventListener("load", init);
-  }, [mode]);
+  // Google Sign-In — temporarily disabled
+  // const handleGoogleCredential = async (response) => { ... };
+  // useEffect(() => { /* Google Identity Services init */ }, [mode]);
 
   return (
     <div className={styles.page}>
@@ -323,7 +263,7 @@ function AuthPage() {
           </button>
         </form>
 
-        {/* Social sign-in */}
+        {/* Social sign-in — temporarily hidden until Google Client ID is set up
         <div className={styles.orDivider}>
           <span className={styles.orLine} />
           <span className={styles.orText}>or</span>
@@ -332,7 +272,6 @@ function AuthPage() {
 
         <div className={styles.socialGroup} style={{ alignItems: "center" }}>
           {GOOGLE_CLIENT_ID ? (
-            // Real Google button (rendered by Google Identity Services)
             <div ref={googleBtnRef} />
           ) : (
             <button
@@ -350,6 +289,7 @@ function AuthPage() {
             </button>
           )}
         </div>
+        */}
 
         <p className={styles.termsText}>
           By clicking on Continue, you accept our{" "}

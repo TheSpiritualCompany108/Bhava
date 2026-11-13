@@ -60,6 +60,7 @@ function ProductDetailInner({ slug }) {
   const atStockLimit = !!variant && inStock && maxQty < 20 && qtyEff >= maxQty;
   const gallery = product ? [product.image, ...(product.gallery || [])].filter(Boolean) : [];
   const faqs = useMemo(() => (product && catalog ? faqsFor(product, catalog) : []), [product, catalog]);
+  // Must stay above early returns — cold QR deep-links hit loading first, then remount hooks
   const alsoLike = useMemo(() => {
     if (!product || !catalog?.products) return [];
     const seen = new Set([product.slug]);
