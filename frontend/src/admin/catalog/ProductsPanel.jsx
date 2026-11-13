@@ -3,6 +3,7 @@ import s from "./AdminCatalog.module.css";
 import { api, money, imgUrl, useDebounced, useNotice, slugify } from "./adminApi";
 import { Notice, Confirm, ErrorList, StatusBadge, Modal, ImageLightbox } from "./common";
 import ProductForm from "./ProductForm";
+import QrDialog from "./QrDialog";
 
 const STOCK_BADGE = { in: ["In stock", "bOk"], low: ["Low stock", "bWarn"], out: ["Out of stock", "bBad"] };
 
@@ -68,6 +69,7 @@ export default function ProductsPanel() {
   const [busy, setBusy] = useState(false);
   const [showCats, setShowCats] = useState(false);
   const [preview, setPreview] = useState(null); // { images, start }
+  const [qrProduct, setQrProduct] = useState(null); // { slug, name }
   const q = useDebounced(search, 300);
 
   const load = useCallback(async () => {
@@ -168,6 +170,7 @@ export default function ProductsPanel() {
                   <td data-label="">
                     <div className={s.rowActions}>
                       <button className={`${s.btn} ${s.btnSm}`} onClick={() => setForm({ slug: p.slug })}>Edit</button>
+                      <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => setQrProduct({ slug: p.slug, name: p.name })}>Generate QR</button>
                       {p.status === "active" && <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => setStatusOf(p, "inactive")} disabled={busy}>Deactivate</button>}
                       {p.status !== "active" && <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => setStatusOf(p, "active")} disabled={busy}>{p.status === "archived" ? "Restore" : "Activate"}</button>}
                       {p.status !== "archived" && <button className={`${s.btn} ${s.btnDanger} ${s.btnSm}`} onClick={() => askArchive(p)}>Archive</button>}
@@ -186,6 +189,7 @@ export default function ProductsPanel() {
         <ProductForm slug={form.slug} meta={data} onClose={() => setForm(null)} onSaved={(msg) => { setForm(null); say("ok", msg); load(); }} />
       )}
       {preview && preview.images.length > 0 && <ImageLightbox images={preview.images} start={preview.start} onClose={() => setPreview(null)} />}
+      {qrProduct && <QrDialog product={qrProduct} onClose={() => setQrProduct(null)} />}
       {showCats && <CategoriesDialog onClose={() => setShowCats(false)} onChanged={load} />}
       {confirm && <Confirm title={confirm.title} message={confirm.message} confirmLabel={confirm.label} danger={confirm.danger} busy={busy} onConfirm={confirm.action} onCancel={() => setConfirm(null)} />}
     </div>

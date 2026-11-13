@@ -8,8 +8,20 @@ import { useHomepageSectionState, resolveHomepageImageUrl } from "../hooks/useHo
 import { ProductCard, BundleCard } from "../shop/Cards";
 import FilterDrawer, { FilterIconButton } from "../shop/FilterDrawer";
 import {
-  shopTabs, productHasFragrance, bundleHasFragrance, productInStock, bundleInStock,
-  FORMAT_FILTERS, PRICE_FILTERS, INTENTION_FILTERS, matchesFormat, matchesPrice, matchesIntention,
+  shopTabs,
+  productHasFragrance,
+  bundleHasFragrance,
+  productInStock,
+  bundleInStock,
+  FORMAT_FILTERS,
+  PRICE_FILTERS,
+  INTENTION_FILTERS,
+  matchesFormat,
+  matchesPrice,
+  matchesIntention,
+  matchesSearchWords,
+  productSearchText,
+  bundleSearchText,
 } from "../shop/shopUtils";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 
@@ -32,10 +44,29 @@ export default function Products() {
   const priceRange = PRICE_FILTERS.some((f) => f.id === params.get("price")) ? params.get("price") : "";
   const intention = INTENTION_FILTERS.some((f) => f.id === params.get("intention")) ? params.get("intention") : "";
   const availability = params.get("availability") === "in-stock" ? "in-stock" : "";
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(() => params.get("q") || "");
   const [sortBy, setSortBy] = useState("featured");
   const [toast, setToast] = useState(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Keep local search in sync when navbar (or a shared link) sets ?q=
+  useEffect(() => {
+    setSearchQuery(params.get("q") || "");
+  }, [params]);
+
+  // Push typed search into the URL so navbar + page stay in sync
+  useEffect(() => {
+    const current = params.get("q") || "";
+    const next = searchQuery.trim();
+    if (current === next) return undefined;
+    const t = setTimeout(() => {
+      const sp = new URLSearchParams(params);
+      if (next) sp.set("q", next);
+      else sp.delete("q");
+      setParams(sp, { replace: true });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [searchQuery, params, setParams]);
 
   const [bannerData, bannerLoaded] = useHomepageSectionState("productsBanner");
   const rawBanner = bannerData?.bannerImage || bannerData?.image || bannerData?.items?.banner?.image;
@@ -114,8 +145,8 @@ export default function Products() {
       bundles = bundles.filter(({ b }) => bundleInStock(catalog, b.slug));
     }
     if (q) {
-      products = products.filter(({ p }) => `${p.name} ${p.tagline} ${p.description} ${p.pack}`.toLowerCase().includes(q));
-      bundles = bundles.filter(({ b }) => `${b.name} ${b.tagline} ${b.description}`.toLowerCase().includes(q));
+      products = products.filter(({ p }) => matchesSearchWords(productSearchText(catalog, p), q));
+      bundles = bundles.filter(({ b }) => matchesSearchWords(bundleSearchText(catalog, b), q));
     }
 
     const cmp = {
@@ -198,6 +229,7 @@ export default function Products() {
           {catalog && (
             <span className={styles.resultCount}>
               Showing <strong>{total}</strong> {total === 1 ? "item" : "items"}
+              {q ? ` for “${searchQuery.trim()}”` : ""}
               {fragrance && catalog.fragrances[fragrance] ? ` in ${catalog.fragrances[fragrance].label}` : ""}
             </span>
           )}
@@ -238,7 +270,7 @@ export default function Products() {
         {catalog && total === 0 && (
           <div className={shop.loadingBox}>
             <h3 style={{ fontFamily: "'Canela', serif", fontSize: 24, color: "#4A0B1D", marginBottom: 8 }}>Nothing matches yet</h3>
-            <p>Try another category or fragrance.</p>
+            <p>Try another word, category, or fragrance.</p>
             <button className={shop.btn} onClick={clearFilters}>Reset filters</button>
           </div>
         )}
