@@ -549,3 +549,56 @@
   background: #e07b39;
   border-radius: 2px;
 }
+
+
+/* ── Shop submenu (desktop: hover/focus dropdown · mobile: inline list) ── */
+.hasSubmenu { position: relative; }
+.submenu {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  background: #fff;
+  border: 1px solid rgba(74, 11, 29, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 14px 36px rgba(74, 11, 29, 0.14);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  z-index: 60;
+}
+.hasSubmenu:hover > .submenu,
+.hasSubmenu:focus-within > .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.submenuLink {
+  display: block;
+  padding: 9px 18px;
+  color: #4A0B1D !important;
+  text-decoration: none !important;
+  font-size: 14px;
+  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  white-space: nowrap;
+}
+.submenuLink:hover { background: #f8edde; color: #E07B39 !important; }
+
+@media (max-width: 768px) {
+  .submenu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    border: 0;
+    border-radius: 0;
+    background: rgba(74, 11, 29, 0.04);
+    padding: 0;
+  }
+  .submenuLink { padding: 10px 20px 10px 36px; font-size: 14px; border-bottom: 1px solid rgba(74, 11, 29, 0.05); }
+}

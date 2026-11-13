@@ -9,7 +9,7 @@ const phases = [
     days: "Chapter 1 — 51 Sutras",
     name: "Samadhi Pada",
     tagline: "Understanding the mind and the path of concentration",
-    color: "#1A3A3A",
+    color: "#4A0B1D",
     purpose:
       "The first chapter introduces the concept of yoga and explains the nature of the mind. Patanjali opens with the famous sutra 'Yoga Chitta Vritti Nirodha' — yoga is the stilling of the movements of the mind. When the mind becomes calm, the true self is revealed.",
     keyTeachings: [

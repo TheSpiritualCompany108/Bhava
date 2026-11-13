@@ -128,7 +128,7 @@
 .bubbleAssistant {
   align-self: flex-start;
   background: #fff;
-  color: #2B2B2B;
+  color: #4A0B1D;
   padding: 10px 14px;
   border-radius: 14px 14px 14px 2px;
   font-size: 13.5px;
@@ -185,7 +185,7 @@
   font-family: inherit;
   outline: none;
   background: #F4EFE6;
-  color: #2B2B2B;
+  color: #4A0B1D;
 }
 
 .input:focus {

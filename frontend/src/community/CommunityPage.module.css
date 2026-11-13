@@ -154,7 +154,7 @@
 .sectionTitle {
   font-size: 36px;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Canela', Cormorant, serif;
   margin-bottom: 10px;
 }
@@ -237,7 +237,7 @@
 .discussTitle {
   font-size: 16px;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Canela', Cormorant, serif;
   line-height: 1.4;
   margin-bottom: 10px;
@@ -366,7 +366,7 @@
 .authorNameBold {
   font-size: 13px;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
   margin-bottom: 2px;
 }
@@ -486,7 +486,7 @@
 .eventTitle {
   font-size: 15px;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Canela', Cormorant, serif;
   line-height: 1.4;
   margin-bottom: 8px;
@@ -577,7 +577,7 @@
   font-size: 14px;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
   background: rgba(255, 255, 255, 0.95);
-  color: #1e2d1e;
+  color: #4A0B1D;
   outline: none;
 }
 

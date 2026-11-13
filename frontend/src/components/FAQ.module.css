@@ -11,7 +11,7 @@
   font-family: 'Canela', Cormorant, serif;
   font-size: 44px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #4A0B1D;
   margin: 0 0 28px 0;
   line-height: 1.2;
 }
@@ -41,7 +41,7 @@
   border: none;
   background: #ffffff;
   font-size: 16px;
-  color: #333;
+  color: #4A0B1D;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   outline: none;
@@ -93,7 +93,7 @@
 .cardTitle {
   font-size: 17px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #4A0B1D;
   margin: 0 0 8px 0;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
 }
@@ -162,7 +162,7 @@
 .detailTitle {
   font-size: 24px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #4A0B1D;
   margin: 0 0 6px 0;
   font-family: 'Canela', Cormorant, serif;
 }
@@ -203,7 +203,7 @@
   align-items: center;
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #4A0B1D;
   gap: 16px;
 }
 

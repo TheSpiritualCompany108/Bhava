@@ -2,10 +2,12 @@ import mongoose from "mongoose";
 
 const reviewSchema = new mongoose.Schema(
   {
+    // Catalog product slug (e.g. "sacred-notes-discovery")
     productId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Tile",
+      type: String,
       required: true,
+      trim: true,
+      lowercase: true,
       index: true,
     },
     userId: {

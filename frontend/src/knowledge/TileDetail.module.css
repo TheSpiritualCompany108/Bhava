@@ -105,7 +105,7 @@
 .cardActions { display:flex; gap:12px; align-items:center; }
 .iconBtn { background: transparent; border:none; padding:8px 10px; border-radius:8px; cursor:pointer; font-size:16px; }
 .cardCaption { text-align:left; }
-.cardTitle { margin:0; font-family:'Canela', Cormorant, serif; font-size:18px; color:#1e2d1e; }
+.cardTitle { margin:0; font-family:'Canela', Cormorant, serif; font-size:18px; color:#4A0B1D; }
 .cardSub { margin:0; font-size:13px; color:#8b7355; }
 
 .heroDescription { margin-top: 6px; color:#5b4c3a; font-family:'Canela', Cormorant, serif; line-height:1.7; padding-left: 6px; border-left: 2px solid rgba(224,123,57,0.25); margin-bottom: 0; }
@@ -114,7 +114,7 @@
 .heroTopControls { padding-top: 8px; }
 
 .sessionsHeader { padding: 8px 0 12px; text-align: left; border-bottom: 1px solid rgba(30,45,30,0.08); margin-bottom: 18px; }
-.sessionsCount { font-size: 22px; color: #1e2d1e; font-weight: 400; margin: 0; font-family: 'Canela', Cormorant, serif; }
+.sessionsCount { font-size: 22px; color: #4A0B1D; font-weight: 400; margin: 0; font-family: 'Canela', Cormorant, serif; }
 
 .sessionsList { display:flex; flex-direction:column; gap:18px; margin-top:64px; }
 .sessionItem { display:flex; align-items:center; gap:18px; padding:18px 22px; border-radius:28px; background:transparent; border:2px solid rgba(110,27,33,0); box-sizing: border-box; transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease, transform 160ms ease; cursor: pointer; }
@@ -171,7 +171,7 @@
 .heroTitle {
   font-size: 48px;
   font-weight: 400;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Canela', Cormorant, serif;
   line-height: 1.12;
   margin-bottom: 6px;
@@ -224,7 +224,7 @@
 .lessonsHeading {
   font-size: 22px;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Canela', Cormorant, serif;
   margin-bottom: 16px;
   padding-bottom: 0;
@@ -265,7 +265,7 @@
 }
 
 .lessonItem:hover .lessonTitle {
-  color: #1e2d1e;
+  color: #4A0B1D;
 }
 
 .lessonDuration {

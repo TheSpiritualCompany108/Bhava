@@ -172,7 +172,7 @@ function Footer() {
   const footerColumns = [
     {
       heading: "Bhava: Store",
-      links: ["Shop All Products", "Collections", "Gift Sets", "Memberships"],
+      links: ["Shop All Products", "Curated Collections"],
     },
     {
       heading: "Sacred Resources",
@@ -285,6 +285,8 @@ function Footer() {
                     >
                       {link}
                     </button>
+                  ) : link === "Curated Collections" ? (
+                    <Link to="/products?category=curated-collections" className={styles.contactLink}>{link}</Link>
                   ) : (
                     <a href="#">{link}</a>
                   )}

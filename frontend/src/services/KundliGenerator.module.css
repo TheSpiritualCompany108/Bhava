@@ -114,7 +114,7 @@
   font-family: 'Canela', 'Work Sans', serif;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #2A1420;
+  color: #4A0B1D;
   margin: 0 0 2px;
 }
 
@@ -140,7 +140,7 @@
   border: 1px solid #E5DDD3;
   font-size: 0.88rem;
   font-family: 'Inter', sans-serif;
-  color: #2A1420;
+  color: #4A0B1D;
   box-sizing: border-box;
 }
 
@@ -392,7 +392,7 @@
 .dashaLord {
   font-weight: 700;
   font-size: 0.88rem;
-  color: #2A1420;
+  color: #4A0B1D;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -553,7 +553,7 @@
 .factValue {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #2A1420;
+  color: #4A0B1D;
   margin: 0;
   font-family: 'Inter', sans-serif;
 }
@@ -567,7 +567,7 @@
   font-family: 'Canela', 'Work Sans', serif;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #2A1420;
+  color: #4A0B1D;
   margin: 0 0 12px;
 }
 
@@ -615,7 +615,7 @@
   font-family: 'Canela', 'Work Sans', serif;
   font-size: 0.92rem;
   font-weight: 700;
-  color: #2A1420;
+  color: #4A0B1D;
   margin: 0 0 4px;
 }
 

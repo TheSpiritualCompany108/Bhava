@@ -4,9 +4,7 @@ import WhyRituals from "../components/WhyRituals";
 import SacredKnowledge from "../components/SacredKnowledge";
 import AstrologyTools from "../components/AstrologyTools";
 
-import SacredCollection from "../components/SacredCollection";
-import ProductSpecification from "../components/ProductSpecification";
-import FeaturedRituals from "../components/FeaturedRituals";
+import HomeShop from "../shop/HomeShop";
 import DailySacredRhythm from "../components/DailySacredRhythm";
 import LivingWisdom from "../components/LivingWisdom";
 import SacredMissionSection from "../components/SacredMissionSection";
@@ -22,13 +20,12 @@ function Home() {
     <>
       {/* Phase I — The Awakening */}
       <HomeMain />
+      {/* Shop modules in playbook order: format → fragrances → start → collections → beads → complete → info */}
+      <HomeShop />
       <WhyRituals />
       <SacredKnowledge />
       <GitaSlider />
-      <SacredCollection />
-      <FeaturedRituals />
       <AstrologyTools />
-      <ProductSpecification />
 
       {/* Phase II — The Daily Practice */}
       <DailySacredRhythm />

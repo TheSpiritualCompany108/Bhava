@@ -50,7 +50,7 @@
 }
 
 .step { color: #aaa; }
-.stepDone { color: #2e7d52; }
+.stepDone { color: #4A0B1D; }
 .stepActive { color: #C0671E; }
 
 .stepLine {
@@ -171,7 +171,7 @@
   font-size: 14.5px;
   font-family: inherit;
   background: #fff;
-  color: #222;
+  color: #4A0B1D;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -236,7 +236,7 @@ textarea.input {
 
 .payOption strong {
   font-size: 15px;
-  color: #221217;
+  color: #4A0B1D;
 }
 
 .payOption p {
@@ -267,12 +267,28 @@ textarea.input {
 
 /* ── Summary ── */
 .summary {
-  background: #1e2d1e;
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(224, 123, 57, 0.22) 0%, transparent 55%),
+    linear-gradient(165deg, #5a1228 0%, #4A0B1D 48%, #310612 100%);
   color: #fff;
-  border-radius: 20px;
-  padding: 28px 26px 24px;
+  border-radius: 22px;
+  padding: 26px 24px 22px;
   position: sticky;
   top: 90px;
+  border: 1px solid rgba(255, 217, 179, 0.14);
+  box-shadow:
+    0 18px 40px rgba(74, 11, 29, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.summaryKicker {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: #E07B39;
+  margin-bottom: 8px;
 }
 
 .summaryTitle {
@@ -280,6 +296,7 @@ textarea.input {
   font-size: 24px;
   margin: 0 0 18px;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .items {
@@ -358,8 +375,8 @@ textarea.input {
   color: rgba(255, 255, 255, 0.88);
 }
 
-.save { color: #7ee2a8; }
-.free { color: #7ee2a8; font-weight: 700; }
+.save { color: #FFD9B3; }
+.free { color: #FFD9B3; font-weight: 700; }
 
 .divider {
   height: 1px;
@@ -437,8 +454,8 @@ textarea.input {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: #e6f4ea;
-  color: #2e7d52;
+  background: #f8edde;
+  color: #4A0B1D;
   font-size: 36px;
   display: flex;
   align-items: center;
@@ -484,7 +501,7 @@ textarea.input {
 }
 
 .successCard span { color: #888; }
-.successCard strong { color: #221217; text-align: right; }
+.successCard strong { color: #4A0B1D; text-align: right; }
 
 .successActions {
   display: flex;

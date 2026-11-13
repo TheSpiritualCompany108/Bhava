@@ -5,8 +5,9 @@ import {
   checkout,
   getMyOrders,
   getAllOrders,
+  updateOrderStatus,
 } from "../controllers/orderController.js";
-import protect from "../middleware/authMiddleware.js";
+import protect, { adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -23,6 +24,9 @@ router.post("/checkout", protect, checkout);
 router.get("/", protect, getMyOrders);
 
 // Protected: admin — all orders
-router.get("/all", protect, getAllOrders);
+router.get("/all", protect, adminOnly, getAllOrders);
+
+// Admin: change order status (cancelling restores component stock once)
+router.patch("/:id/status", protect, adminOnly, updateOrderStatus);
 
 export default router;

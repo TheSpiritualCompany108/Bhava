@@ -15,7 +15,9 @@
 body {
   font-family: var(--font-secondary);
   background-color: #F4EFE6;
+  color: #4A0B1D; /* brand maroon — replaces the browser's default black for any text without its own colour */
 }
+input, textarea, select, button { color: #4A0B1D; } /* form controls default to black in browsers */
 
 /* ── Headings default to primary (Canela) ────────────────── */
 h1, h2, h3, h4, h5, h6 {

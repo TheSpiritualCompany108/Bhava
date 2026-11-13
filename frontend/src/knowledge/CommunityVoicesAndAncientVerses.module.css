@@ -30,7 +30,7 @@
 .voicesHeading {
   font-size: 32px;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Canela', Cormorant, serif;
 }
 
@@ -53,7 +53,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.85);
   border: 1.5px solid rgba(192, 103, 30, 0.25);
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-size: 28px;
   cursor: pointer;
   display: flex;
@@ -214,7 +214,7 @@
 .versesHeading {
   font-size: 32px;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Canela', Cormorant, serif;
   margin-bottom: 6px;
 }
@@ -274,7 +274,7 @@
 
 .verseQuote {
   font-size: 22px;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Canela', Cormorant, serif;
   text-align: center;
   line-height: 1.65;

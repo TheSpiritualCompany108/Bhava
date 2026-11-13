@@ -19,7 +19,7 @@
   z-index: 10;
   background: rgba(0, 0, 0, 0.06);
   border: none;
-  color: rgba(0, 0, 0, 0.45);
+  color: #4A0B1D;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -33,7 +33,7 @@
 
 .closeBtn:hover {
   background: rgba(0, 0, 0, 0.12);
-  color: rgba(0, 0, 0, 0.7);
+  color: #4A0B1D;
 }
 
 /* ─── CARD ──────────────────────────────────────────────────── */
@@ -65,7 +65,7 @@
   font-size: 22px;
   font-weight: 600;
   letter-spacing: 5px;
-  color: #1a1a1a;
+  color: #4A0B1D;
    text-align: center; 
   margin-top: 6px;
   margin-bottom: 20px;
@@ -152,7 +152,7 @@
   background: #ffffff;
   border: 1.5px solid #D8D0C4;
   border-radius: 12px;
-  color: #1a1a1a;
+  color: #4A0B1D;
   font-size: 15px;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -225,7 +225,7 @@
   width: 100%;
   padding: 15px 20px;
   background: #ffffff;
-  color: #1a1a1a;
+  color: #4A0B1D;
   border: 1.5px solid #D8D0C4;
   border-radius: 12px;
   font-size: 15px;
@@ -303,7 +303,7 @@
 
 .tabActive {
   background: #ffffff;
-  color: #1a1a1a;
+  color: #4A0B1D;
   font-weight: 600;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }

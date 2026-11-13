@@ -177,8 +177,8 @@
   background: linear-gradient(160deg, #E1E7E1 0%, #F2F5F2 100%);
 }
 .green .iconBadge { background: #1E2D1E; }
-.green .cardTitle { color: #1E2D1E; }
-.green .cardLink { color: #1E2D1E; }
+.green .cardTitle { color: #4A0B1D; }
+.green .cardLink { color: #4A0B1D; }
 
 /* ── Feature bar ── */
 .featureBar {
@@ -217,7 +217,7 @@
 .featureTitle {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #2A1420;
+  color: #4A0B1D;
   margin: 0;
   font-family: 'Inter', sans-serif;
 }

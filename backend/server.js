@@ -88,6 +88,8 @@ import horoscopeRoutes from "./routes/horoscopeRoutes.js";
 import homepageRoutes from "./routes/homepageRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import catalogRoutes from "./routes/catalogRoutes.js";
+import { bootstrapCatalogIfEmpty } from "./services/catalogService.js";
 
 dotenv.config();
 
@@ -140,6 +142,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/catalog", catalogRoutes);
 app.use("/api/career", careerRoutes);
 app.use("/api/tiles", tilesRoutes);
 app.use("/api/quotes", quotesRoutes);
@@ -173,6 +176,8 @@ mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => {
     console.log("Connected to MongoDB");
+    // First run only: if no catalogue exists yet, load the approved catalogue (additive; never overwrites)
+    bootstrapCatalogIfEmpty().catch((e) => console.error("Catalogue bootstrap failed:", e.message));
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });

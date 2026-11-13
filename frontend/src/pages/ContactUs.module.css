@@ -40,7 +40,7 @@
 }
 
 .backArrow:hover {
-  color: #1e2d1e;
+  color: #4A0B1D;
 }
 
 /* ── Header ── */
@@ -52,7 +52,7 @@
   font-family: 'Canela', Cormorant, serif;
   font-size: 2.6rem;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   margin: 0 0 10px;
   letter-spacing: -0.5px;
 }
@@ -105,7 +105,7 @@
   border-radius: 10px;
   padding: 13px 16px;
   font-size: 0.95rem;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: inherit;
   outline: none;
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
@@ -164,7 +164,7 @@
 .fileText {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #1e2d1e;
+  color: #4A0B1D;
   letter-spacing: 0.2px;
 }
 
@@ -256,7 +256,7 @@
 
 .sendBtn:hover {
   background: transparent;
-  color: #1e2d1e;
+  color: #4A0B1D;
   transform: translateY(-1px);
 }
 
@@ -296,7 +296,7 @@
 .successTitle {
   font-family: 'Canela', Cormorant, serif;
   font-size: 2rem;
-  color: #1e2d1e;
+  color: #4A0B1D;
   margin: 0 0 12px;
 }
 

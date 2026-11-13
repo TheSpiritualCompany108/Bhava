@@ -1,0 +1,283 @@
+/* Cart layout — bag → address → payment flow, item list left, price details right */
+.page { background: #fff; min-height: 100vh; font-family: 'Neue Haas Grotesk', Inter, sans-serif; color: #4A0B1D; padding-bottom: 120px; }
+
+.stepsBar { border-bottom: 1px solid #eee3d3; background: #fff; }
+.steps { list-style: none; margin: 0 auto; padding: 22px 16px; display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #8a7a7e; }
+.steps li { white-space: nowrap; }
+.stepOn { color: #C0671E; padding-bottom: 4px; border-bottom: 2px solid #E07B39; }
+.dash { width: 90px; border-top: 1px dashed #c9b99a; }
+
+.wrap { max-width: 1020px; margin: 0 auto; padding: 0 24px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 0; margin-top: 28px; align-items: start; }
+.left { padding-right: 30px; min-width: 0; }
+.right { padding: 0 0 20px 26px; border-left: 1px solid #eee3d3; position: sticky; top: 90px; }
+
+.selectedBar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 4px 16px; font-size: 14px; letter-spacing: .3px; }
+.linkBtn { background: none; border: 0; cursor: pointer; font-size: 12px; font-weight: 700; letter-spacing: .8px; color: #8a7a7e; padding: 6px; }
+.linkBtn:hover { color: #E07B39; }
+
+.item { position: relative; display: flex; gap: 16px; padding: 14px; margin-bottom: 14px; border: 1px solid #eee3d3; border-radius: 6px; background: #fff; }
+.itemBad { border-color: #c0452f; }
+.thumb { flex: 0 0 112px; width: 112px; height: 140px; display: block; background: #f5f0e6; border-radius: 4px; overflow: hidden; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.info { flex: 1; min-width: 0; padding-right: 26px; }
+.cat { margin: 0 0 2px; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #C0671E; }
+.title { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.3; }
+.title a { color: #4A0B1D; text-decoration: none; }
+.title a:hover { color: #E07B39; }
+.variant { margin: 3px 0 0; font-size: 13px; color: #8a7a7e; }
+.comps { margin: 6px 0 0; padding: 0; list-style: none; font-size: 12.5px; color: #6f6064; line-height: 1.6; }
+.chips { margin-top: 10px; }
+.qtyChip { display: inline-flex; align-items: center; background: #f6efe3; border-radius: 4px; padding: 4px 8px; font-size: 13px; font-weight: 700; }
+.qtyChip select { border: 0; background: transparent; font: inherit; font-weight: 700; color: #4A0B1D; cursor: pointer; }
+.priceRow { margin: 10px 0 0; font-size: 16px; }
+.muted { color: #8a7a7e; font-size: 13px; font-weight: 400; }
+.note { margin: 6px 0 0; font-size: 12px; color: #8a7a7e; }
+.warn { margin: 8px 0 0; font-size: 13px; color: #a2331f; }
+.inlineBtn { background: none; border: 0; padding: 0; color: #E07B39; font-weight: 700; cursor: pointer; }
+.remove { position: absolute; top: 8px; right: 10px; border: 0; background: none; cursor: pointer; font-size: 17px; color: #4A0B1D; padding: 6px; line-height: 1; }
+.remove:hover { color: #E07B39; }
+
+.addon { display: flex; align-items: center; gap: 14px; padding: 12px 14px; margin-bottom: 14px; border: 1px dashed rgba(224, 123, 57, .6); border-radius: 6px; background: #fffaf3; }
+.addon img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; }
+.addonText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+.addonK { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #C0671E; }
+.addBtn { border: 1.5px solid #E07B39; color: #C0671E; background: #fff; font-weight: 700; font-size: 12.5px; letter-spacing: .8px; padding: 9px 18px; border-radius: 4px; cursor: pointer; text-decoration: none; }
+.addBtn:hover { background: #E07B39; color: #fff; }
+.continue { display: inline-block; margin-top: 8px; font-weight: 700; font-size: 14px; color: #C0671E; text-decoration: none; }
+
+.sectionH { margin: 0 0 16px; font-size: 12.5px; font-weight: 700; letter-spacing: .8px; color: #8a7a7e; }
+.row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 15px; }
+.free { color: #C0671E; font-weight: 700; }
+.total { margin-top: 10px; padding-top: 16px; border-top: 1px solid #eee3d3; font-weight: 700; font-size: 16px; }
+.gst { margin: 0 0 14px; font-size: 12px; color: #8a7a7e; }
+.ship { margin-bottom: 14px; background: #f6efe3 !important; color: #4A0B1D !important; border: 0 !important; border-radius: 4px !important; font-size: 13px; }
+.alert { background: #fdecea; color: #8a1c10; border-radius: 6px; padding: 10px 12px; font-size: 13px; margin: 0 0 14px; line-height: 1.5; }
+.cta { width: 100%; border: 0; background: #E07B39; color: #fff; font-weight: 700; font-size: 14px; letter-spacing: 1.2px; padding: 15px 10px; border-radius: 4px; cursor: pointer; transition: background .15s; }
+.cta:hover:not(:disabled) { background: #c96a2c; }
+.cta:disabled { opacity: .55; cursor: not-allowed; }
+.secure { margin: 12px 0 0; text-align: center; font-size: 12px; color: #8a7a7e; line-height: 1.5; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .left { padding-right: 0; }
+  .right { position: static; border-left: 0; border-top: 8px solid #f6efe3; padding: 20px 0 0; margin-top: 14px; }
+  .wrap { padding: 0 14px; }
+  .dash { width: 28px; }
+  .steps { gap: 8px; letter-spacing: 1.5px; font-size: 12px; }
+  .thumb { flex-basis: 88px; width: 88px; height: 112px; }
+}
+
+.terms { margin: 0 0 12px; font-size: 12px; line-height: 1.6; color: #6f6064; }
+.termsLink { color: #E07B39; font-weight: 700; }
+
+/* ── You may also like (Myntra-style) ── */
+.likeSection {
+  margin-top: 36px;
+  padding: 32px 0 52px;
+  background: #fff8f1;
+  border-top: 1px solid #f0e4d4;
+}
+
+.likeWrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.likeTitle {
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee3d3;
+  font-size: 18px;
+  font-weight: 700;
+  color: #4A0B1D;
+  font-family: 'Canela', Cormorant, Georgia, serif;
+}
+
+.likeChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.likeChip {
+  border: 1px solid #ddd2c4;
+  background: #fff;
+  color: #4A0B1D;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.likeChip:hover {
+  border-color: #E07B39;
+  color: #C0671E;
+}
+
+.likeChipOn {
+  border-color: #E07B39;
+  color: #C0671E;
+  background: #fff7ef;
+}
+
+.likeGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.likeCard {
+  background: #fff;
+  border: 1px solid #eee3d3;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.likeCard:hover {
+  box-shadow: 0 10px 24px rgba(74, 11, 29, 0.1);
+  transform: translateY(-2px);
+}
+
+.likeImg {
+  display: block;
+  aspect-ratio: 1 / 1;
+  background: #f3ebe0;
+  position: relative;
+  overflow: hidden;
+}
+
+.likeImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.likeCard:hover .likeImg img {
+  transform: scale(1.04);
+}
+
+.likeOos {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  background: rgba(74, 11, 29, 0.92);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 5px 9px;
+  border-radius: 999px;
+}
+
+.likeBody {
+  padding: 12px 12px 8px;
+  flex: 1;
+}
+
+.likeLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.likeBrand {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #4A0B1D;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.likeName {
+  margin: 0;
+  font-size: 12.5px;
+  color: #7a6a6e;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.8em;
+}
+
+.likeDesc {
+  display: none;
+}
+
+.likePrice {
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #4A0B1D;
+}
+
+.likeAdd {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid #eee3d3;
+  background: #fff;
+  color: #C0671E;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 13px 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.likeAdd:hover:not(:disabled) {
+  background: #fff7ef;
+  color: #a8581a;
+}
+
+.likeAddOff {
+  background: #f3ebe3;
+  color: #4A0B1D;
+  cursor: not-allowed;
+  opacity: 1;
+  font-weight: 800;
+}
+
+.likeCardDim {
+  opacity: 1;
+}
+
+.likeCardDim .likeImg {
+  filter: grayscale(0.25);
+}
+
+.likeCardDim .likeBody {
+  opacity: 0.88;
+}
+
+@media (max-width: 1100px) {
+  .likeGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 860px) {
+  .likeWrap { padding: 0 14px; }
+  .likeGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+}
+
+@media (max-width: 560px) {
+  .likeGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .likeTitle { font-size: 16px; }
+}

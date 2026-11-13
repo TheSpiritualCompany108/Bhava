@@ -54,7 +54,7 @@ const morningPractices = [
     sub: "Breath Control",
     desc: "Awaken vital energy within",
     detail: "10-20 min",
-    color: "#1a3a2a",
+    color: "#4A0B1D",
     iconColor: "#4ae0a0",
   },
   {

@@ -8,6 +8,16 @@ const orderItemSchema = new mongoose.Schema({
   image:     { type: String, default: "" },
   category:  { type: String, default: "" },
   quantity:  { type: Number, required: true, min: 1, default: 1 },
+  // Catalogue orders: exact component SKUs/variants actually deducted from inventory
+  kind:      { type: String, enum: ["product", "bundle", "legacy"], default: "legacy" },
+  slug:      { type: String, default: "" },
+  variantLabel: { type: String, default: "" },
+  components: [
+    {
+      sku: String, productSlug: String, name: String, variantLabel: String, quantity: Number, unitPrice: Number,
+      _id: false,
+    },
+  ],
 });
 
 const orderSchema = new mongoose.Schema(
@@ -62,6 +72,9 @@ const orderSchema = new mongoose.Schema(
     paymentStatus: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
 
     notes: { type: String, default: "" },
+
+    // Set once when a cancelled order has had its component stock returned (prevents double restock)
+    stockRestored: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
