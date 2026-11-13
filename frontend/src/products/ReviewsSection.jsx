@@ -144,18 +144,10 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
     }
   };
 
-  const remove = async (reviewId) => {
-    if (!window.confirm("Remove your review?")) return;
-    try {
-      const res = await fetch(`${API_BASE}/api/reviews/${encodeURIComponent(productId)}/${reviewId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) await load();
-    } catch {
-      /* ignore */
-    }
-  };
+  const myReview = currentUser
+    ? reviews.find((r) => String(r.userId) === String(currentUser.id))
+    : null;
+  const alreadyReviewed = Boolean(myReview);
 
   const shown = (filterStar ? reviews.filter((r) => r.rating === filterStar) : reviews).slice(0, visible);
   const totalFiltered = filterStar ? reviews.filter((r) => r.rating === filterStar).length : reviews.length;
@@ -201,9 +193,13 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
         </div>
 
         <div className={styles.ctaBox}>
-          <button type="button" className={styles.writeBtn} onClick={formOpen ? () => setFormOpen(false) : openForm}>
-            {formOpen ? "Cancel" : "Write a review"}
-          </button>
+          {alreadyReviewed ? (
+            <p className={styles.alreadyNote}>You already reviewed this product.</p>
+          ) : (
+            <button type="button" className={styles.writeBtn} onClick={formOpen ? () => setFormOpen(false) : openForm}>
+              {formOpen ? "Cancel" : "Write a review"}
+            </button>
+          )}
         </div>
       </div>
 
@@ -211,7 +207,7 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
         <p className={`${styles.msg} ${formMsg.type === "error" ? styles.msgError : styles.msgSuccess}`}>{formMsg.text}</p>
       )}
 
-      {formOpen && (
+      {formOpen && !alreadyReviewed && (
         <form className={styles.form} onSubmit={submit}>
           <div className={styles.formRow}>
             <label className={styles.label}>Your rating</label>
@@ -307,26 +303,6 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
               </div>
               {r.title && <h4 className={styles.cardTitle}>{r.title}</h4>}
               <p className={styles.cardBody}>{r.body}</p>
-              {currentUser && String(currentUser.id) === String(r.userId) && (
-                <div className={styles.ownRow}>
-                  <button
-                    type="button"
-                    className={styles.linkBtn}
-                    onClick={() => {
-                      setRating(r.rating);
-                      setTitle(r.title);
-                      setBody(r.body);
-                      setFormOpen(true);
-                      window.scrollTo({ top: document.getElementById("reviews").offsetTop - 80, behavior: "smooth" });
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button type="button" className={styles.linkBtn} onClick={() => remove(r.id)}>
-                    Delete
-                  </button>
-                </div>
-              )}
             </li>
           ))}
         </ul>

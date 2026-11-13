@@ -119,22 +119,20 @@ export const createReview = async (req, res) => {
       verified: Boolean(hasOrdered),
     };
 
-    // Upsert: a user can update their own review
+    // One review per customer — no edit after submit
     const existing = await Review.findOne({ productId, userId: req.userId });
-    let review;
-    let created = false;
     if (existing) {
-      Object.assign(existing, payload);
-      review = await existing.save();
-    } else {
-      review = await Review.create({ ...payload, productId, userId: req.userId });
-      created = true;
+      return res.status(409).json({
+        success: false,
+        message: "You have already reviewed this product. Reviews cannot be edited.",
+      });
     }
 
+    const review = await Review.create({ ...payload, productId, userId: req.userId });
     const all = await Review.find({ productId }).lean();
-    res.status(created ? 201 : 200).json({
+    res.status(201).json({
       success: true,
-      message: created ? "Thank you for sharing your experience!" : "Your review has been updated.",
+      message: "Thank you for sharing your experience!",
       review: shape(review),
       summary: buildSummary(all),
     });
@@ -147,16 +145,18 @@ export const createReview = async (req, res) => {
   }
 };
 
-// DELETE /api/reviews/:productId/:reviewId  (protected: owner or admin)
+// DELETE /api/reviews/:productId/:reviewId  (admin only — customers cannot delete after submit)
 export const deleteReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
     const review = await Review.findById(reviewId);
     if (!review) return res.status(404).json({ success: false, message: "Review not found" });
 
-    const isOwner = String(review.userId) === String(req.userId);
-    if (!isOwner && req.userRole !== "admin") {
-      return res.status(403).json({ success: false, message: "Not allowed" });
+    if (req.userRole !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Reviews cannot be deleted after they are submitted.",
+      });
     }
     await review.deleteOne();
     res.json({ success: true, message: "Review removed" });
