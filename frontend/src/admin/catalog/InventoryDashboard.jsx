@@ -219,6 +219,9 @@ export default function InventoryDashboard() {
   const [preview, setPreview] = useState(null);
   const [dialog, setDialog] = useState(null); // {type:'stock'|'history'|'bulk', row?}
   const [threshold, setThreshold] = useState("");
+  const [shopFilters, setShopFilters] = useState({
+    category: true, fragrance: true, format: true, price: true, intention: true, availability: true,
+  });
   const [selected, setSelected] = useState(() => new Set());
   const q = useDebounced(search, 300);
 
@@ -242,6 +245,11 @@ export default function InventoryDashboard() {
   useEffect(() => { setPage(1); }, [q, category, stockStatus, active, sort, order, limit]);
   useEffect(() => { setSelected(new Set()); }, [q, category, stockStatus, active, sort, order, page, limit]);
   useEffect(() => { api("/categories").then((j) => setCategories(j.items)).catch(() => {}); }, []);
+  useEffect(() => {
+    api("/settings").then((j) => {
+      if (j.shopFilters) setShopFilters((prev) => ({ ...prev, ...j.shopFilters }));
+    }).catch(() => {});
+  }, []);
 
   const pageSkus = useMemo(() => (data?.items || []).map((r) => r.sku), [data]);
   const allPageSelected = pageSkus.length > 0 && pageSkus.every((sku) => selected.has(sku));
@@ -273,6 +281,15 @@ export default function InventoryDashboard() {
       const j = await api("/settings", { method: "PUT", body: { lowStockThreshold: Number(threshold) } });
       say("ok", j.message);
       load();
+    } catch (e) { say("err", e.message); }
+  };
+
+  const saveShopFilters = async (next) => {
+    setShopFilters(next);
+    try {
+      const j = await api("/settings", { method: "PUT", body: { shopFilters: next } });
+      say("ok", j.message || "Shop filters updated.");
+      if (j.shopFilters) setShopFilters((prev) => ({ ...prev, ...j.shopFilters }));
     } catch (e) { say("err", e.message); }
   };
 
@@ -349,6 +366,28 @@ export default function InventoryDashboard() {
           <span className={s.hint}>Operational setting (not from the catalogue document): SKUs with 1–{summary.lowStockThreshold} units are “low”.</span>
         </div>
       )}
+
+      <div className={s.bar} style={{ fontSize: 13, flexWrap: "wrap", alignItems: "center" }}>
+        <span className={s.label} style={{ marginRight: 8 }}>Shop filter panel (left drawer)</span>
+        {[
+          ["category", "Category"],
+          ["fragrance", "Fragrance"],
+          ["format", "Format"],
+          ["price", "Price"],
+          ["intention", "Intention"],
+          ["availability", "Availability"],
+        ].map(([key, label]) => (
+          <label key={key} className={s.check} style={{ marginRight: 12 }}>
+            <input
+              type="checkbox"
+              checked={!!shopFilters[key]}
+              onChange={(e) => saveShopFilters({ ...shopFilters, [key]: e.target.checked })}
+            />
+            {label}
+          </label>
+        ))}
+        <span className={s.hint}>Turn groups on/off for the /products filter icon drawer. Live on the storefront after save.</span>
+      </div>
 
       {selected.size > 0 && (
         <div className={s.bulkBar}>
