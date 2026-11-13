@@ -1,6 +1,6 @@
 .navbarContainer {
   background-color: #f8edde;
-  padding: 15px 0;
+  padding: 12px 0;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -8,50 +8,46 @@
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 15px;
+  padding: 0 20px;
 }
 
-.row {
+.topBar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-}
-
-.col3 {
-  flex: 0 0 25%;
-  max-width: 25%;
-}
-
-.col9 {
-  flex: 0 0 75%;
-  max-width: 75%;
+  gap: 12px;
+  min-height: 56px;
+  width: 100%;
+  flex-wrap: nowrap;
 }
 
 .brandContainer {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .logo {
-  height: 56px;
+  height: 52px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 1px 2px rgba(74, 11, 29, 0.25));
 }
 
 .heading {
-  color:#D57F45;
+  color: #d57f45;
   font-weight: 700;
   font-size: 24px;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Canela', 'Cormorant', serif;
+  font-family: "Canela", "Cormorant", serif;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .dotsBhava {
@@ -71,21 +67,13 @@
   display: block;
 }
 
-.betaTag {
-  font-size: 9px;
-  font-weight: 700;
-  color: #4A0B1D;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  background: #EDEADE;
-  border: 1.5px solid #4A0B1D;
-  border-radius: 6px;
-  padding: 2px 7px;
-  margin-left: 6px;
-  vertical-align: middle;
-  line-height: 1;
-  display: inline-block;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+.navPanel {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+  /* Keep desktop links from colliding with actions */
+  margin-right: 8px;
 }
 
 .nav {
@@ -93,84 +81,122 @@
   padding: 0;
   display: flex;
   list-style: none;
-  justify-content: flex-end !important;
   align-items: center;
+  flex-wrap: nowrap;
+  gap: 2px;
 }
 
 .navItem {
   list-style: none;
   margin: 0;
+  flex-shrink: 0;
 }
 
 .navLink {
+  display: inline-flex;
+  align-items: center;
   text-decoration: none !important;
-  color: #6B3A45 !important;
-  font-size: 15px;
+  color: #6b3a45 !important;
+  font-size: 14px;
   font-weight: 500;
-  padding: 8px 15px !important;
+  padding: 8px 10px !important;
   transition: color 0.3s;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  white-space: nowrap;
   background: none;
   border: 0;
   cursor: pointer;
+  line-height: 1.2;
 }
 
 .navLink:hover {
-  color: #E07B39 !important;
+  color: #e07b39 !important;
 }
 
 .askBhava {
-  display: inline-flex !important;
-  align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-weight: 700 !important;
-  border: none;
-  cursor: pointer;
-  background: linear-gradient(90deg, #E07B39, #C0671E, #4A0B1D, #E07B39);
-  background-size: 300% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent !important;
-  animation: askBhavaShimmer 4s linear infinite;
 }
 
 .askBhavaSparkle {
   font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
   animation: askBhavaPulse 2s ease-in-out infinite;
+  /* Keep emoji visible — do NOT put gradient clip on this span */
+  -webkit-text-fill-color: initial;
+  color: initial;
+}
+
+.askBhavaText {
+  background: linear-gradient(90deg, #e07b39, #c0671e, #4a0b1d, #e07b39);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: askBhavaShimmer 4s linear infinite;
+  white-space: nowrap;
 }
 
 @keyframes askBhavaShimmer {
-  to { background-position: 300% center; }
+  to {
+    background-position: 300% center;
+  }
 }
 
 @keyframes askBhavaPulse {
-  0%, 100% { transform: scale(1); opacity: 0.85; }
-  50% { transform: scale(1.2); opacity: 1; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.actions {
+  position: relative;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .btnGetStarted {
-  background: #4A0B1D;
+  background: #4a0b1d;
   color: #f8edde;
-  border: 2px solid #4A0B1D;
-  padding: 8px 23px;
+  border: 2px solid #4a0b1d;
+  padding: 8px 18px;
   border-radius: 999px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-  margin-left: 10px;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  white-space: nowrap;
+  margin-left: 6px;
 }
 
 .btnGetStarted:hover {
   background: transparent;
-  color: #4A0B1D;
+  color: #4a0b1d;
   transform: translateY(-1px);
-  box-shadow: none;
 }
 
-/* ── Cart Icon ─────────────────────────────────────────────── */
+.mobileOnlyCta {
+  display: none;
+}
+
+.desktopOnlyCta {
+  display: inline-flex;
+}
+
+/* ── Cart ── */
 .cartIconBtn {
   position: relative;
   background: none;
@@ -182,12 +208,14 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  color: #4A0B1D;
+  color: #4a0b1d;
   transition: background 0.2s;
   padding: 0;
-  margin-left: 4px;
 }
-.cartIconBtn:hover { background: rgba(74, 11, 29, 0.08); }
+
+.cartIconBtn:hover {
+  background: rgba(74, 11, 29, 0.08);
+}
 
 .cartSvg {
   width: 22px;
@@ -196,8 +224,8 @@
 
 .cartBadge {
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 0;
+  right: 0;
   background: #c0671e;
   color: #fff;
   font-size: 10px;
@@ -209,23 +237,23 @@
   align-items: center;
   justify-content: center;
   padding: 0 3px;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
   border: 2px solid #f8edde;
   line-height: 1;
 }
 
-/* ── User Menu ─────────────────────────────────────────────── */
+/* ── User menu ── */
 .userMenu {
   position: relative;
-  margin-left: 10px;
+  margin-left: 4px;
 }
 
 .avatarBtn {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 2px solid #4A0B1D;
-  background: #4A0B1D;
+  border: 2px solid #4a0b1d;
+  background: #4a0b1d;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -249,7 +277,7 @@
   color: #f8edde;
   font-size: 13px;
   font-weight: 700;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
   letter-spacing: 0.5px;
 }
 
@@ -260,7 +288,7 @@
   background: #fff;
   border: 1px solid #e8e0d5;
   border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.13);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.13);
   min-width: 248px;
   padding: 0;
   z-index: 1000;
@@ -269,11 +297,16 @@
 }
 
 @keyframes dropFade {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Header */
 .dropdownHeader {
   display: flex;
   align-items: center;
@@ -287,7 +320,7 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: #4A0B1D;
+  background: #4a0b1d;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -305,13 +338,13 @@
   color: #f8edde;
   font-size: 15px;
   font-weight: 700;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
 }
 
 .dropdownName {
   font-weight: 700;
   font-size: 14px;
-  color: #4A0B1D;
+  color: #4a0b1d;
   margin: 0 0 2px;
   white-space: nowrap;
   overflow: hidden;
@@ -329,7 +362,6 @@
   max-width: 160px;
 }
 
-/* Nav items */
 .dropdownNav {
   padding: 6px 0;
 }
@@ -344,17 +376,17 @@
   text-align: left;
   font-size: 13.5px;
   font-weight: 500;
-  color: #4A0B1D;
+  color: #4a0b1d;
   cursor: pointer;
   padding: 10px 16px;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
   transition: background 0.15s;
   position: relative;
 }
 
 .dropdownItem:hover {
   background: #f5f0e8;
-  color: #4A0B1D;
+  color: #4a0b1d;
 }
 
 .dropdownItemIcon {
@@ -364,7 +396,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6B3A45;
+  color: #6b3a45;
 }
 
 .dropdownItemIcon svg {
@@ -391,14 +423,12 @@
   padding: 0 4px;
 }
 
-/* Divider */
 .dropdownDivider {
   border: none;
   border-top: 1px solid #ede8e0;
   margin: 0;
 }
 
-/* Sign Out */
 .dropdownLogout {
   width: 100%;
   display: flex;
@@ -412,7 +442,7 @@
   color: #c0671e;
   cursor: pointer;
   padding: 12px 16px;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
   transition: background 0.15s;
 }
 
@@ -436,125 +466,58 @@
   border: none;
   cursor: pointer;
   padding: 6px;
-  margin-left: auto;
   z-index: 1100;
 }
 
-.bar {
+.hamBar {
   display: block;
   width: 24px;
   height: 2px;
-  background: #4A0B1D;
+  background: #4a0b1d;
   border-radius: 2px;
   transition: transform 0.3s ease, opacity 0.3s ease;
   transform-origin: center;
 }
 
-/* Animate to X when open */
-.barTop  { transform: translateY(7px) rotate(45deg); }
-.barMid  { opacity: 0; transform: scaleX(0); }
-.barBot  { transform: translateY(-7px) rotate(-45deg); }
-
-/* ── Responsive ── */
-@media (max-width: 768px) {
-  .navbarContainer {
-    padding: 10px 0;
-  }
-
-  .heading { font-size: 20px; }
-  .logo    { height: 42px; }
-  .dotName { width: 5px; height: 5px; }
-  .dotsBhava { gap: 3px; }
-
-  .hamburger {
-    display: flex;
-  }
-
-  /* Desktop col layout off on mobile */
-  .col3 { flex: 0 0 auto; max-width: none; }
-  .col9 {
-    flex: 0 0 100%;
-    max-width: 100%;
-    /* Hidden by default */
-    display: none;
-    flex-direction: column;
-    background: #f8edde;
-    padding: 12px 0 20px;
-    border-top: 1px solid rgba(74, 11, 29, 0.08);
-    animation: slideDown 0.25s ease;
-  }
-
-  .mobileMenuOpen {
-    display: flex !important;
-  }
-
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .nav {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 0;
-    width: 100%;
-  }
-
-  .navItem {
-    width: 100%;
-  }
-
-  .navLink {
-    display: block;
-    width: 100%;
-    padding: 12px 20px !important;
-    font-size: 16px !important;
-    color: #4A0B1D !important;
-    border-bottom: 1px solid rgba(74, 11, 29, 0.06);
-  }
-
-  .navLinkActive::after {
-    display: none;
-  }
-
-  .btnGetStarted {
-    margin: 16px 20px 0;
-    width: calc(100% - 40px);
-    text-align: center;
-    font-size: 15px;
-    padding: 12px 0;
-  }
-
-  .userMenu {
-    margin: 16px 20px 0;
-  }
-
-  .cartIconBtn {
-    margin: 0 20px;
-  }
+.hamBarTop {
+  transform: translateY(7px) rotate(45deg);
 }
 
-/* Active link style with underline */
+.hamBarMid {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamBarBot {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.backdrop {
+  display: none;
+}
+
 .navLinkActive {
-  color: #4A0B1D !important;
+  color: #4a0b1d !important;
   font-weight: 600 !important;
   position: relative;
 }
 
 .navLinkActive::after {
-  content: '';
+  content: "";
   position: absolute;
-  bottom: -2px;
-  left: 15px;
-  right: 15px;
+  bottom: 2px;
+  left: 10px;
+  right: 10px;
   height: 2px;
   background: #e07b39;
   border-radius: 2px;
 }
 
+/* ── Shop submenu ── */
+.hasSubmenu {
+  position: relative;
+}
 
-/* ── Shop submenu (desktop: hover/focus dropdown · mobile: inline list) ── */
-.hasSubmenu { position: relative; }
 .submenu {
   list-style: none;
   margin: 0;
@@ -573,6 +536,7 @@
   transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
   z-index: 60;
 }
+
 .hasSubmenu:hover > .submenu,
 .hasSubmenu:focus-within > .submenu,
 .hasSubmenu.submenuOpen > .submenu {
@@ -580,18 +544,132 @@
   visibility: visible;
   transform: translateY(0);
 }
+
 .submenuLink {
   display: block;
   padding: 9px 18px;
-  color: #4A0B1D !important;
+  color: #4a0b1d !important;
   text-decoration: none !important;
   font-size: 14px;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
   white-space: nowrap;
 }
-.submenuLink:hover { background: #f8edde; color: #E07B39 !important; }
 
-@media (max-width: 768px) {
+.submenuLink:hover {
+  background: #f8edde;
+  color: #e07b39 !important;
+}
+
+/* ── Large desktop: roomier link padding ── */
+@media (min-width: 1280px) {
+  .navLink {
+    font-size: 15px;
+    padding: 8px 14px !important;
+  }
+
+  .navLinkActive::after {
+    left: 14px;
+    right: 14px;
+  }
+}
+
+/* ── Tablet + mobile: hamburger drawer ── */
+@media (max-width: 1100px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .desktopOnlyCta {
+    display: none;
+  }
+
+  .mobileOnlyCta {
+    display: block;
+    width: 100%;
+    padding: 8px 16px 4px;
+  }
+
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    border: none;
+    background: rgba(74, 11, 29, 0.28);
+    z-index: 1040;
+    cursor: pointer;
+  }
+
+  .navPanel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(340px, 92vw);
+    flex: none;
+    background: #f8edde;
+    box-shadow: -12px 0 40px rgba(74, 11, 29, 0.18);
+    z-index: 1050;
+    padding: 72px 0 28px;
+    overflow-y: auto;
+    transform: translateX(105%);
+    transition: transform 0.28s ease;
+    justify-content: flex-start;
+    margin-right: 0;
+  }
+
+  .brandContainer {
+    position: relative;
+    z-index: 1100;
+  }
+
+  .navPanelOpen {
+    transform: translateX(0);
+  }
+
+  .nav {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 0;
+  }
+
+  .navItem {
+    width: 100%;
+  }
+
+  .navLink {
+    display: flex;
+    width: 100%;
+    padding: 14px 22px !important;
+    font-size: 16px !important;
+    color: #4a0b1d !important;
+    border-bottom: 1px solid rgba(74, 11, 29, 0.06);
+  }
+
+  .navLinkActive::after {
+    display: none;
+  }
+
+  .askBhava {
+    justify-content: flex-start;
+  }
+
+  .askBhavaText {
+    /* Solid color in drawer — gradient clip can look washed on mobile */
+    background: none;
+    -webkit-text-fill-color: #c0671e;
+    color: #c0671e;
+    animation: none;
+  }
+
+  .btnGetStarted {
+    margin: 8px 0 0;
+    width: 100%;
+    text-align: center;
+    font-size: 15px;
+    padding: 12px 0;
+  }
+
   .submenu {
     position: static;
     opacity: 1;
@@ -602,6 +680,54 @@
     border-radius: 0;
     background: rgba(74, 11, 29, 0.04);
     padding: 0;
+    min-width: 0;
   }
-  .submenuLink { padding: 10px 20px 10px 36px; font-size: 14px; border-bottom: 1px solid rgba(74, 11, 29, 0.05); }
+
+  .submenuLink {
+    padding: 11px 22px 11px 36px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(74, 11, 29, 0.05);
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 14px;
+  }
+
+  .topBar {
+    gap: 8px;
+    min-height: 48px;
+  }
+
+  .heading {
+    font-size: 20px;
+  }
+
+  .logo {
+    height: 40px;
+  }
+
+  .dotName {
+    width: 5px;
+    height: 5px;
+  }
+
+  .dotsBhava {
+    gap: 3px;
+  }
+
+  .navbarContainer {
+    padding: 8px 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .heading {
+    font-size: 18px;
+  }
+
+  .logo {
+    height: 36px;
+  }
 }

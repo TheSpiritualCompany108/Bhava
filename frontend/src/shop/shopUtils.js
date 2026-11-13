@@ -142,6 +142,34 @@ export const bundleLine = (b, selection, quantity = 1, unitPrice) => ({
 
 export const fragLabel = (catalog, id) => catalog?.fragrances[id]?.label || cap(id);
 
+/** Split query into words; every word must appear somewhere in `haystack` (AND). */
+export const matchesSearchWords = (haystack, query) => {
+  const text = String(haystack || "").toLowerCase();
+  const words = String(query || "")
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!words.length) return true;
+  return words.every((w) => text.includes(w));
+};
+
+export const productSearchText = (catalog, p) => {
+  const catLabel = catalog?.categories?.find((c) => c.id === p.category)?.label || p.category || "";
+  const frags = (p.variants || [])
+    .flatMap((v) => v.fragrances || [])
+    .map((f) => fragLabel(catalog, f))
+    .join(" ");
+  return [p.name, p.tagline, p.description, p.pack, p.slug, catLabel, frags].filter(Boolean).join(" ");
+};
+
+export const bundleSearchText = (catalog, b) => {
+  const frags = Object.values(catalog?.fragrances || {})
+    .map((f) => f.label)
+    .join(" ");
+  return [b.name, b.tagline, b.description, b.slug, frags].filter(Boolean).join(" ");
+};
+
 // Section 8.3 basket-building: one relevant add-on for what is already in the cart.
 // Returns { slug, variant|null, reason } — variant is set only when it can be inferred safely
 // (same fragrance); otherwise the shopper is sent to the product page to choose.
