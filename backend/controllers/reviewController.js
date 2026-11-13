@@ -35,6 +35,7 @@ const shape = (r) => ({
   title: r.title,
   body: r.body,
   verified: r.verified,
+  productId: r.productId || "",
   createdAt: r.createdAt,
 });
 
@@ -42,8 +43,16 @@ const shape = (r) => ({
 export const getVerifiedReviews = async (req, res) => {
   try {
     const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 6, 1), 12);
-    const reviews = await Review.find({ verified: true }).sort({ createdAt: -1 }).limit(limit).lean();
-    res.json({ success: true, reviews: reviews.map(shape) });
+    const filter = { verified: true };
+    const [reviews, allVerified] = await Promise.all([
+      Review.find(filter).sort({ rating: -1, createdAt: -1 }).limit(limit).lean(),
+      Review.find(filter).select("rating").lean(),
+    ]);
+    res.json({
+      success: true,
+      summary: buildSummary(allVerified),
+      reviews: reviews.map(shape),
+    });
   } catch {
     res.status(500).json({ success: false, message: "Could not load reviews" });
   }

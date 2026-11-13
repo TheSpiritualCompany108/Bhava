@@ -80,6 +80,7 @@ function Navbar() {
 
   return (
     <nav className={styles.navbarContainer}>
+      <span className={styles.betaTag} aria-label="Beta">BETA</span>
       <div className={styles.container}>
         <div className={styles.topBar}>
           <div

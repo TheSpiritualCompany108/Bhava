@@ -54,7 +54,7 @@ const slides = [
     title: ["Practice Together.", "Grow Together."],
     description:
       "Quiet stories, shared experiences, and a community that values consistency over perfection.",
-    cta: "Join Bhava",
+    cta: "Join Bhava:",
     ctaPath: "/community",
   },
 ];
@@ -177,7 +177,7 @@ function HomeMain() {
               <p className={styles.homeMainHeroDescription1}>{o.description1 || "Ritual is not reserved for special occasions. It is the quiet return to yourself, every single day."}</p>
 
               <div className={styles.homeMainHeroButtons}>
-                <button className={styles.homeMainBtnPrimary} onClick={() => navigate("/about")}>{o.primaryCta || "Begin With Bhava"}</button>
+                <button className={styles.homeMainBtnPrimary} onClick={() => navigate("/about")}>{o.primaryCta || "Begin With Bhava:"}</button>
                 <button className={styles.homeMainBtnSecondary} onClick={() => navigate("/knowledge")}>{o.secondaryCta || "Explore the System"}</button>
               </div>
 

@@ -32,7 +32,12 @@ export default function HomeShop() {
   const { catalog } = useCatalog();
   if (!catalog) return null; // never block the rest of the homepage
 
-  const starters = ["sacred-notes-discovery", "pure-ritual-single", "sacred-ember"].map((x) => getProduct(catalog, x)).filter(Boolean);
+  const starters = [
+    "sacred-notes-discovery",
+    "pure-ritual-single",
+    "sacred-ember",
+    "sacred-sambrani-offering-cups",
+  ].map((x) => getProduct(catalog, x)).filter(Boolean);
   const byModule = (m) => catalog.bundles
     .filter((b) => b.homeModule === m)
     .sort((a, b) => {
@@ -81,10 +86,12 @@ export default function HomeShop() {
 
       {/* 4 · Start with a format */}
       <section className={`${s.sec} ${s.secWhite}`} aria-labelledby="hs-start" hidden={!starters.length}>
-        <div className={s.wrap}>
-          <Head kicker="Start with a format" title="A Sacred Place To Begin" sub="Three formats, each in your choice of fragrance." />
-          <div className={s.grid3} id="hs-start">
-            {starters.map((p) => <ProductCard key={p.slug} product={p} catalog={catalog} />)}
+        <div className={`${s.wrap} ${s.wrapWide}`}>
+          <Head kicker="Start with a format" title="A Sacred Place To Begin" sub="Four formats to begin your ritual — incense, cones and Sambrani." />
+          <div className={`${s.grid4} ${s.gridCards}`} id="hs-start">
+            {starters.map((p) => (
+              <ProductCard key={p.slug} product={p} catalog={catalog} dense />
+            ))}
           </div>
         </div>
       </section>
@@ -106,8 +113,10 @@ export default function HomeShop() {
       <section className={s.sec} aria-labelledby="hs-beads" hidden={!bracelets.length}>
         <div className={s.wrap}>
           <Head kicker="Sacred Beads" title="Six Bracelets. Six Intentions." sub="10 mm beads strung on a flexible stretch cord for convenient wear." />
-          <div className={s.grid3} id="hs-beads">
-            {bracelets.map((p) => <ProductCard key={p.slug} product={p} catalog={catalog} />)}
+          <div className={`${s.grid3} ${s.gridCards}`} id="hs-beads">
+            {bracelets.map((p) => (
+              <ProductCard key={p.slug} product={p} catalog={catalog} dense />
+            ))}
           </div>
         </div>
       </section>

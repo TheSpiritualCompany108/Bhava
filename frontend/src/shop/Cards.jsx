@@ -9,7 +9,7 @@ import { addToCartEvent } from "../utils/analytics";
 
 const FRAG_ORDER = ["guggal", "oud", "sandalwood"];
 
-export function ProductCard({ product: p, catalog, onAdded }) {
+export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const [quickOpen, setQuickOpen] = useState(false);
@@ -17,6 +17,8 @@ export function ProductCard({ product: p, catalog, onAdded }) {
   const single = p.variants.length === 1;
   const multiFrag = p.mode === "single" || p.mode === "camphor";
   const offered = FRAG_ORDER.filter((f) => p.variants.some((v) => v.fragrances.includes(f)));
+  // Dense = Sacred Beads card size (no fragrance chips, solid CTA, same body rhythm)
+  const showFrags = !dense && p.mode !== "none";
 
   const quickAdd = (e) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ export function ProductCard({ product: p, catalog, onAdded }) {
   };
 
   return (
-    <article className={`${styles.card} ${inStock ? "" : styles.cardDim}`}>
+    <article className={`${styles.card} ${dense ? styles.cardDense : ""} ${inStock ? "" : styles.cardDim}`}>
       <div className={styles.cardImg}>
         <Link to={`/product/${p.slug}`} tabIndex={-1} aria-hidden="true" className={styles.imgLink}>
           <img src={imgSrc(p.image)} alt={p.name} loading="lazy" />
@@ -44,8 +46,8 @@ export function ProductCard({ product: p, catalog, onAdded }) {
           <span className={styles.cardType}>{catalog.categories.find((c) => c.id === p.category)?.label}</span>
           <h3 className={styles.cardTitle}>{p.name}</h3>
           {p.tagline && <p className={styles.cardTagline}>{p.tagline}</p>}
-          <p className={styles.cardPack}>{p.pack}</p>
-          {p.mode !== "none" && (
+          {p.pack && <p className={dense ? styles.cardTagline : styles.cardPack}>{p.pack}</p>}
+          {showFrags && (
             <div className={styles.dots} aria-label="Fragrances">
               {p.mode === "pair" || p.mode === "all"
                 ? offered.map((f) => <span key={f} className={styles.dot}>{catalog.fragrances[f].label}</span>)
@@ -64,7 +66,10 @@ export function ProductCard({ product: p, catalog, onAdded }) {
         ) : single && !multiFrag ? (
           <button className={styles.btn} onClick={quickAdd}>Add to Cart +</button>
         ) : (
-          <button className={`${styles.btn} ${styles.btnGhost}`} onClick={() => navigate(`/product/${p.slug}`)}>
+          <button
+            className={dense ? styles.btn : `${styles.btn} ${styles.btnGhost}`}
+            onClick={() => navigate(`/product/${p.slug}`)}
+          >
             {p.mode === "pair" ? "Choose pair" : "Choose fragrance"}
           </button>
         )}
