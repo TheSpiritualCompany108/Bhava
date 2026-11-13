@@ -444,18 +444,34 @@ function ProductDetailInner({ slug }) {
               </div>
             )}
             {tab === "ship" && (
-              <div>
-                <p>{shippingCopy(catalog.shipping)}.</p>
-                <p style={{ marginTop: 12 }}>
-                  <Link to="/shipping-policy">Shipping policy</Link>
-                  {" · "}
-                  <Link to="/returns-refund-policy">Returns &amp; refund policy</Link>
-                </p>
-                {!RETURNS_POLICY_LIVE && <p className={shop.pending} style={{ marginTop: 12 }}>{PENDING_RETURNS}</p>}
+              <div className={styles.shipTab}>
+                <p className={styles.shipLead}>{shippingCopy(catalog.shipping)}.</p>
+                <div className={styles.policyLinks}>
+                  <Link to="/shipping-policy" className={styles.policyLink}>Shipping policy</Link>
+                  <span className={styles.policyDot} aria-hidden="true">·</span>
+                  <Link to="/returns-refund-policy" className={styles.policyLink}>Returns &amp; refund policy</Link>
+                </div>
+                {!RETURNS_POLICY_LIVE && <p className={`${shop.pending} ${styles.shipPending}`}>{PENDING_RETURNS}</p>}
               </div>
             )}
           </div>
         </section>
+
+        {/* ── You May Also Like ── */}
+        {alsoLike.length > 0 && (
+          <section className={styles.similarSection} aria-labelledby="also-like-title">
+            <div className={styles.similarHeader}>
+              <span className={styles.similarKicker}>Sacred Pairings</span>
+              <h2 id="also-like-title" className={styles.similarTitle}>You May Also Like</h2>
+              <p className={styles.similarSub}>
+                Soft companions for this offering — chosen to deepen devotion, not distract from it.
+              </p>
+            </div>
+            <div className={styles.similarGrid}>
+              {alsoLike.map((p) => <ProductCard key={p.slug} product={p} catalog={catalog} />)}
+            </div>
+          </section>
+        )}
 
         {/* ── FAQ ── */}
         <section className={styles.infoSection}>
@@ -473,21 +489,48 @@ function ProductDetailInner({ slug }) {
         {/* ── Customer Reviews (Phool-style) ── */}
         <ReviewsSection productId={product.slug} productTitle={product.name} onSummary={onReviewSummary} />
 
-        {/* ── You May Also Like ── */}
-        {alsoLike.length > 0 && (
-          <section className={styles.similarSection} aria-labelledby="also-like-title">
-            <div className={styles.similarHeader}>
-              <span className={styles.similarKicker}>Sacred Pairings</span>
-              <h2 id="also-like-title" className={styles.similarTitle}>You May Also Like</h2>
-              <p className={styles.similarSub}>
-                Soft companions for this offering — chosen to deepen devotion, not distract from it.
-              </p>
-            </div>
-            <div className={styles.similarGrid}>
-              {alsoLike.map((p) => <ProductCard key={p.slug} product={p} catalog={catalog} />)}
-            </div>
-          </section>
-        )}
+        {/* ── Devotion & ritual imagery ── */}
+        <section className={styles.ritualSection} aria-labelledby="ritual-visuals-title">
+          <div className={styles.ritualIntro}>
+            <p className={styles.ritualKicker}>Devotion &amp; ritual</p>
+            <h2 id="ritual-visuals-title" className={styles.sectionHeading}>Made for quiet practice</h2>
+            <p className={styles.ritualLead}>
+              Soft light, steady breath, and a fragrance that stays with you — small moments that turn a room into a sanctuary.
+            </p>
+          </div>
+          <div className={styles.ritualGrid}>
+            {[
+              {
+                src: "/Daily%20Practices/Daily%20Puja.png",
+                alt: "Daily puja ritual with soft lamp light",
+                caption: "Morning offering",
+                note: "A calm start to the day",
+              },
+              {
+                src: "/incense.jpeg",
+                alt: "Incense rising during a quiet ritual",
+                caption: "Fragrance & presence",
+                note: "Let the smoke settle the mind",
+              },
+              {
+                src: "/Daily%20Practices/Aarti.png",
+                alt: "Aarti flame during devotion",
+                caption: "Evening aarti",
+                note: "Warm light for evening prayer",
+              },
+            ].map((item) => (
+              <figure key={item.caption} className={styles.ritualFigure}>
+                <div className={styles.ritualImgWrap}>
+                  <img src={item.src} alt={item.alt} loading="lazy" />
+                </div>
+                <figcaption>
+                  <strong>{item.caption}</strong>
+                  <span>{item.note}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

@@ -277,7 +277,8 @@ export default function CartPage() {
             {data && !allOk && <p role="alert" className={x.alert}>Some items are unavailable. Reduce the quantity or remove them to continue — they are not included in the total above.</p>}
 
             <p className={x.terms}>
-              By placing the order, you agree to Bhava: <span className={x.termsLink}>Terms of Use</span> and <span className={x.termsLink}>Privacy Policy</span>
+              By placing the order, you agree to Bhava: <Link to="/terms" className={x.termsLink}>Terms of Use</Link> and{" "}
+              <Link to="/privacy-policy" className={x.termsLink}>Privacy Policy</Link>
             </p>
             <button className={x.cta} onClick={handleCheckout} disabled={!allOk || loading}>
               {loading ? "CHECKING AVAILABILITY…" : "PROCEED TO CHECKOUT"}

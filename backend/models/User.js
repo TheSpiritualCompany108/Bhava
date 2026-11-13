@@ -46,6 +46,22 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Address book (synced from checkout / account page)
+    addresses: [
+      {
+        clientId: { type: String, default: "" },
+        fullName: { type: String, default: "" },
+        countryCode: { type: String, default: "+91" },
+        phone: { type: String, default: "" },
+        line1: { type: String, default: "" },
+        line2: { type: String, default: "" },
+        city: { type: String, default: "" },
+        state: { type: String, default: "" },
+        pincode: { type: String, default: "" },
+        addressType: { type: String, enum: ["Home", "Office"], default: "Home" },
+        makeDefault: { type: Boolean, default: false },
+      },
+    ],
   },
   { timestamps: true }
 );

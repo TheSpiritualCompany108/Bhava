@@ -4,6 +4,8 @@ import {
   placeOrder,
   checkout,
   getMyOrders,
+  cancelMyOrder,
+  hideMyOrder,
   getAllOrders,
   updateOrderStatus,
 } from "../controllers/orderController.js";
@@ -22,6 +24,12 @@ router.post("/checkout", protect, checkout);
 
 // Protected: get current user's orders
 router.get("/", protect, getMyOrders);
+
+// Customer: cancel own pending/confirmed order
+router.post("/:id/cancel", protect, cancelMyOrder);
+
+// Customer: soft-remove cancelled/delivered order from My Orders
+router.delete("/:id", protect, hideMyOrder);
 
 // Protected: admin — all orders
 router.get("/all", protect, adminOnly, getAllOrders);

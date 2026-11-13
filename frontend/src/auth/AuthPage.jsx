@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { clearSharedAddressCache } from "../account/addressBook";
 import styles from "./AuthPage.module.css";
 
 // Temporarily disabled — uncomment when Google Client ID is ready
@@ -65,6 +66,7 @@ function AuthPage() {
           setError(data.message || "Incorrect password. Please try again.");
         }
       } else {
+        clearSharedAddressCache();
         localStorage.setItem("bhava_token", data.token);
         localStorage.setItem("bhava_user", JSON.stringify(data.user));
         setSuccess(`Welcome back, ${data.user.name}!`);
@@ -109,6 +111,7 @@ function AuthPage() {
       if (!data.success) {
         setError(data.message || "Something went wrong. Please try again.");
       } else {
+        clearSharedAddressCache();
         localStorage.setItem("bhava_token", data.token);
         localStorage.setItem("bhava_user", JSON.stringify(data.user));
         setSuccess(`Welcome to Bhava, ${data.user.name}!`);
