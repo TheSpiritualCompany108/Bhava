@@ -400,6 +400,28 @@ export async function setStock(sku, stock, { reason = "", actor = "" } = {}) {
   return { sku, stock, before: prev };
 }
 
+/** Set absolute stock for many SKUs in one request (each SKU still logged separately). */
+export async function bulkSetStock(items, { reason = "", actor = "" } = {}) {
+  if (!Array.isArray(items) || items.length === 0) throw new ApiError(400, "Select at least one SKU to update.");
+  if (items.length > 200) throw new ApiError(400, "You can update at most 200 SKUs at once.");
+
+  const results = [];
+  const errors = [];
+  for (const item of items) {
+    const sku = String(item?.sku || "").trim().toUpperCase();
+    const stock = Number(item?.stock);
+    try {
+      results.push(await setStock(sku, stock, { reason, actor }));
+    } catch (e) {
+      errors.push({ sku: sku || String(item?.sku || ""), message: e?.message || "Could not update this SKU." });
+    }
+  }
+  if (!results.length) {
+    throw new ApiError(400, "No SKUs were updated. Check the quantities and try again.", errors);
+  }
+  return { updated: results.length, failed: errors.length, results, errors };
+}
+
 /** Relative adjustment (+/-). Refuses to go below zero, atomically. */
 export async function adjustStock(sku, delta, { reason = "", actor = "" } = {}) {
   if (!(await knownSku(sku))) throw new ApiError(400, "Unknown SKU — it is not a variant of any catalogue product.");

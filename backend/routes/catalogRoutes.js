@@ -34,6 +34,7 @@ router.put("/admin/categories/:id", admin, c.saveCategory);
 // Admin — inventory
 router.get("/admin/inventory", admin, c.adminInventory);
 router.get("/admin/inventory/summary", admin, c.adminInventorySummary);
+router.put("/admin/inventory/bulk", admin, c.adminBulkSetStock);
 router.put("/admin/inventory", admin, c.adminSetStock);
 router.post("/admin/inventory/adjust", admin, c.adminAdjustStock);
 router.get("/admin/inventory/:sku/movements", admin, c.adminMovements);
