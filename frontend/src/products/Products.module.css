@@ -59,14 +59,53 @@
   position: relative;
   display: block;
   overflow: hidden;
+  height: clamp(230px, 34vw, 620px);
+  background: #f3ebe3;
 }
 
 .bannerImg {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  height: clamp(230px, 34vw, 620px); /* full width, no side gaps */
+  height: 100%;
   object-fit: cover;
-  object-position: center 38%; /* keeps the subjects (statue, box, mala) in frame */
+  object-position: center 38%;
+  opacity: 0;
+  transition: opacity 0.85s ease;
+  pointer-events: none;
+}
+
+.bannerImgActive {
+  opacity: 1;
+  z-index: 1;
+}
+
+.bannerDots {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.bannerDot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.bannerDotOn {
+  background: #E07B39;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55);
 }
 
 /* ── Collection Headings & Search Outside Box, Above Categories ── */

@@ -154,7 +154,7 @@ const HOMEPAGE_TABS = [
   {
     key: "productsBanner",
     label: "🛍️ Products Banner",
-    hint: "The website banner image & headings shown at the top of the Products page (/products).",
+    hint: "The Products page (/products) top banner — add multiple images to run as a slider.",
     defaultKicker: "Sacred Vessels & Offerings",
     defaultTitle: "Our Sacred Collections",
     defaultSubtitle: "Authentic prayer malas, temple-grade incense, consecrated oils, and ritual thalis handcrafted to ground and elevate your daily devotion.",
@@ -1377,50 +1377,129 @@ export default function AdminPage() {
         <div style={{ background: "#fff", padding: 20, borderRadius: 8, border: "1px solid #eee", maxWidth: 760 }}>
           {homepageTab === "productsBanner" && (() => {
             const activeTab = HOMEPAGE_TABS.find((t) => t.key === homepageTab);
-            const preview = homepageImagePreviews["banner"];
-            const currentImg = homepageData.bannerImage || homepageData.image || (homepageData.items && homepageData.items.banner && homepageData.items.banner.image);
-            const displayImg = preview || (currentImg ? resolveImageUrl(currentImg) : "/Slide 02.png");
+            const legacyImg =
+              homepageData.bannerImage ||
+              homepageData.image ||
+              (homepageData.items && homepageData.items.banner && homepageData.items.banner.image) ||
+              "";
+            const slides = Array.isArray(homepageData.slides) && homepageData.slides.length
+              ? homepageData.slides
+              : legacyImg
+                ? [{ id: "banner", image: legacyImg }]
+                : [];
+
+            const addBannerSlide = () => {
+              const id = `pb-${Date.now()}`;
+              setHomepageSaved(false);
+              setHomepageData((prev) => ({
+                ...prev,
+                slides: [...(Array.isArray(prev.slides) && prev.slides.length ? prev.slides : slides), { id, image: "" }],
+              }));
+            };
+
+            const removeBannerSlide = (id) => {
+              setHomepageSaved(false);
+              clearHomepagePendingImage(id);
+              setHomepageData((prev) => {
+                const nextSlides = (Array.isArray(prev.slides) && prev.slides.length ? prev.slides : slides).filter((s) => s.id !== id);
+                const next = { ...prev, slides: nextSlides };
+                if (id === "banner") {
+                  next.bannerImage = "";
+                  next.image = "";
+                }
+                return next;
+              });
+            };
+
+            const moveBannerSlide = (idx, dir) => {
+              setHomepageSaved(false);
+              setHomepageData((prev) => {
+                const list = [...(Array.isArray(prev.slides) && prev.slides.length ? prev.slides : slides)];
+                const j = idx + dir;
+                if (j < 0 || j >= list.length) return prev;
+                [list[idx], list[j]] = [list[j], list[idx]];
+                return { ...prev, slides: list };
+              });
+            };
 
             return (
               <div style={{ marginBottom: 20 }}>
-                {/* Banner Image Card */}
                 <div style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #f0f0f0" }}>
-                  <h4 style={{ margin: "0 0 8px 0", color: "#4A0B1D", fontSize: 15 }}>Website Banner Image</h4>
+                  <h4 style={{ margin: "0 0 8px 0", color: "#4A0B1D", fontSize: 15 }}>Products Banner Slider</h4>
                   <p style={{ margin: "0 0 14px 0", fontSize: 13, color: "#666" }}>
-                    Yeh banner Products page (/products) par sabse upar website banner ki tarah dikhega:
+                    Add multiple images — they rotate as a slider on the Products page (/products). First slide is the default fallback banner.
                   </p>
 
-                  <div style={{ marginBottom: 14, border: "2px dashed #E0D0C0", borderRadius: 8, padding: 10, textAlign: "center", background: "#FAF7F2" }}>
-                    <img
-                      src={displayImg}
-                      alt="Products Banner Preview"
-                      style={{ width: "100%", maxHeight: 240, objectFit: "cover", borderRadius: 6, display: "block" }}
-                    />
-                    {preview && (
-                      <p style={{ margin: "8px 0 0", fontSize: 12, color: "#E07B39", fontWeight: 600 }}>
-                        ● New image selected (Click "✓ Save Changes" below to publish to website)
-                      </p>
-                    )}
+                  {slides.length === 0 && (
+                    <div style={{ marginBottom: 14, border: "2px dashed #E0D0C0", borderRadius: 8, padding: 18, textAlign: "center", background: "#FAF7F2", color: "#888", fontSize: 13 }}>
+                      No slides yet. Default site banner will show until you add one.
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    {slides.map((s, idx) => {
+                      const savedImg = s.image || homepageData.items?.[s.id]?.image || "";
+                      const preview = homepageImagePreviews[s.id];
+                      const displayImg = preview || (savedImg ? resolveImageUrl(savedImg) : "");
+                      return (
+                        <div key={s.id} style={{ border: "1px solid #eee3d3", borderRadius: 10, padding: 12, background: "#FAF7F2" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+                            <strong style={{ color: "#4A0B1D", fontSize: 13 }}>Slide {idx + 1}</strong>
+                            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                              <button type="button" disabled={idx === 0} onClick={() => moveBannerSlide(idx, -1)} style={{ padding: "5px 10px", fontSize: 12, borderRadius: 6, border: "1px solid #ddd", background: "#fff", cursor: idx === 0 ? "not-allowed" : "pointer", opacity: idx === 0 ? 0.45 : 1 }}>↑</button>
+                              <button type="button" disabled={idx === slides.length - 1} onClick={() => moveBannerSlide(idx, 1)} style={{ padding: "5px 10px", fontSize: 12, borderRadius: 6, border: "1px solid #ddd", background: "#fff", cursor: idx === slides.length - 1 ? "not-allowed" : "pointer", opacity: idx === slides.length - 1 ? 0.45 : 1 }}>↓</button>
+                              <button type="button" onClick={() => removeBannerSlide(s.id)} style={{ padding: "5px 10px", fontSize: 12, borderRadius: 6, border: "1px solid #c0392b", background: "#fff", color: "#c0392b", cursor: "pointer", fontWeight: 600 }}>Remove</button>
+                            </div>
+                          </div>
+
+                          <div style={{ marginBottom: 10, border: "1px dashed #E0D0C0", borderRadius: 8, padding: 8, textAlign: "center", background: "#fff" }}>
+                            {displayImg ? (
+                              <img src={displayImg} alt={`Slide ${idx + 1}`} style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 6, display: "block" }} />
+                            ) : (
+                              <p style={{ margin: "28px 0", fontSize: 13, color: "#999" }}>No image yet — upload one</p>
+                            )}
+                            {preview && (
+                              <p style={{ margin: "8px 0 0", fontSize: 12, color: "#E07B39", fontWeight: 600 }}>
+                                ● New image selected (Save Changes to publish)
+                              </p>
+                            )}
+                          </div>
+
+                          <label style={{ padding: "8px 14px", background: "#4A0B1D", color: "#fff", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}>
+                            📸 {displayImg ? "Replace Image" : "Upload Image"}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={(e) => handleHomepageImageSelect(s.id, e.target.files[0])}
+                            />
+                          </label>
+                        </div>
+                      );
+                    })}
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                    <label style={{ padding: "9px 16px", background: "#4A0B1D", color: "#fff", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}>
-                      📸 Select New Banner Image
-                      <input
-                        type="file"
-                        accept="image/*"
-                        style={{ display: "none" }}
-                        onChange={(e) => handleHomepageImageSelect("banner", e.target.files[0])}
-                      />
-                    </label>
-
-                    {(preview || currentImg) && (
+                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+                    <button
+                      type="button"
+                      onClick={addBannerSlide}
+                      style={{ padding: "9px 16px", background: "#E07B39", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 600 }}
+                    >
+                      + Add Slide
+                    </button>
+                    {slides.length > 0 && (
                       <button
                         type="button"
                         onClick={() => {
+                          setHomepageSaved(false);
+                          slides.forEach((s) => clearHomepagePendingImage(s.id));
                           clearHomepagePendingImage("banner");
-                          handleHomepageFieldChange("bannerImage", "");
-                          handleHomepageFieldChange("image", "");
+                          setHomepageData((prev) => ({
+                            ...prev,
+                            slides: [],
+                            bannerImage: "",
+                            image: "",
+                          }));
                         }}
                         style={{ padding: "8px 14px", background: "#fff", color: "#c0392b", border: "1px solid #c0392b", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}
                       >
@@ -1430,11 +1509,10 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Headings & Text */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <h4 style={{ margin: "0 0 4px 0", color: "#4A0B1D", fontSize: 15 }}>Headings (Categories ke upar)</h4>
                   <p style={{ margin: "0 0 8px 0", fontSize: 13, color: "#666" }}>
-                    Text headings jo categories filter ke upar box se bahar display hoti hain:
+                    Yeh headings jo categories filter ke upar box se bahar display hoti hain:
                   </p>
 
                   <HomepageField
