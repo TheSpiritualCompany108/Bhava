@@ -124,7 +124,7 @@ function Navbar() {
                   }}
                 >
                   <span className={styles.askBhavaSparkle} aria-hidden="true">✨</span>
-                  <span className={styles.askBhavaText}>Ask Bhava</span>
+                  <span className={styles.askBhavaText}>Ask Bhava:</span>
                 </button>
               </li>
               <li className={`${styles.navItem} ${styles.hasSubmenu} ${shopOpen ? styles.submenuOpen : ""}`}>
