@@ -6,6 +6,7 @@ import { useCart } from "../context/CartContext";
 import useCatalog from "../hooks/useCatalog";
 import { useHomepageSectionState, resolveHomepageImageUrl } from "../hooks/useHomepageSection";
 import { ProductCard, BundleCard } from "../shop/Cards";
+import FilterDrawer, { FilterIconButton } from "../shop/FilterDrawer";
 import {
   shopTabs,
   productHasFragrance,
@@ -25,6 +26,9 @@ import {
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 
 const FRAGRANCE_FILTERS = ["guggal", "oud", "sandalwood"];
+const DEFAULT_FILTERS = {
+  category: true, fragrance: true, format: true, price: true, intention: true, availability: true,
+};
 
 export default function Products() {
   const { itemCount } = useCart();
@@ -43,6 +47,7 @@ export default function Products() {
   const [searchQuery, setSearchQuery] = useState(() => params.get("q") || "");
   const [sortBy, setSortBy] = useState("featured");
   const [toast, setToast] = useState(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Keep local search in sync when navbar (or a shared link) sets ?q=
   useEffect(() => {
@@ -72,6 +77,8 @@ export default function Products() {
     bannerData?.subtitle ||
     "Sacred Beads, incense, Sambrani and camphor — chosen with care for a more considered daily ritual.";
 
+  const shopFilters = { ...DEFAULT_FILTERS, ...(catalog?.shopFilters || {}) };
+
   const setParam = (k, v) => {
     const next = new URLSearchParams(params);
     if (v && v !== "all") next.set(k, v);
@@ -79,11 +86,30 @@ export default function Products() {
     setParams(next, { replace: true });
   };
 
+  const clearFilters = () => {
+    setSearchQuery("");
+    setParams({}, { replace: true });
+  };
+
+  const activeFilterCount = [
+    tab !== "all" && shopFilters.category,
+    fragrance && shopFilters.fragrance,
+    format && shopFilters.format,
+    priceRange && shopFilters.price,
+    intention && shopFilters.intention,
+    availability && shopFilters.availability,
+  ].filter(Boolean).length;
+
   useEffect(() => {
     if (!toast) return undefined;
     const t = setTimeout(() => setToast(null), 3500);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    document.body.style.overflow = filtersOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [filtersOpen]);
 
   const q = searchQuery.trim().toLowerCase();
   const q0 = q;
@@ -96,7 +122,6 @@ export default function Products() {
     if (tab === "curated-collections") products = [];
     else if (tab !== "all") products = products.filter(({ p }) => p.category === tab);
     if (tab !== "all" && tab !== "curated-collections") bundles = [];
-    // PDF §6.8: feature the strongest combinations first; the rest are shown only on request / contextually
     if ((tab === "curated-collections" || tab === "all") && !showMore && !q0) bundles = bundles.filter(({ b }) => b.featured);
 
     if (fragrance) {
@@ -199,59 +224,17 @@ export default function Products() {
       </section>
 
       <section className={styles.controlsBar}>
-        <div className={styles.categoryPills} role="tablist" aria-label="Shop categories">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              role="tab"
-              aria-selected={tab === t.id}
-              onClick={() => setParam("category", t.id)}
-              className={`${styles.pillBtn} ${tab === t.id ? styles.pillActive : ""}`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        <div className={styles.metaRow}>
-          <div className={shop.chips} role="group" aria-label="Filter by fragrance">
-            <button className={`${shop.chip} ${!fragrance ? shop.chipOn : ""}`} onClick={() => setParam("fragrance", "")}>
-              All fragrances
-            </button>
-            {FRAGRANCE_FILTERS.map((f) => (
-              <button
-                key={f}
-                className={`${shop.chip} ${fragrance === f ? shop.chipOn : ""}`}
-                onClick={() => setParam("fragrance", fragrance === f ? "" : f)}
-                aria-pressed={fragrance === f}
-              >
-                {catalog?.fragrances[f]?.label || f}
-              </button>
-            ))}
-          </div>
-
+        <div className={styles.toolbarRow}>
+          <FilterIconButton open={filtersOpen} onClick={() => setFiltersOpen(true)} activeCount={activeFilterCount} />
+          {catalog && (
+            <span className={styles.resultCount}>
+              Showing <strong>{total}</strong> {total === 1 ? "item" : "items"}
+              {q ? ` for “${searchQuery.trim()}”` : ""}
+              {fragrance && catalog.fragrances[fragrance] ? ` in ${catalog.fragrances[fragrance].label}` : ""}
+            </span>
+          )}
           <div className={styles.sortContainer}>
-            <label htmlFor="formatSelect" className={styles.sortLabel}>Format</label>
-            <select id="formatSelect" value={format} onChange={(e) => setParam("format", e.target.value)} className={styles.sortSelect}>
-              <option value="">All formats</option>
-              {FORMAT_FILTERS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
-            </select>
-            <label htmlFor="priceSelect" className={styles.sortLabel}>Price</label>
-            <select id="priceSelect" value={priceRange} onChange={(e) => setParam("price", e.target.value)} className={styles.sortSelect}>
-              <option value="">All prices</option>
-              {PRICE_FILTERS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
-            </select>
-            <label htmlFor="intentionSelect" className={styles.sortLabel}>Intention</label>
-            <select id="intentionSelect" value={intention} onChange={(e) => setParam("intention", e.target.value)} className={styles.sortSelect}>
-              <option value="">All intentions</option>
-              {INTENTION_FILTERS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
-            </select>
-            <label htmlFor="availSelect" className={styles.sortLabel}>Availability</label>
-            <select id="availSelect" value={availability} onChange={(e) => setParam("availability", e.target.value)} className={styles.sortSelect}>
-              <option value="">All</option>
-              <option value="in-stock">In stock</option>
-            </select>
-            <label htmlFor="sortSelect" className={styles.sortLabel}>Sort By:</label>
+            <label htmlFor="sortSelect" className={styles.sortLabel}>Sort By</label>
             <select id="sortSelect" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className={styles.sortSelect}>
               <option value="featured">Featured</option>
               <option value="price-low">Price: Low to High</option>
@@ -260,14 +243,19 @@ export default function Products() {
             </select>
           </div>
         </div>
-        {catalog && (
-          <span className={styles.resultCount} style={{ display: "block", marginTop: 10 }}>
-            Showing <strong>{total}</strong> {total === 1 ? "item" : "items"}
-            {q && ` for “${searchQuery.trim()}”`}
-            {fragrance && ` in ${catalog.fragrances[fragrance].label}`}
-          </span>
-        )}
       </section>
+
+      <FilterDrawer
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        catalog={catalog}
+        shopFilters={shopFilters}
+        tabs={tabs}
+        values={{ tab, fragrance, format, priceRange, intention, availability }}
+        onSet={setParam}
+        onClear={clearFilters}
+        activeCount={activeFilterCount}
+      />
 
       <main className={styles.container}>
         {loading && <div className={shop.loadingBox}>Loading the collection…</div>}
@@ -283,15 +271,7 @@ export default function Products() {
           <div className={shop.loadingBox}>
             <h3 style={{ fontFamily: "'Canela', serif", fontSize: 24, color: "#4A0B1D", marginBottom: 8 }}>Nothing matches yet</h3>
             <p>Try another word, category, or fragrance.</p>
-            <button
-              className={shop.btn}
-              onClick={() => {
-                setSearchQuery("");
-                setParams({}, { replace: true });
-              }}
-            >
-              Reset filters
-            </button>
+            <button className={shop.btn} onClick={clearFilters}>Reset filters</button>
           </div>
         )}
 

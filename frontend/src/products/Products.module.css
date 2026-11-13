@@ -181,8 +181,235 @@
   padding: 12px 36px 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   box-sizing: border-box;
+}
+
+.toolbarRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(74, 11, 29, 0.08);
+  padding-bottom: 14px;
+}
+.toolbarRow .resultCount {
+  flex: 1;
+  min-width: 120px;
+}
+.toolbarRow .sortContainer {
+  margin-left: auto;
+}
+
+.filterIconBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(74, 11, 29, 0.18);
+  background: #fff;
+  color: #4A0B1D;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.filterIconBtn:hover {
+  border-color: #E07B39;
+  color: #E07B39;
+  background: #fff8f2;
+}
+.filterIconBtnOn {
+  background: #4A0B1D;
+  color: #fff;
+  border-color: #4A0B1D;
+}
+.filterBadge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #E07B39;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.filterIconBtnOn .filterBadge {
+  background: #fff;
+  color: #4A0B1D;
+}
+
+/* ── Left filter drawer ── */
+.filterBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 12, 18, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s;
+  z-index: 1200;
+}
+.filterBackdropOpen {
+  opacity: 1;
+  visibility: visible;
+}
+.filterDrawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: min(360px, 92vw);
+  background: #F8F5F0;
+  box-shadow: 12px 0 40px rgba(74, 11, 29, 0.18);
+  transform: translateX(-105%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1201;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(74, 11, 29, 0.08);
+}
+.filterDrawerOpen {
+  transform: translateX(0);
+}
+.filterDrawerHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 22px 14px;
+  border-bottom: 1px solid rgba(74, 11, 29, 0.08);
+  background: #fff;
+}
+.filterKicker {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #E07B39;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-weight: 700;
+}
+.filterDrawerTitle {
+  margin: 4px 0 0;
+  font-family: Canela, serif;
+  font-size: 28px;
+  color: #4A0B1D;
+  font-weight: 500;
+}
+.filterClose {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(74, 11, 29, 0.12);
+  background: #fff;
+  color: #4A0B1D;
+  cursor: pointer;
+  font-size: 16px;
+}
+.filterDrawerBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 18px 24px;
+}
+.filterSection {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(74, 11, 29, 0.08);
+}
+.filterSectionTitle {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4A0B1D;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-weight: 800;
+}
+.filterOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.filterOpt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: #4A0B1D;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.filterOpt:hover {
+  background: #fff;
+  border-color: rgba(224, 123, 57, 0.35);
+}
+.filterOptOn {
+  background: #fff;
+  border-color: #4A0B1D;
+  font-weight: 700;
+}
+.filterCheck {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(74, 11, 29, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  background: #fff;
+  color: #fff;
+}
+.filterOptOn .filterCheck {
+  background: #4A0B1D;
+  border-color: #4A0B1D;
+}
+.filterDrawerFoot {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 10px;
+  padding: 14px 18px 18px;
+  border-top: 1px solid rgba(74, 11, 29, 0.08);
+  background: #fff;
+}
+.filterClearBtn,
+.filterApplyBtn {
+  min-height: 44px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13.5px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  cursor: pointer;
+}
+.filterClearBtn {
+  background: transparent;
+  border: 1.5px solid #4A0B1D;
+  color: #4A0B1D;
+}
+.filterClearBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.filterApplyBtn {
+  background: #E07B39;
+  border: 0;
+  color: #fff;
+}
+.filterApplyBtn:hover {
+  background: #c96a2c;
 }
 
 .categoryPills {

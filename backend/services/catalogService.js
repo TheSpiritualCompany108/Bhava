@@ -2,7 +2,7 @@
 import CatalogProduct from "../models/CatalogProduct.js";
 import CatalogBundle from "../models/CatalogBundle.js";
 import CatalogCategory from "../models/CatalogCategory.js";
-import CatalogSettings from "../models/CatalogSettings.js";
+import CatalogSettings, { DEFAULT_SHOP_FILTERS } from "../models/CatalogSettings.js";
 import Inventory from "../models/Inventory.js";
 import StockMovement from "../models/StockMovement.js";
 import Order from "../models/Order.js";
@@ -52,7 +52,10 @@ export async function loadStock() {
 
 export async function getSettings() {
   const doc = await CatalogSettings.findOneAndUpdate({ key: "main" }, { $setOnInsert: { key: "main", lowStockThreshold: LOW_STOCK_DEFAULT } }, { upsert: true, new: true });
-  return { lowStockThreshold: doc.lowStockThreshold };
+  return {
+    lowStockThreshold: doc.lowStockThreshold,
+    shopFilters: { ...DEFAULT_SHOP_FILTERS, ...(doc.shopFilters?.toObject?.() || doc.shopFilters || {}) },
+  };
 }
 
 // ── Sync / migration (additive only) ─────────────────────────────────────────

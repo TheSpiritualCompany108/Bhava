@@ -42,7 +42,7 @@ const publicProduct = (p) => {
 };
 
 export const getCatalog = wrap(async (req, res) => {
-  const [ctx, stock] = await Promise.all([loadCtx(), loadStock()]);
+  const [ctx, stock, settings] = await Promise.all([loadCtx(), loadStock(), getSettings()]);
   const bundles = ctx.bundles
     .map((b) => ({ b, price: bundlePrice(ctx, b) }))
     .filter(({ price }) => price !== null)
@@ -59,6 +59,7 @@ export const getCatalog = wrap(async (req, res) => {
     products: ctx.products.map(publicProduct),
     bundles,
     availability: availabilityFor(stock, ctx),
+    shopFilters: settings.shopFilters,
   });
 });
 
@@ -222,10 +223,24 @@ export const adminMovements = wrap(async (req, res) => res.json({ success: true,
 // ── Admin: settings / sync / upload ──────────────────────────────────────────
 export const adminGetSettings = wrap(async (req, res) => res.json({ success: true, ...(await getSettings()) }));
 export const adminPutSettings = wrap(async (req, res) => {
-  const n = Number(req.body?.lowStockThreshold);
-  if (!Number.isInteger(n) || n < 0 || n > 10000) throw new ApiError(422, "Low-stock threshold must be a whole number ≥ 0.");
-  await CatalogSettings.updateOne({ key: "main" }, { $set: { lowStockThreshold: n } }, { upsert: true });
-  res.json({ success: true, message: `Low-stock threshold set to ${n}.`, lowStockThreshold: n });
+  const patch = {};
+  if (req.body?.lowStockThreshold !== undefined) {
+    const n = Number(req.body.lowStockThreshold);
+    if (!Number.isInteger(n) || n < 0 || n > 10000) throw new ApiError(422, "Low-stock threshold must be a whole number ≥ 0.");
+    patch.lowStockThreshold = n;
+  }
+  if (req.body?.shopFilters && typeof req.body.shopFilters === "object") {
+    const keys = ["category", "fragrance", "format", "price", "intention", "availability"];
+    const next = {};
+    for (const k of keys) {
+      if (typeof req.body.shopFilters[k] === "boolean") next[`shopFilters.${k}`] = req.body.shopFilters[k];
+    }
+    Object.assign(patch, next);
+  }
+  if (!Object.keys(patch).length) throw new ApiError(400, "Nothing to update.");
+  await CatalogSettings.updateOne({ key: "main" }, { $set: patch }, { upsert: true });
+  const settings = await getSettings();
+  res.json({ success: true, message: "Shop settings saved.", ...settings });
 });
 export const adminSync = wrap(async (req, res) => {
   const report = await syncCatalog({ dryRun: !!req.body?.dryRun });
