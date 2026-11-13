@@ -34,7 +34,7 @@ const challenges = [
     title: "21-Day Dhyan Challenge",
     description:
       "Establish a powerful daily meditation habit in 21 days. Ancient techniques, modern structure — transform your mind from within.",
-    color: "#1a3a2a",
+    color: "#4A0B1D",
     accent: "#4ade80",
     image: "/dhyanChallenge.png",
     route: "/knowledge/21-day-dhyan",

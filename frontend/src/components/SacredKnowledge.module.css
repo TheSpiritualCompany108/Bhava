@@ -169,8 +169,8 @@
   background: linear-gradient(160deg, #E1E7E1 0%, #F2F5F2 100%);
 }
 .green .iconBadge { background: #1E2D1E; }
-.green .cardTitle { color: #1E2D1E; }
-.green .cardLink { color: #1E2D1E; }
+.green .cardTitle { color: #4A0B1D; }
+.green .cardLink { color: #4A0B1D; }
 
 /* ── Responsive ── */
 @media (max-width: 900px) {

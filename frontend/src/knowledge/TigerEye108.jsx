@@ -102,7 +102,7 @@ function TigerEye108() {
       description:
         "Content educating seekers on the authentic Vedic and Ayurvedic basis for crystal usage. Not metaphysical fluff — scientific, traditional, grounded evidence.",
       posts: ["Why 108 is encoded in nature", "Tiger Eye in ancient warfare", "Chakra science explained simply", "Mala bead meditation science"],
-      color: "#1E3A2F",
+      color: "#4A0B1D",
     },
     {
       title: "Emotional Depth Stories",

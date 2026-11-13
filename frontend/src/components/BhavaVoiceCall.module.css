@@ -271,7 +271,7 @@
 }
 .stateSpeak .instructionIconWrapper {
   background: #2ed573;
-  color: #000;
+  color: #4A0B1D;
   box-shadow: 0 0 16px rgba(46, 213, 115, 0.6);
 }
 .stateSpeak .instructionBadge {
@@ -291,7 +291,7 @@
 }
 .stateWait .instructionIconWrapper {
   background: #ffab00;
-  color: #000;
+  color: #4A0B1D;
   animation: rotateSpin 2s infinite linear;
 }
 .stateWait .instructionBadge {
@@ -414,7 +414,7 @@
   height: 68px;
   border-radius: 50%;
   background: linear-gradient(135deg, #2ed573, #00f2fe);
-  color: #080307;
+  color: #4A0B1D;
   box-shadow: 0 8px 20px rgba(46, 213, 115, 0.4);
 }
 

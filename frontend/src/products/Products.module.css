@@ -9,7 +9,7 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  background: #1E2D1E;
+  background: #4A0B1D;
   color: #fff;
   padding: 14px 22px;
   border-radius: 999px;
@@ -138,9 +138,17 @@
 }
 
 .searchIcon {
-  font-size: 16px;
-  color: #8C8075;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #C0671E;
   margin-right: 10px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.searchIcon svg {
+  display: block;
 }
 
 .searchInput {
@@ -148,7 +156,7 @@
   border: none;
   outline: none;
   font-size: 14.5px;
-  color: #221B16;
+  color: #4A0B1D;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
   background: transparent;
 }
@@ -521,7 +529,7 @@
 
 .modalClose:hover {
   background: #e5ded3;
-  color: #111;
+  color: #4A0B1D;
 }
 
 .modalImageCol {

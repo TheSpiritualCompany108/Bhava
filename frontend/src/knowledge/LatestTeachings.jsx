@@ -35,7 +35,7 @@ function LatestTeachings() {
           category: tile.subtitle || tile.summary,
           image: tile.imageUrl ? (tile.imageUrl.startsWith('http') ? tile.imageUrl : `${API_BASE}${tile.imageUrl}`) : "/Latest%20Teachings/placeholder.png",
           tagColor: "#3a2a6a",
-          color: "#1a1a3a",
+          color: "#4A0B1D",
           route: `/knowledge/detail/${tile._id}`,
         }));
         setTeachings(mappedTeachings);

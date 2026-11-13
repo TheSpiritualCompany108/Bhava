@@ -1,7 +1,7 @@
 import Order from "../models/Order.js";
 import Cart from "../models/Cart.js";
-import Tile from "../models/Tile.js";
-import mongoose from "mongoose";
+import { priceCart, requirementsOf } from "../data/catalog.js";
+import { loadCtx, loadStock, deductStock, restoreStock, logOrderMovements, cancelOrderAndRestock, ApiError } from "../services/catalogService.js";
 
 // Helper: parse "₹1,299" → 1299
 const parsePrice = (str) => {
@@ -53,48 +53,10 @@ export const createPreorder = async (req, res) => {
   }
 };
 
-// POST /api/orders  — place a full order from cart (protected)
+// POST /api/orders — legacy server-cart order path. Disabled: it bypassed catalogue pricing,
+// shipping and component-level inventory checks. All purchases go through /api/orders/checkout.
 export const placeOrder = async (req, res) => {
-  try {
-    const { address, notes } = req.body;
-
-    const cart = await Cart.findOne({ userId: req.userId });
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ success: false, message: "Your cart is empty." });
-    }
-
-    const amount = cart.items.reduce((s, i) => s + i.priceNum * i.quantity, 0);
-
-    const order = await Order.create({
-      userId: req.userId,
-      type: "order",
-      items: cart.items.map((i) => ({
-        productId: i.productId,
-        title: i.title,
-        price: i.price,
-        priceNum: i.priceNum,
-        image: i.image,
-        category: i.category,
-        quantity: i.quantity,
-      })),
-      amount,
-      address: address || {},
-      notes: notes || "",
-    });
-
-    // Clear the cart after order placed
-    cart.items = [];
-    await cart.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Order placed successfully!",
-      orderId: order._id,
-      amount,
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Server error. Please try again." });
-  }
+  res.status(410).json({ success: false, message: "Please use the checkout page to place your order." });
 };
 
 // GET /api/orders  — get user's orders (protected)
@@ -108,9 +70,9 @@ export const getMyOrders = async (req, res) => {
 };
 
 // POST /api/orders/checkout — secure checkout (protected)
-// body: { items: [{ productId, quantity }], address: {...}, notes, paymentMethod }
-// Prices are always re-read from the product (never trusted from the client).
-const FOUNDING_DISCOUNT = 0.3; // keep in sync with CartPage
+// body: { items: [{ kind, slug, variant?, selection?, quantity }], address, notes, paymentMethod }
+// Prices, shipping and stock are always computed server-side from the master catalogue.
+// Stock for every component SKU is deducted atomically; bundles deduct their actual components.
 export const checkout = async (req, res) => {
   try {
     const { items, address = {}, notes = "", paymentMethod = "cod" } = req.body;
@@ -140,44 +102,61 @@ export const checkout = async (req, res) => {
     if (!/^\d{6}$/.test(a.pincode)) return res.status(400).json({ success: false, message: "Please enter a valid 6-digit pincode." });
     a.phone = a.phone.slice(-10);
 
-    const orderItems = [];
-    for (const it of items) {
-      const qty = Math.min(Math.max(parseInt(it.quantity, 10) || 1, 1), 99);
-      if (!mongoose.isValidObjectId(it.productId)) {
-        return res.status(400).json({ success: false, message: "One of the items in your cart is no longer available. Please remove it and try again." });
-      }
-      const tile = await Tile.findById(it.productId);
-      if (!tile || tile.status === "draft" || tile.status === "archived") {
-        return res.status(400).json({ success: false, message: `"${it.title || "An item"}" is no longer available. Please remove it from your cart.` });
-      }
-      const priceNum = parsePrice(tile.badgeText);
-      orderItems.push({
-        productId: String(tile._id),
-        title: tile.title,
-        price: tile.badgeText || `₹${priceNum}`,
-        priceNum,
-        image: tile.imageUrl || "",
-        category: tile.meta?.productType || tile.category || "",
-        quantity: qty,
+    // Validate + price against current stock
+    const [ctx, stock] = await Promise.all([loadCtx(), loadStock()]);
+    const priced = priceCart(items, stock, ctx);
+    const bad = priced.lines.find((l) => !l.ok);
+    if (bad) {
+      return res.status(409).json({
+        success: false,
+        code: "CART_INVALID",
+        message: `${bad.title || "An item in your cart"}: ${bad.message} Please review your cart.`,
       });
     }
 
-    const subtotal = orderItems.reduce((s, i) => s + i.priceNum * i.quantity, 0);
-    const discount = Math.round(subtotal * FOUNDING_DISCOUNT);
-    const shipping = 0;
-    const total = subtotal - discount + shipping;
+    // Reserve (deduct) every component SKU atomically — fails closed if anything raced out of stock
+    const need = requirementsOf(priced.lines);
+    const deducted = await deductStock(need);
+    if (!deducted) {
+      return res.status(409).json({
+        success: false,
+        code: "OUT_OF_STOCK",
+        message: "Sorry — an item in your cart just went out of stock. Please review your cart.",
+      });
+    }
 
-    const order = await Order.create({
-      userId: req.userId,
-      type: "order",
-      items: orderItems,
-      amount: total,
-      pricing: { subtotal, discount, shipping, total },
-      address: a,
-      paymentMethod: "cod",
-      paymentStatus: "pending",
-      notes: clean(notes).slice(0, 500),
-    });
+    const orderItems = priced.lines.map((l) => ({
+      productId: l.lineId,
+      title: l.title,
+      price: `₹${l.unitPrice.toLocaleString("en-IN")}`,
+      priceNum: l.unitPrice,
+      image: "",
+      category: l.category,
+      quantity: l.quantity,
+      kind: l.kind,
+      slug: l.slug,
+      variantLabel: l.variantLabel,
+      components: l.components,
+    }));
+
+    let order;
+    try {
+      order = await Order.create({
+        userId: req.userId,
+        type: "order",
+        items: orderItems,
+        amount: priced.total,
+        pricing: { subtotal: priced.subtotal, discount: 0, shipping: priced.shipping, total: priced.total },
+        address: a,
+        paymentMethod: "cod",
+        paymentStatus: "pending",
+        notes: clean(notes).slice(0, 500),
+      });
+    } catch (err) {
+      await restoreStock(need);
+      throw err;
+    }
+    await logOrderMovements(deducted, order._id); // audit trail (best-effort, never blocks the order)
 
     // Best-effort: empty the server-side cart
     Cart.updateOne({ userId: req.userId }, { items: [] }).catch(() => {});
@@ -186,7 +165,8 @@ export const checkout = async (req, res) => {
       success: true,
       message: "Order placed successfully!",
       orderId: order._id,
-      total,
+      total: priced.total,
+      shipping: priced.shipping,
     });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error. Please try again." });
@@ -201,6 +181,31 @@ export const getAllOrders = async (req, res) => {
       .sort({ createdAt: -1 });
     res.status(200).json({ success: true, count: orders.length, orders });
   } catch (err) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+};
+
+// PATCH /api/orders/:id/status — admin. Cancelling returns each component SKU's stock exactly once.
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const status = String(req.body?.status || "");
+    if (!["pending", "confirmed", "shipped", "delivered", "cancelled"].includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status." });
+    }
+    if (status === "cancelled") {
+      const { order, restored } = await cancelOrderAndRestock(req.params.id, { actor: String(req.userId || "admin") });
+      return res.json({ success: true, message: `Order cancelled. Stock returned for ${Object.keys(restored).length} SKU(s).`, order, restored });
+    }
+    const current = await Order.findById(req.params.id);
+    if (!current) return res.status(404).json({ success: false, message: "Order not found." });
+    if (current.status === "cancelled") {
+      return res.status(409).json({ success: false, message: "A cancelled order cannot be reopened (its stock has already been returned). Ask the customer to place a new order." });
+    }
+    current.status = status;
+    await current.save();
+    res.json({ success: true, message: `Order marked ${status}.`, order: current });
+  } catch (err) {
+    if (err instanceof ApiError) return res.status(err.status).json({ success: false, message: err.message });
     res.status(500).json({ success: false, message: "Server error." });
   }
 };

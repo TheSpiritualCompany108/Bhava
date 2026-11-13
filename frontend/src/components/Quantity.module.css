@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #333;
+  color: #4A0B1D;
   cursor: pointer;
   border-radius: 7px;
   padding: 0;
@@ -32,6 +32,6 @@
   padding: 0 8px;
   font-weight: 700;
   font-size: 15px;
-  color: #111;
+  color: #4A0B1D;
   font-variant-numeric: tabular-nums;
 }

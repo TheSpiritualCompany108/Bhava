@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Review from "../models/Review.js";
-import Tile from "../models/Tile.js";
+import CatalogProduct from "../models/CatalogProduct.js";
 import User from "../models/User.js";
 import Order from "../models/Order.js";
 
@@ -9,6 +9,8 @@ const SORTS = {
   highest: { rating: -1, createdAt: -1 },
   lowest: { rating: 1, createdAt: -1 },
 };
+
+const slugOf = (v) => String(v || "").trim().toLowerCase();
 
 const buildSummary = (reviews) => {
   const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
@@ -20,7 +22,7 @@ const buildSummary = (reviews) => {
   const count = reviews.length;
   return {
     count,
-    average: count ? Math.round((sum / count) * 10) / 10 : 0,
+    average: count ? Math.round((sum / count) * 100) / 100 : 0,
     breakdown,
   };
 };
@@ -36,12 +38,12 @@ const shape = (r) => ({
   createdAt: r.createdAt,
 });
 
-// GET /api/reviews/:productId?sort=recent|highest|lowest
+// GET /api/reviews/:productId?sort=recent|highest|lowest  (productId = catalog slug)
 export const getReviews = async (req, res) => {
   try {
-    const { productId } = req.params;
-    if (!mongoose.isValidObjectId(productId)) {
-      return res.status(400).json({ success: false, message: "Invalid product id" });
+    const productId = slugOf(req.params.productId);
+    if (!productId) {
+      return res.status(400).json({ success: false, message: "Invalid product" });
     }
     const sort = SORTS[req.query.sort] || SORTS.recent;
 
@@ -59,9 +61,9 @@ export const getReviews = async (req, res) => {
 // POST /api/reviews/:productId  (protected)  body: { rating, title, body }
 export const createReview = async (req, res) => {
   try {
-    const { productId } = req.params;
-    if (!mongoose.isValidObjectId(productId)) {
-      return res.status(400).json({ success: false, message: "Invalid product id" });
+    const productId = slugOf(req.params.productId);
+    if (!productId) {
+      return res.status(400).json({ success: false, message: "Invalid product" });
     }
     if (!mongoose.isValidObjectId(req.userId)) {
       return res.status(403).json({ success: false, message: "Please sign in with a customer account to review." });
@@ -73,7 +75,7 @@ export const createReview = async (req, res) => {
     }
 
     const [product, user] = await Promise.all([
-      Tile.findById(productId).select("title"),
+      CatalogProduct.findOne({ slug: productId, status: { $ne: "archived" } }).select("slug name"),
       User.findById(req.userId).select("name"),
     ]);
     if (!product) return res.status(404).json({ success: false, message: "Product not found" });
@@ -82,7 +84,11 @@ export const createReview = async (req, res) => {
     const hasOrdered = await Order.exists({
       userId: req.userId,
       status: { $ne: "cancelled" },
-      "items.title": product.title,
+      $or: [
+        { "items.slug": product.slug },
+        { "items.components.productSlug": product.slug },
+        { "items.title": product.name },
+      ],
     });
 
     const payload = {

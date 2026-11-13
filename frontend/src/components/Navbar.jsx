@@ -4,6 +4,17 @@ import styles from "./Navbar.module.css";
 import { useCart } from "../context/CartContext";
 import { warmupVoiceBackend } from "../utils/voiceBackendWarmup";
 
+// Main navigation per the master playbook (Section 9.1)
+const SHOP_NAV = [
+  { label: "Shop All", to: "/products" },
+  { label: "Incense Sticks", to: "/products?category=incense-sticks" },
+  { label: "Bamboo-less Incense", to: "/products?category=bamboo-less-incense" },
+  { label: "Incense Cones", to: "/products?category=incense-cones" },
+  { label: "Sambrani & Camphor", to: "/products?category=sambrani-camphor" },
+  { label: "Sacred Beads", to: "/products?category=sacred-beads" },
+  { label: "Curated Collections", to: "/products?category=curated-collections" },
+];
+
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -101,14 +112,23 @@ function Navbar() {
                   Ask Bhava:
                 </button>
               </li>
-              <li className={styles.navItem}>
+              <li className={`${styles.navItem} ${styles.hasSubmenu}`}>
                 <Link
-                  className={`${styles.navLink} ${isActive("/products") ? styles.navLinkActive : ""}`}
+                  className={`${styles.navLink} ${/^\/(products?|collection)(\/|$)/.test(location.pathname) ? styles.navLinkActive : ""}`}
                   to="/products"
                   onClick={() => setMenuOpen(false)}
                 >
                   Products
                 </Link>
+                <ul className={styles.submenu} aria-label="Shop categories">
+                  {SHOP_NAV.map((n) => (
+                    <li key={n.label}>
+                      <Link to={n.to} className={styles.submenuLink} onClick={() => setMenuOpen(false)}>
+                        {n.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </li>
               <li className={styles.navItem}>
                 <Link

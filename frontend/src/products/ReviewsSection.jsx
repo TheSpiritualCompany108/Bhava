@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./ReviewsSection.module.css";
 
@@ -18,12 +18,13 @@ const timeAgo = (iso) => {
 };
 
 export function Stars({ value, size = 16, interactive = false, onChange, onHover }) {
+  const filled = Math.round(Number(value) || 0);
   return (
     <span className={styles.stars} style={{ fontSize: size }} aria-label={`${value} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}
-          className={`${styles.star} ${n <= value ? styles.starOn : ""} ${interactive ? styles.starClickable : ""}`}
+          className={`${styles.star} ${n <= filled ? styles.starOn : ""} ${interactive ? styles.starClickable : ""}`}
           onClick={interactive ? () => onChange?.(n) : undefined}
           onMouseEnter={interactive ? () => onHover?.(n) : undefined}
           onMouseLeave={interactive ? () => onHover?.(0) : undefined}
@@ -40,6 +41,8 @@ export function Stars({ value, size = 16, interactive = false, onChange, onHover
 export default function ReviewsSection({ productId, productTitle, onSummary }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const onSummaryRef = useRef(onSummary);
+  onSummaryRef.current = onSummary;
 
   const [reviews, setReviews] = useState([]);
   const [summary, setSummary] = useState({ count: 0, average: 0, breakdown: {} });
@@ -68,19 +71,19 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
     if (!productId) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/reviews/${productId}?sort=${sort}`);
+      const res = await fetch(`${API_BASE}/api/reviews/${encodeURIComponent(productId)}?sort=${sort}`);
       const json = await res.json();
       if (res.ok && json.success) {
-        setReviews(json.reviews);
-        setSummary(json.summary);
-        onSummary?.(json.summary);
+        setReviews(json.reviews || []);
+        setSummary(json.summary || { count: 0, average: 0, breakdown: {} });
+        onSummaryRef.current?.(json.summary);
       }
     } catch {
       /* keep empty state */
     } finally {
       setLoading(false);
     }
-  }, [productId, sort, onSummary]);
+  }, [productId, sort]);
 
   useEffect(() => {
     load();
@@ -112,7 +115,7 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
     setSubmitting(true);
     setFormMsg({ type: "", text: "" });
     try {
-      const res = await fetch(`${API_BASE}/api/reviews/${productId}`, {
+      const res = await fetch(`${API_BASE}/api/reviews/${encodeURIComponent(productId)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ rating, title, body }),
@@ -144,7 +147,7 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
   const remove = async (reviewId) => {
     if (!window.confirm("Remove your review?")) return;
     try {
-      const res = await fetch(`${API_BASE}/api/reviews/${productId}/${reviewId}`, {
+      const res = await fetch(`${API_BASE}/api/reviews/${encodeURIComponent(productId)}/${reviewId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -157,6 +160,7 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
   const shown = (filterStar ? reviews.filter((r) => r.rating === filterStar) : reviews).slice(0, visible);
   const totalFiltered = filterStar ? reviews.filter((r) => r.rating === filterStar).length : reviews.length;
   const pct = (n) => (summary.count ? Math.round(((summary.breakdown?.[n] || 0) / summary.count) * 100) : 0);
+  const avgLabel = summary.count ? summary.average.toFixed(2) : "0.00";
 
   return (
     <section className={styles.section} id="reviews">
@@ -165,15 +169,15 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
         <h2 className={styles.title}>Customer Reviews</h2>
       </div>
 
-      {/* Summary */}
       <div className={styles.summary}>
         <div className={styles.scoreBox}>
-          <div className={styles.scoreNum}>{summary.count ? summary.average.toFixed(1) : "—"}</div>
-          <Stars value={Math.round(summary.average)} size={20} />
+          <Stars value={summary.count ? summary.average : 0} size={20} />
+          <div className={styles.scoreLine}>
+            <strong>{avgLabel}</strong> out of 5
+          </div>
           <div className={styles.scoreMeta}>
-            {summary.count
-              ? `Based on ${summary.count} review${summary.count > 1 ? "s" : ""}`
-              : "No reviews yet"}
+            Based on {summary.count} review{summary.count !== 1 ? "s" : ""}
+            {summary.count > 0 && <span className={styles.metaCheck} aria-hidden>✓</span>}
           </div>
         </div>
 
@@ -187,7 +191,7 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
               disabled={!summary.count}
               title={`Show ${n}-star reviews`}
             >
-              <span className={styles.barLabel}>{n} ★</span>
+              <Stars value={n} size={11} />
               <span className={styles.barTrack}>
                 <span className={styles.barFill} style={{ width: `${pct(n)}%` }} />
               </span>
@@ -197,11 +201,8 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
         </div>
 
         <div className={styles.ctaBox}>
-          <p className={styles.ctaText}>
-            {currentUser ? `Share your experience with ${productTitle}.` : "Sign in to share your experience."}
-          </p>
           <button type="button" className={styles.writeBtn} onClick={formOpen ? () => setFormOpen(false) : openForm}>
-            {formOpen ? "Cancel" : "Write a Review"}
+            {formOpen ? "Cancel" : "Write a review"}
           </button>
         </div>
       </div>
@@ -210,26 +211,21 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
         <p className={`${styles.msg} ${formMsg.type === "error" ? styles.msgError : styles.msgSuccess}`}>{formMsg.text}</p>
       )}
 
-      {/* Form */}
       {formOpen && (
         <form className={styles.form} onSubmit={submit}>
           <div className={styles.formRow}>
             <label className={styles.label}>Your rating</label>
             <div className={styles.ratingPicker}>
-              <Stars
-                value={hoverRating || rating}
-                size={30}
-                interactive
-                onChange={setRating}
-                onHover={setHoverRating}
-              />
+              <Stars value={hoverRating || rating} size={30} interactive onChange={setRating} onHover={setHoverRating} />
               <span className={styles.ratingHint}>
                 {["", "Poor", "Fair", "Good", "Very good", "Excellent"][hoverRating || rating] || "Tap to rate"}
               </span>
             </div>
           </div>
           <div className={styles.formRow}>
-            <label className={styles.label} htmlFor="rv-title">Title <span>(optional)</span></label>
+            <label className={styles.label} htmlFor="rv-title">
+              Title <span>(optional)</span>
+            </label>
             <input
               id="rv-title"
               className={styles.input}
@@ -240,13 +236,15 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
             />
           </div>
           <div className={styles.formRow}>
-            <label className={styles.label} htmlFor="rv-body">Your review</label>
+            <label className={styles.label} htmlFor="rv-body">
+              Your review
+            </label>
             <textarea
               id="rv-body"
               className={styles.textarea}
               rows={4}
               maxLength={2000}
-              placeholder="What did you love? How did it feel in your daily practice?"
+              placeholder={`What did you love about ${productTitle || "this product"}?`}
               value={body}
               onChange={(e) => setBody(e.target.value)}
             />
@@ -255,7 +253,9 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
             <p className={`${styles.msg} ${formMsg.type === "error" ? styles.msgError : styles.msgSuccess}`}>{formMsg.text}</p>
           )}
           <div className={styles.formActions}>
-            <span className={styles.postingAs}>Posting as <strong>{currentUser?.name}</strong></span>
+            <span className={styles.postingAs}>
+              Posting as <strong>{currentUser?.name}</strong>
+            </span>
             <button type="submit" className={styles.submitBtn} disabled={submitting}>
               {submitting ? "Submitting…" : "Submit Review"}
             </button>
@@ -263,29 +263,25 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
         </form>
       )}
 
-      {/* List */}
       <div className={styles.listHeader}>
-        <span className={styles.listCount}>
-          {filterStar ? `${totalFiltered} ${filterStar}-star review${totalFiltered !== 1 ? "s" : ""}` : `${summary.count} review${summary.count !== 1 ? "s" : ""}`}
-          {filterStar ? (
-            <button type="button" className={styles.clearFilter} onClick={() => setFilterStar(0)}>Clear</button>
-          ) : null}
-        </span>
         <label className={styles.sortWrap}>
-          Sort by
-          <select className={styles.sortSelect} value={sort} onChange={(e) => setSort(e.target.value)}>
+          <select className={styles.sortSelect} value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Sort reviews">
             <option value="recent">Most Recent</option>
             <option value="highest">Highest Rated</option>
             <option value="lowest">Lowest Rated</option>
           </select>
         </label>
+        {filterStar ? (
+          <button type="button" className={styles.clearFilter} onClick={() => setFilterStar(0)}>
+            Clear {filterStar}-star filter
+          </button>
+        ) : null}
       </div>
 
       {loading ? (
         <p className={styles.empty}>Loading reviews…</p>
       ) : shown.length === 0 ? (
         <div className={styles.empty}>
-          <div className={styles.emptyMark}>✦</div>
           <p>
             {filterStar
               ? `No ${filterStar}-star reviews yet.`
@@ -296,25 +292,39 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
         <ul className={styles.list}>
           {shown.map((r) => (
             <li key={r.id} className={styles.card}>
-              <div className={styles.cardTop}>
-                <div className={styles.avatar}>{(r.name || "?").trim().charAt(0).toUpperCase()}</div>
-                <div className={styles.who}>
-                  <span className={styles.name}>
-                    {r.name}
-                    {r.verified && <span className={styles.verified}>✓ Verified Purchase</span>}
-                  </span>
-                  <span className={styles.date}>{timeAgo(r.createdAt)}</span>
-                </div>
-                <Stars value={r.rating} size={15} />
+              <div className={styles.cardMeta}>
+                <Stars value={r.rating} size={16} />
+                <span className={styles.date}>{timeAgo(r.createdAt)}</span>
+              </div>
+              <div className={styles.who}>
+                <span className={styles.userIcon} aria-hidden>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2h19.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z" />
+                  </svg>
+                </span>
+                <span className={styles.name}>{r.name}</span>
+                {r.verified && <span className={styles.verified}>Verified</span>}
               </div>
               {r.title && <h4 className={styles.cardTitle}>{r.title}</h4>}
               <p className={styles.cardBody}>{r.body}</p>
               {currentUser && String(currentUser.id) === String(r.userId) && (
                 <div className={styles.ownRow}>
-                  <button type="button" className={styles.linkBtn} onClick={() => { setRating(r.rating); setTitle(r.title); setBody(r.body); setFormOpen(true); window.scrollTo({ top: document.getElementById("reviews").offsetTop - 80, behavior: "smooth" }); }}>
+                  <button
+                    type="button"
+                    className={styles.linkBtn}
+                    onClick={() => {
+                      setRating(r.rating);
+                      setTitle(r.title);
+                      setBody(r.body);
+                      setFormOpen(true);
+                      window.scrollTo({ top: document.getElementById("reviews").offsetTop - 80, behavior: "smooth" });
+                    }}
+                  >
                     Edit
                   </button>
-                  <button type="button" className={styles.linkBtn} onClick={() => remove(r.id)}>Delete</button>
+                  <button type="button" className={styles.linkBtn} onClick={() => remove(r.id)}>
+                    Delete
+                  </button>
                 </div>
               )}
             </li>

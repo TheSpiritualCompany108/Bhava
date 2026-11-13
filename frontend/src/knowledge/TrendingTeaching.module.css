@@ -28,7 +28,7 @@
 .trendingHeading {
   font-size: 28px;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-family: 'Canela', Cormorant, serif;
   margin-bottom: 4px;
 }
@@ -58,7 +58,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.85);
   border: 1.5px solid rgba(192, 103, 30, 0.25);
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-size: 28px;
   cursor: pointer;
   display: flex;
@@ -181,7 +181,7 @@
 .teachingTitle {
   font-size: 15px;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
   margin-bottom: 3px;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
   white-space: nowrap;

@@ -1,9 +1,9 @@
-// Inserts DEMO reviews for every product (category "Products").
+// Inserts DEMO reviews for active catalogue products.
 //   node seed-reviews.js          -> add demo reviews (skips products that already have demo ones)
 //   node seed-reviews.js --clear  -> remove all demo reviews
 import "dotenv/config";
 import mongoose from "mongoose";
-import Tile from "./models/Tile.js";
+import CatalogProduct from "./models/CatalogProduct.js";
 import Review from "./models/Review.js";
 
 const DEMO = [
@@ -21,12 +21,15 @@ if (process.argv.includes("--clear")) {
   const r = await Review.deleteMany({ demo: true });
   console.log(`Removed ${r.deletedCount} demo reviews`);
 } else {
-  const products = await Tile.find({ category: "Products" }).select("_id title");
+  // Drop legacy Tile ObjectId reviews so slug-based reviews can take over cleanly
+  await Review.deleteMany({ demo: true, productId: { $type: "objectId" } });
+
+  const products = await CatalogProduct.find({ status: "active" }).select("slug name").lean();
   let added = 0;
   for (const p of products) {
-    if (await Review.exists({ productId: p._id, demo: true })) continue;
+    if (await Review.exists({ productId: p.slug, demo: true })) continue;
     const docs = DEMO.map((d) => ({
-      productId: p._id,
+      productId: p.slug,
       userId: new mongoose.Types.ObjectId(),
       name: d.name,
       rating: d.rating,
@@ -39,7 +42,7 @@ if (process.argv.includes("--clear")) {
     }));
     await Review.insertMany(docs, { timestamps: false });
     added += docs.length;
-    console.log(`+ ${docs.length} reviews for "${p.title}"`);
+    console.log(`+ ${docs.length} reviews for "${p.name}"`);
   }
   console.log(`Done. Added ${added} demo reviews across ${products.length} products.`);
 }

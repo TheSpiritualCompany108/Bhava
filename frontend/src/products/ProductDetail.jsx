@@ -1,622 +1,439 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
+import shop from "../shop/Shop.module.css";
 import { useCart } from "../context/CartContext";
-import ReviewsSection, { Stars } from "./ReviewsSection";
+import useCatalog from "../hooks/useCatalog";
 import { QuantityDecrease, QuantityValue, QuantityIncrease } from "../components/Quantity";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-// Helper to resolve image URL
-const resolveImageUrl = (url) => {
-  if (!url) return "/Products/Home Page Incense.png";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${API_BASE}${url.startsWith("/") ? "" : "/"}${url}`;
-};
-
-// Fades/slides its children in when scrolled into view
-function Reveal({ children, delay = 0 }) {
-  const ref = useRef(null);
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  return (
-    <div ref={ref} className={`${styles.reveal} ${shown ? styles.revealIn : ""}`} style={{ transitionDelay: `${delay}ms` }}>
-      {children}
-    </div>
-  );
-}
+import { ProductCard } from "../shop/Cards";
+import { faqsFor, PENDING_USE_SAFETY, PENDING_RETURNS, PENDING_STORY, FOOTNOTE_PRICE } from "../shop/content";
+import { inr, imgSrc, shippingCopy, bundleContentLines, productMaxQty, getProduct, getBundle, variantInStock, productInStock, productLine } from "../shop/shopUtils";
+import ReviewsSection, { Stars } from "./ReviewsSection";
 
 export default function ProductDetail() {
   const { id } = useParams();
+  return <ProductDetailInner key={id} slug={id} />; // remount per product → selection/qty/tab reset
+}
+
+function ProductDetailInner({ slug }) {
   const navigate = useNavigate();
   const { addToCart, itemCount, cartItems } = useCart();
+  const { catalog, loading, error, reload } = useCatalog();
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [allProducts, setAllProducts] = useState([]);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const product = getProduct(catalog, slug);
+  const [picked, setPicked] = useState("");
   const [qty, setQty] = useState(1);
-  const [activeTab, setActiveTab] = useState("ritual");
-  const [toastMessage, setToastMessage] = useState(null);
-  const [failedImages, setFailedImages] = useState([]);
-  const [reviewSummary, setReviewSummary] = useState({ count: 0, average: 0 });
-  const handleReviewSummary = useCallback((s) => setReviewSummary(s), []);
+  const [tab, setTab] = useState("about");
+  const [toast, setToast] = useState(false);
+  const [addedQty, setAddedQty] = useState(1);
+  const [activeImg, setActiveImg] = useState(0);
+  const [reviewSummary, setReviewSummary] = useState(null);
+  const onReviewSummary = useCallback((s) => setReviewSummary(s), []);
 
-  const scrollToReviews = () => {
-    const el = document.getElementById("reviews");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  // Reset failed images, index and load product data
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    setActiveImageIndex(0);
-    setFailedImages([]);
-    setQty(1);
+    window.scrollTo({ top: 0 });
+  }, []);
+  // Single-variant products are pre-selected; otherwise the shopper must choose explicitly
+  const variantKey = product ? (product.variants.length === 1 ? product.variants[0].key : picked) : "";
+  useEffect(() => {
+    if (!toast) return undefined;
+    const t = setTimeout(() => setToast(false), 3500);
+    return () => clearTimeout(t);
+  }, [toast]);
 
-    const loadData = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        // Fetch current product
-        const res = await fetch(`${API_BASE}/api/tiles/${id}`);
-        const json = await res.json();
-        if (res.ok && json.success && json.data) {
-          setProduct(json.data);
-        } else {
-          setError(json.message || "Product offering not found.");
-        }
+  // SEO fields managed in Admin (fall back to name / tagline)
+  useEffect(() => {
+    if (!product) return undefined;
+    const prevTitle = document.title;
+    document.title = product.seoTitle || `${product.name} | Bhava`;
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) { meta = document.createElement("meta"); meta.name = "description"; document.head.appendChild(meta); }
+    const prevDesc = meta.content;
+    meta.content = product.seoDescription || product.tagline || "";
+    return () => { document.title = prevTitle; meta.content = prevDesc; };
+  }, [product]);
 
-        // Fetch catalog for similar products
-        const catRes = await fetch(`${API_BASE}/api/tiles?category=Products`);
-        const catJson = await catRes.json();
-        if (catRes.ok && catJson.success && Array.isArray(catJson.data)) {
-          setAllProducts(catJson.data);
-        }
-      } catch (err) {
-        console.error("Failed to load product detail:", err);
-        setError("Network error while loading product.");
-      } finally {
-        setLoading(false);
-      }
+  const variant = product?.variants.find((v) => v.key === variantKey);
+  const lineId = product && variant ? `product:${product.slug}:${variant.key}` : "";
+  const inCart = cartItems.find((i) => i.productId === lineId);
+  const inStock = product ? (variant ? variantInStock(catalog, product.slug, variant.key) : productInStock(catalog, product)) : false;
+  // Quantity can never exceed what is actually in stock (minus what this line already has in the cart)
+  const maxQty = product && variant ? Math.max(0, productMaxQty(catalog, product.slug, variant.key) - (inCart?.quantity || 0)) : 20;
+  const qtyEff = Math.max(1, Math.min(qty, maxQty || 1));
+  const atStockLimit = !!variant && inStock && maxQty < 20 && qtyEff >= maxQty;
+  const gallery = product ? [product.image, ...(product.gallery || [])].filter(Boolean) : [];
+  const faqs = useMemo(() => (product && catalog ? faqsFor(product, catalog) : []), [product, catalog]);
+
+  if (loading) return <div className={styles.page}><div className={shop.loadingBox}>Loading…</div></div>;
+  if (error || !catalog) {
+    return (
+      <div className={styles.page}>
+        <div className={shop.loadingBox}>
+          <p>{error || "Catalogue unavailable."}</p>
+          <button className={shop.btn} onClick={reload}>Try again</button>
+        </div>
+      </div>
+    );
+  }
+  if (!product) {
+    return (
+      <div className={styles.page}>
+        <div className={shop.loadingBox}>
+          <h2 style={{ fontFamily: "'Canela', serif", color: "#4A0B1D" }}>We couldn’t find that product</h2>
+          <button className={shop.btn} onClick={() => navigate("/products")}>← Back to the shop</button>
+        </div>
+      </div>
+    );
+  }
+
+  const category = catalog.categories.find((c) => c.id === product.category);
+  const needsChoice = product.variants.length > 1 && !variant;
+  const choiceNoun = product.mode === "pair" ? "a fragrance pair" : "a fragrance";
+  const qualifiesFree = product.price >= catalog.shipping.freeAbove;
+  const rel = product.related || {};
+  const upsells = [
+    rel.upsell && { type: "product", slug: rel.upsell, kicker: "Make It More Sacred" },
+    rel.upsellBundle && { type: "bundle", slug: rel.upsellBundle, kicker: "Make It More Sacred" },
+    rel.upsellAlt && { type: "product", slug: rel.upsellAlt, kicker: "A Sacred Companion" }, // neutral — not described as an upgrade
+  ].filter(Boolean);
+  const bundle = rel.bundle ? getBundle(catalog, rel.bundle) : null;
+  const alsoLike = useMemo(() => {
+    if (!product || !catalog?.products) return [];
+    const seen = new Set([product.slug]);
+    const out = [];
+    const push = (p) => {
+      if (!p || seen.has(p.slug) || out.length >= 4) return;
+      seen.add(p.slug);
+      out.push(p);
     };
+    (product.related?.crossSell || []).forEach((slug) => push(getProduct(catalog, slug)));
+    catalog.products.filter((p) => p.category === product.category).forEach(push);
+    catalog.products.forEach(push);
+    return out;
+  }, [catalog, product]);
 
-    loadData();
-  }, [id]);
-
-  const handleImageError = (imgUrl) => {
-    if (!imgUrl) return;
-    setFailedImages((prev) => (prev.includes(imgUrl) ? prev : [...prev, imgUrl]));
+  const add = (e) => {
+    if (needsChoice || !inStock) return;
+    const btn = e?.currentTarget;
+    addToCart(productLine(product, variant.key, qtyEff));
+    if (btn) playAddToCartAnimation(btn, { image: product.image });
+    setAddedQty(qtyEff);
+    setToast(true);
   };
-
-  // Consolidate images
-  const images = useMemo(() => {
-    if (!product) return [];
-    const list = [];
-    if (product.imageUrl) list.push(product.imageUrl);
-    if (product.meta?.additionalImages && Array.isArray(product.meta.additionalImages)) {
-      product.meta.additionalImages.forEach((img) => {
-        if (img && typeof img === "string" && !list.includes(img)) list.push(img);
-      });
-    }
-    return list.length > 0 ? list : ["/Products/Home Page Incense.png"];
-  }, [product]);
-
-  // Valid non-broken images
-  const validImages = useMemo(() => {
-    const filtered = images.filter((img) => !failedImages.includes(img));
-    return filtered.length > 0 ? filtered : images;
-  }, [images, failedImages]);
-
-  const safeActiveIndex = activeImageIndex < validImages.length ? activeImageIndex : 0;
-
-  // Compute Similar Products
-  const similarProducts = useMemo(() => {
-    if (!product || allProducts.length === 0) return [];
-    const currentId = String(product._id);
-    const currentType = (product.meta?.productType || product.category || "").toUpperCase();
-    const currentTitle = (product.title || "").toUpperCase();
-
-    // Filter out current product
-    const others = allProducts.filter((p) => String(p._id) !== currentId);
-
-    // Score others by relevance
-    const scored = others.map((p) => {
-      let score = 0;
-      const otherType = (p.meta?.productType || p.category || "").toUpperCase();
-      const otherTitle = (p.title || "").toUpperCase();
-
-      if (otherType && currentType && otherType === currentType) score += 5;
-      if (otherTitle.includes(currentTitle) || currentTitle.includes(otherTitle)) score += 3;
-      return { product: p, score };
-    });
-
-    scored.sort((a, b) => b.score - a.score);
-    return scored.slice(0, 4).map((s) => s.product);
-  }, [product, allProducts]);
-
-  // Short bullet highlights derived from the full description (shown beside the buy box)
-  const highlights = useMemo(() => {
-    const raw = (product?.fullDescription || "").trim();
-    if (!raw) return [];
-    let parts = raw.split(/\n+/);
-    if (parts.length < 2) parts = raw.split(/(?<=[.!?])\s+/);
-    return parts
-      .map((p) => p.replace(/^[\s•\-*]+/, "").trim())
-      .filter(Boolean)
-      .slice(0, 6);
-  }, [product]);
-
-  // Is this product already in the cart?
-  const cartLine = product
-    ? cartItems.find((i) => i.productId === (product._id || product.handle || product.title))
-    : null;
-
-  // Handle Add To Cart
-  const handleAddToCart = (e) => {
-    if (e) e.stopPropagation();
-    if (!product) return;
-
-    addToCart({
-      productId: product._id || product.handle || product.title,
-      title: product.title,
-      price: product.badgeText || "₹999",
-      image: resolveImageUrl(product.imageUrl || images[0] || ""),
-      category: product.meta?.productType || product.category || "Products",
-      quantity: qty,
-    });
-
-    setToastMessage(`✓ Added ${qty} × "${product.title}" to your sacred cart`);
-    setTimeout(() => setToastMessage(null), 3500);
-  };
-
-  // Handle Buy Now (Add + Navigate to Cart)
-  const handleBuyNow = () => {
-    handleAddToCart();
+  const buyNow = () => {
+    if (needsChoice || !inStock) return;
+    addToCart(productLine(product, variant.key, qtyEff));
     navigate("/cart");
   };
 
-  if (loading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.container} style={{ textAlign: "center", padding: "100px 20px" }}>
-          <h2 style={{ fontFamily: "'Canela', serif", color: "#4A0B1D" }}>Awakening Sacred Offering…</h2>
-          <p style={{ color: "#666" }}>Please wait while we connect to the sacred repository.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !product) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.container} style={{ textAlign: "center", padding: "100px 20px" }}>
-          <h2 style={{ fontFamily: "'Canela', serif", color: "#4A0B1D" }}>Offering Not Found</h2>
-          <p style={{ color: "#666", marginBottom: 24 }}>{error || "The sacred item you are looking for is not available."}</p>
-          <button
-            onClick={() => navigate("/products")}
-            style={{
-              background: "#E07B39",
-              color: "#fff",
-              border: "none",
-              padding: "12px 28px",
-              borderRadius: 999,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            ← Return to Sacred Catalog
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const displayCategory = product.meta?.productType || product.subtitle || "Sacred Item";
-  const displayPrice = product.badgeText || "₹999";
-  const comparePrice = product.meta?.compareAtPrice ? `₹${product.meta.compareAtPrice}` : null;
-  const priceNum = parseInt(String(displayPrice).replace(/[^\d]/g, ""), 10) || 0;
-  const compareNum = parseInt(String(product.meta?.compareAtPrice || "").replace(/[^\d]/g, ""), 10) || 0;
-  const savingsPct = compareNum > priceNum && priceNum > 0 ? Math.round(((compareNum - priceNum) / compareNum) * 100) : 0;
-  const howToUse = (product.meta?.howToUse || "")
-    .split(/\n+/)
-    .map((s) => s.replace(/^[\s•\-*\d.]+/, "").trim())
-    .filter(Boolean);
-  const didYouKnow = (product.meta?.didYouKnow || "").trim();
+  // Fragrance details to show for the current selection
+  const shownFragrances = variant ? variant.fragrances : product.mode === "all" ? product.variants[0].fragrances : [];
 
   return (
     <div className={styles.page}>
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className={styles.toast}>
-          <span>{toastMessage}</span>
-          <button className={styles.toastLink} onClick={() => navigate("/cart")}>
-            View Cart ({itemCount}) →
-          </button>
+      {toast && (
+        <div className={styles.toast} role="status">
+          <span>✓ Added {addedQty} × “{product.name}”{variant?.label && product.mode !== "none" ? ` (${variant.label})` : ""}</span>
+          <button className={styles.toastLink} onClick={() => navigate("/cart")}>View Cart ({itemCount}) →</button>
         </div>
       )}
 
       <div className={styles.container}>
-        {/* Breadcrumb */}
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <Link to="/">Home</Link>
-          <span>/</span>
-          <Link to="/products">Sacred Collections</Link>
-          <span>/</span>
-          <span className={styles.breadcrumbCurrent}>{product.title}</span>
+          <Link to="/">Home</Link><span>/</span>
+          <Link to="/products">Products</Link><span>/</span>
+          <Link to={`/products?category=${product.category}`}>{category?.label}</Link><span>/</span>
+          <span className={styles.breadcrumbCurrent}>{product.name}</span>
         </nav>
 
-        {/* Product Showcase */}
         <div className={styles.productShowcase}>
-          {/* Left: Gallery */}
           <div className={styles.galleryCol}>
             <div className={styles.mainImageWrapper}>
-              <img
-                key={validImages[safeActiveIndex]}
-                src={resolveImageUrl(validImages[safeActiveIndex] || product.imageUrl)}
-                alt={product.title}
-                className={styles.mainImage}
-                onError={() => handleImageError(validImages[safeActiveIndex])}
-              />
-              <span className={styles.badgeOverlay}>
-                {product.duration || "Handcrafted"}
-              </span>
+              <img src={imgSrc(gallery[Math.min(activeImg, gallery.length - 1)])} alt={product.name} className={styles.mainImage} />
             </div>
-
-            {validImages.length > 1 && (
+            {gallery.length > 1 && (
               <div className={styles.thumbnailRow}>
-                {validImages.map((img, idx) => (
-                  <button
-                    key={`${img}-${idx}`}
-                    type="button"
-                    className={`${styles.thumbnailBtn} ${safeActiveIndex === idx ? styles.thumbnailActive : ""}`}
-                    onClick={() => setActiveImageIndex(idx)}
-                  >
-                    <img
-                      src={resolveImageUrl(img)}
-                      alt={`Thumbnail ${idx + 1}`}
-                      className={styles.thumbnailImg}
-                      onError={() => handleImageError(img)}
-                    />
+                {gallery.map((g, i) => (
+                  <button key={g + i} type="button" className={`${styles.thumbnailBtn} ${i === activeImg ? styles.thumbnailActive : ""}`} onClick={() => setActiveImg(i)} aria-label={`Show image ${i + 1}`}>
+                    <img src={imgSrc(g)} alt="" className={styles.thumbnailImg} />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Right: Details & Purchase */}
           <div className={styles.detailsCol}>
-            <span className={styles.categoryTag}>{displayCategory}</span>
-            <h1 className={styles.title}>{product.title}</h1>
+            <span className={styles.categoryTag}>{category?.label}</span>
+            <h1 className={styles.title}>{product.name}</h1>
+            {product.tagline && <p className={styles.tagline}>{product.tagline}</p>}
 
-            <button type="button" className={styles.ratingRow} onClick={scrollToReviews}>
-              <Stars value={Math.round(reviewSummary.average)} size={15} />
-              {reviewSummary.count > 0 ? (
-                <span>
-                  <strong>{reviewSummary.average.toFixed(1)}</strong> · {reviewSummary.count} review{reviewSummary.count > 1 ? "s" : ""}
-                </span>
-              ) : (
-                <span>No reviews yet · Be the first</span>
-              )}
+            <button
+              type="button"
+              className={styles.ratingRow}
+              onClick={() => document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            >
+              <Stars value={reviewSummary?.count ? Math.round(reviewSummary.average) : 0} size={15} />
+              <strong>{reviewSummary?.count ? reviewSummary.average.toFixed(2) : "—"}</strong>
+              <span>
+                {reviewSummary?.count
+                  ? `${reviewSummary.count} review${reviewSummary.count !== 1 ? "s" : ""}`
+                  : "Be the first to review"}
+              </span>
             </button>
 
             <div className={styles.priceSection}>
-              <span className={styles.currentPrice}>{displayPrice}</span>
-              {comparePrice && <span className={styles.comparePrice}>{comparePrice}</span>}
-              {savingsPct > 0 && <span className={styles.discountBadge}>Save {savingsPct}%</span>}
-              <span className={styles.taxNote}>Inclusive of all taxes</span>
+              <span className={styles.currentPrice}>{inr(product.price)}</span>
+              <span className={styles.taxNote}>{FOOTNOTE_PRICE}</span>
             </div>
 
-            <div className={styles.stockStatus}>
-              <span className={styles.stockDot}></span>
-              <span>In Stock — Dispatches within 24 hours in ritual packaging</span>
+            <div className={styles.stockStatus} aria-live="polite">
+              <span className={styles.stockDot} style={inStock ? undefined : { background: "#a2331f" }}></span>
+              <span className={inStock ? shop.stockOk : shop.stockOut}>
+                {inStock ? "In stock · Ready to ship" : variant ? "This option is out of stock" : "Currently out of stock"}
+              </span>
             </div>
 
-            {/* Intention Essence Quote */}
-            <div className={styles.intentionBox}>
-              <span className={styles.intentionLabel}>Sacred Intention &amp; Essence</span>
-              <p className={styles.intentionText}>
-                "{product.summary || product.subtitle || "A timeless devotional tool crafted to still the mind and sanctify your home altar."}"
-              </p>
-            </div>
-
-            {/* Quantity */}
-            <div className={styles.qtyRow}>
-              <span className={styles.qtyLabel}>Quantity</span>
-              <div className={styles.qtyWrapper}>
-                <QuantityDecrease value={qty} onClick={() => setQty((q) => Math.max(1, q - 1))} />
-                <QuantityValue>{qty}</QuantityValue>
-                <QuantityIncrease value={qty} max={99} onClick={() => setQty((q) => q + 1)} />
+            {product.intention && (
+              <div className={styles.intentionBox}>
+                <span className={styles.intentionLabel}>Intention</span>
+                <p className={styles.intentionText}>{product.intention}</p>
               </div>
-            </div>
-
-            {/* Actions: Add to Cart + Buy Now */}
-            <div className={styles.actionsRow}>
-              <div className={styles.addWrap}>
-                <button
-                  className={`${styles.addToCartBtn} ${cartLine ? styles.addedBtn : ""}`}
-                  onClick={(e) => {
-                    if (cartLine) {
-                      navigate("/cart");
-                      return;
-                    }
-                    const btn = e.currentTarget;
-                    handleAddToCart(e);
-                    playAddToCartAnimation(btn, { image: resolveImageUrl(product.imageUrl || images[0] || "") });
-                  }}
-                >
-                  <span data-label style={{ display: "inline-block" }}>
-                    {cartLine ? `✓ In Cart (${cartLine.quantity}) · View Cart →` : "Add to Sacred Cart +"}
-                  </span>
-                </button>
-              </div>
-
-              <button className={styles.buyNowBtn} onClick={handleBuyNow}>
-                Buy Now →
-              </button>
-            </div>
-
-            {/* Delivery perks */}
-            <div className={styles.perks}>
-              <span>🚚 Free shipping</span>
-              <span>↩ 7-day returns</span>
-              <span>🔒 Secure payment</span>
-            </div>
-
-            {/* Highlights */}
-            {highlights.length > 0 && (
-              <ul className={styles.highlights}>
-                {highlights.map((h, i) => (
-                  <li key={i}>{h}</li>
-                ))}
-              </ul>
             )}
 
-            {/* Trust Badges */}
-            <div className={styles.trustGrid}>
-              <div className={styles.trustItem}>
-                <span className={styles.trustIcon}>🌿</span>
-                <span>100% Natural &amp; Pure Botanicals</span>
+            {/* ── Variant selector (only valid combinations from the master matrix) ── */}
+            {product.mode === "all" && (
+              <div className={shop.selBlock}>
+                <div className={shop.selLabel}>Fragrances</div>
+                <div className={shop.chips}>
+                  {product.variants[0].fragrances.map((f) => <span key={f} className={shop.fixedNote}>{catalog.fragrances[f].label}</span>)}
+                </div>
+                <p className={shop.note} style={{ marginTop: 8 }}>45 sticks in total across all three fragrances.</p>
               </div>
-              <div className={styles.trustItem}>
-                <span className={styles.trustIcon}>🛕</span>
-                <span>Temple Blessed &amp; Consecrated</span>
+            )}
+            {product.mode === "fixed" && (
+              <div className={shop.selBlock}>
+                <div className={shop.selLabel}>Fragrance</div>
+                <span className={shop.fixedNote}>Guggal only</span>
               </div>
-              <div className={styles.trustItem}>
-                <span className={styles.trustIcon}>📦</span>
-                <span>Safe Sacred Protective Packaging</span>
-              </div>
-              <div className={styles.trustItem}>
-                <span className={styles.trustIcon}>🔒</span>
-                <span>Secure Bank-Grade Payment</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Information Tabs */}
-        <Reveal>
-        <section className={styles.infoSection}>
-          <div className={styles.tabsHeader}>
-            <button
-              className={`${styles.tabBtn} ${activeTab === "ritual" ? styles.tabBtnActive : ""}`}
-              onClick={() => setActiveTab("ritual")}
-            >
-              The Sacred Ritual
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === "story" ? styles.tabBtnActive : ""}`}
-              onClick={() => setActiveTab("story")}
-            >
-              Story &amp; Description
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === "specs" ? styles.tabBtnActive : ""}`}
-              onClick={() => setActiveTab("specs")}
-            >
-              Specifications &amp; Purity
-            </button>
-          </div>
-
-          <div className={styles.tabBody}>
-            {activeTab === "ritual" && (
-              <div>
-                <p>
-                  Every Bhava offering is created to support the quiet return to yourself through intentional daily practice.
-                </p>
-                <div className={styles.ritualSteps}>
-                  <div className={styles.stepCard}>
-                    <span className={styles.stepNum}>STEP 01</span>
-                    <h4 className={styles.stepTitle}>PAUSE &amp; SANCTIFY</h4>
-                    <p className={styles.stepDesc}>
-                      Take 3 deep, grounding breaths. Hold or place the offering on your altar, letting go of outer distractions.
-                    </p>
-                  </div>
-                  <div className={styles.stepCard}>
-                    <span className={styles.stepNum}>STEP 02</span>
-                    <h4 className={styles.stepTitle}>AWAKEN INTENTION</h4>
-                    <p className={styles.stepDesc}>
-                      Light or chant with your chosen sankalpa (intention). Notice the sacred aroma and vibration filling the space.
-                    </p>
-                  </div>
-                  <div className={styles.stepCard}>
-                    <span className={styles.stepNum}>STEP 03</span>
-                    <h4 className={styles.stepTitle}>SEAL IN DEVOTION</h4>
-                    <p className={styles.stepDesc}>
-                      Close your ritual with a moment of gratitude. Carry the quiet clarity with you into the rest of your day.
-                    </p>
-                  </div>
+            )}
+            {(product.mode === "single" || product.mode === "pair" || product.mode === "camphor") && (
+              <div className={shop.selBlock} role="radiogroup" aria-label={product.mode === "pair" ? "Fragrance pair" : "Fragrance"}>
+                <div className={shop.selLabel}>
+                  <span>{product.mode === "pair" ? "Choose your pair" : "Choose your fragrance"}</span>
+                  {product.mode === "camphor" && <small>Both tablets share the same fragrance</small>}
+                </div>
+                <div className={shop.chips}>
+                  {product.variants.map((v) => {
+                    const ok = variantInStock(catalog, product.slug, v.key);
+                    return (
+                      <button
+                        key={v.key}
+                        role="radio"
+                        aria-checked={variantKey === v.key}
+                        disabled={!ok}
+                        title={ok ? "" : "Out of stock"}
+                        className={`${shop.chip} ${variantKey === v.key ? shop.chipOn : ""}`}
+                        onClick={() => setPicked(v.key)}
+                      >
+                        {v.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {activeTab === "story" && (
-              <div>
-                <p>
-                  {product.fullDescription || product.summary || product.subtitle || "Handcrafted according to timeless temple traditions."}
-                </p>
-                <p style={{ marginTop: 14 }}>
-                  Our artisans and herbalists follow centuries-old methods rooted in traditional Ayurvedic knowledge and sacred temple recipes.
-                </p>
+            {shownFragrances.length > 0 && (
+              <div className={shop.fragDesc}>
+                {shownFragrances.map((f) => (
+                  <p key={f} style={{ margin: "0 0 6px" }}>
+                    <b>{catalog.fragrances[f].label}</b> — {catalog.fragrances[f].short}
+                  </p>
+                ))}
               </div>
             )}
 
-            {activeTab === "specs" && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 32px" }}>
-                <div><strong>Category:</strong> {displayCategory}</div>
-                <div><strong>Origin:</strong> Handcrafted in India</div>
-                <div><strong>Quality Grade:</strong> {product.duration || "Temple Grade"}</div>
-                <div><strong>Packaging:</strong> Eco-Friendly Sacred Box</div>
-                <div><strong>Care:</strong> Store in a dry, serene space away from direct moisture</div>
-                <div><strong>Availability:</strong> Ready to Ship Worldwide</div>
+            {/* ── Quantity + actions ── */}
+            <div className={styles.qtyRow}>
+              <span className={styles.qtyLabel}>Quantity</span>
+              <div className={styles.qtyWrapper}>
+                <QuantityDecrease value={qtyEff} onClick={() => setQty(Math.max(1, qtyEff - 1))} />
+                <QuantityValue>{qtyEff}</QuantityValue>
+                <QuantityIncrease value={qtyEff} max={Math.max(1, maxQty)} onClick={() => setQty(Math.min(Math.max(1, maxQty), qtyEff + 1))} />
+              </div>
+            </div>
+            {atStockLimit && (
+              <p className={shop.note} role="status" style={{ margin: "-4px 0 12px", textAlign: "right" }}>
+                {inCart ? "You already have the maximum available quantity in your cart." : "Maximum available quantity selected."}
+              </p>
+            )}
+
+            <div className={styles.actionsRow}>
+              <div className={styles.addWrap}>
+                <button
+                  className={`${styles.addToCartBtn} ${inCart ? styles.addedBtn : ""}`}
+                  disabled={!inStock || needsChoice}
+                  onClick={(e) => (inCart ? navigate("/cart") : add(e))}
+                >
+                  <span data-label style={{ display: "inline-block" }}>
+                    {!inStock && variant
+                      ? "Out of stock"
+                      : needsChoice
+                        ? `Select ${choiceNoun}`
+                        : inCart
+                          ? `✓ In Cart (${inCart.quantity}) · View Cart →`
+                          : "Add to Cart +"}
+                  </span>
+                </button>
+              </div>
+              <button className={styles.buyNowBtn} onClick={buyNow} disabled={!inStock || needsChoice}>Buy Now →</button>
+            </div>
+
+            <div className={styles.perks}>
+              <span>🚚 {shippingCopy(catalog.shipping)}</span>
+              {qualifiesFree && <span>✓ Free shipping on this item</span>}
+            </div>
+
+            <div className={styles.trustGrid}>
+              <div className={styles.trustItem}><span className={styles.trustIcon}>✦</span> Thoughtfully curated</div>
+              <div className={styles.trustItem}><span className={styles.trustIcon}>◈</span> Secure checkout</div>
+              <div className={styles.trustItem}><span className={styles.trustIcon}>◎</span> Easy returns guidance</div>
+              <div className={styles.trustItem}><span className={styles.trustIcon}>◉</span> Packed with care</div>
+            </div>
+
+            {/* ── Upsell ── */}
+            {upsells.map((u) => {
+              if (u.type === "bundle") {
+                const b = getBundle(catalog, u.slug);
+                return b ? (
+                  <Link key={u.slug} to={`/collection/${b.slug}`} className={shop.promo}>
+                    <div>
+                      <div className={shop.promoK}>{u.kicker}</div>
+                      <div className={shop.promoT}>{b.name} — {inr(b.price)}</div>
+                      <div className={shop.promoS}>{b.description}</div>
+                    </div>
+                    <span className={shop.promoGo}>View →</span>
+                  </Link>
+                ) : null;
+              }
+              const up = getProduct(catalog, u.slug);
+              return up ? (
+                <Link key={u.slug} to={`/product/${up.slug}`} className={shop.promo}>
+                  <div>
+                    <div className={shop.promoK}>{u.kicker}</div>
+                    <div className={shop.promoT}>{up.name} — {inr(up.price)}</div>
+                    <div className={shop.promoS}>{up.pack}</div>
+                  </div>
+                  <span className={shop.promoGo}>View →</span>
+                </Link>
+              ) : null;
+            })}
+
+            {/* ── One highly relevant curated collection ── */}
+            {bundle && (
+              <Link to={`/collection/${bundle.slug}`} className={shop.promo} style={{ borderStyle: "dashed" }}>
+                <div>
+                  <div className={shop.promoK}>Curated collection</div>
+                  <div className={shop.promoT}>{bundle.name} — {inr(bundle.price)}</div>
+                  <div className={shop.promoS}>{bundleContentLines(catalog, bundle).join(" · ")}</div>
+                </div>
+                <span className={shop.promoGo}>Choose &amp; add →</span>
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* ── Information ── */}
+        <section className={styles.infoSection}>
+          <div className={styles.tabsHeader} role="tablist">
+            {[["about", "About"], ["contents", "Pack Contents"], ["use", "Use & Safety"], ["ship", "Shipping & Returns"]].map(([k, l]) => (
+              <button key={k} role="tab" aria-selected={tab === k} className={`${styles.tabBtn} ${tab === k ? styles.tabBtnActive : ""}`} onClick={() => setTab(k)}>
+                {l}
+              </button>
+            ))}
+          </div>
+          <div className={styles.tabBody}>
+            {tab === "about" && (
+              <div>
+                {product.description ? <p>{product.description}</p> : <p className={shop.pending}>{PENDING_STORY}</p>}
+                {product.intention && (
+                  <p style={{ marginTop: 14 }}><strong>Intention:</strong> <em>{product.intention}</em></p>
+                )}
+                {product.fitNote && <p style={{ marginTop: 14 }}>{product.fitNote}</p>}
+                {product.mode !== "none" && product.mode !== "fixed" && (
+                  <div style={{ marginTop: 18 }}>
+                    <strong>The fragrances</strong>
+                    {Object.values(catalog.fragrances)
+                      .filter((fr) => product.variants.some((v) => v.fragrances.includes(fr.id)))
+                      .map((fr) => (
+                        <p key={fr.id} style={{ marginTop: 10 }}>
+                          <b>{fr.label}</b> <span style={{ color: "#7a6a6e" }}>· {fr.short}</span><br />
+                          {fr.description}
+                        </p>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {tab === "contents" && (
+              <table className={shop.contents}>
+                <tbody>
+                  {product.contents.map(([k, v]) => (
+                    <tr key={k}><th scope="row">{k}</th><td>{v}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {tab === "use" && (
+              <div>
+                {[["How to use", product.usage], ["Safety", product.safety], ["Storage", product.storage], ["Materials / ingredients", product.materials]]
+                  .filter(([, v]) => v)
+                  .map(([k, v]) => (
+                    <div key={k} style={{ marginBottom: 14 }}><strong>{k}</strong><p style={{ margin: "4px 0 0", whiteSpace: "pre-line" }}>{v}</p></div>
+                  ))}
+                {!product.usage && !product.safety && <p className={shop.pending}>{PENDING_USE_SAFETY}</p>}
+              </div>
+            )}
+            {tab === "ship" && (
+              <div>
+                <p>{shippingCopy(catalog.shipping)}.</p>
+                <p className={shop.pending} style={{ marginTop: 12 }}>{PENDING_RETURNS}</p>
               </div>
             )}
           </div>
         </section>
-        </Reveal>
 
-        {/* How to Use / Did You Know */}
-        <Reveal>
-        <div className={styles.infoPair}>
-          <div className={styles.infoCard}>
-            <span className={styles.infoCardKicker}>Guidance</span>
-            <h3 className={styles.infoCardTitle}>How to Use</h3>
-            <ol className={styles.infoList}>
-              {(howToUse.length
-                ? howToUse
-                : [
-                    "Find a quiet corner of your home or altar and settle your breath.",
-                    "Set a simple sankalpa (intention) before you begin.",
-                    "Use the offering slowly and mindfully, staying present with the senses.",
-                    "Close with a moment of gratitude and store it in a dry, clean place.",
-                  ]
-              ).map((s, i) => (
-                <li key={i}>{s}</li>
-              ))}
-            </ol>
+        {/* ── FAQ ── */}
+        <section className={styles.infoSection}>
+          <h2 className={styles.sectionHeading}>Questions</h2>
+          <div className={shop.faq}>
+            {faqs.map((f) => (
+              <details key={f.q}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
           </div>
-          <div className={`${styles.infoCard} ${styles.infoCardAccent}`}>
-            <span className={styles.infoCardKicker}>Did You Know?</span>
-            <h3 className={styles.infoCardTitle}>Rooted in Tradition</h3>
-            <p className={styles.infoText}>
-              {didYouKnow ||
-                "Every Bhava offering is prepared by artisans following traditional temple methods, then blessed before it reaches your home. Small variations in colour and texture are natural signs of handcrafting."}
-            </p>
-          </div>
-        </div>
-        </Reveal>
+        </section>
 
-        {/* Customer Reviews */}
-        <Reveal>
-          <ReviewsSection productId={product._id} productTitle={product.title} onSummary={handleReviewSummary} />
-        </Reveal>
+        {/* ── Customer Reviews (Phool-style) ── */}
+        <ReviewsSection productId={product.slug} productTitle={product.name} onSummary={onReviewSummary} />
 
-        {/* Similar Products Section */}
-        {similarProducts.length > 0 && (
-          <Reveal>
-          <section className={styles.similarSection}>
+        {/* ── You May Also Like ── */}
+        {alsoLike.length > 0 && (
+          <section className={styles.similarSection} aria-labelledby="also-like-title">
             <div className={styles.similarHeader}>
               <span className={styles.similarKicker}>Sacred Pairings</span>
-              <h2 className={styles.similarTitle}>You May Also Like</h2>
-              <p style={{ color: "#666", fontSize: 15, margin: 0 }}>
-                Complementary devotional offerings that harmonize with this intention to deepen your practice.
+              <h2 id="also-like-title" className={styles.similarTitle}>You May Also Like</h2>
+              <p className={styles.similarSub}>
+                Soft companions for this offering — chosen to deepen devotion, not distract from it.
               </p>
             </div>
-
             <div className={styles.similarGrid}>
-              {similarProducts.map((item) => (
-                <div
-                  key={item._id}
-                  style={{
-                    background: "#ffffff",
-                    borderRadius: 14,
-                    overflow: "hidden",
-                    border: "1px solid rgba(0,0,0,0.06)",
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-4px)";
-                    e.currentTarget.style.boxShadow = "0 12px 28px rgba(74,11,29,0.12)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "none";
-                    e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.04)";
-                  }}
-                  onClick={() => navigate(`/product/${item._id || item.handle}`)}
-                >
-                  <div style={{ width: "100%", aspectRatio: "1/1", overflow: "hidden", background: "#f5f0e6" }}>
-                    <img
-                      src={resolveImageUrl(item.imageUrl)}
-                      alt={item.title}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
-
-                  <div style={{ padding: "18px 16px", display: "flex", flexDirection: "column", flex: 1 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#C0671E", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>
-                      {item.meta?.productType || item.subtitle || "Sacred Item"}
-                    </span>
-                    <h4 style={{ fontFamily: "'Canela', serif", fontSize: 17, color: "#221217", margin: "0 0 10px", lineHeight: 1.3 }}>
-                      {item.title}
-                    </h4>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto" }}>
-                      <span style={{ fontSize: 16, fontWeight: 800, color: "#4A0B1D" }}>
-                        {item.badgeText || "₹999"}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart({
-                            productId: item._id || item.handle || item.title,
-                            title: item.title,
-                            price: item.badgeText || "₹999",
-                            image: resolveImageUrl(item.imageUrl || ""),
-                            category: item.meta?.productType || item.category || "Products",
-                            quantity: 1,
-                          });
-                          setToastMessage(`✓ Added "${item.title}" to cart`);
-                          setTimeout(() => setToastMessage(null), 3500);
-                        }}
-                        style={{
-                          background: "#E07B39",
-                          color: "#fff",
-                          border: "none",
-                          padding: "7px 14px",
-                          borderRadius: 999,
-                          fontSize: 12,
-                          fontWeight: 700,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Add to Cart +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              {alsoLike.map((p) => <ProductCard key={p.slug} product={p} catalog={catalog} />)}
             </div>
           </section>
-          </Reveal>
         )}
       </div>
     </div>

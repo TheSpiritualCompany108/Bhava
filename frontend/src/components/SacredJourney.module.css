@@ -207,7 +207,7 @@
 .sacredDescription {
   font-size: 1.05rem;
   line-height: 1.8;
-  color: #2c2c2c;
+  color: #4A0B1D;
   margin-bottom: 40px;
   max-width: 860px;
   margin-left: auto;
@@ -225,7 +225,7 @@
 /* Pre-Order Button */
 .btnPreorder {
   background: transparent;
-  color: #1a1a1a;
+  color: #4A0B1D;
   border: 2px solid #1a1a1a;
   padding: 18px 120px;
   font-size: 1.05rem;

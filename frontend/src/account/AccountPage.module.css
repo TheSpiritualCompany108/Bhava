@@ -59,12 +59,12 @@
 
 .sidebarItem:hover {
   background: #f5f0e8;
-  color: #1e2d1e;
+  color: #4A0B1D;
 }
 
 .sidebarItemActive {
   background: #f5f0e8;
-  color: #1e2d1e;
+  color: #4A0B1D;
   font-weight: 700;
   border-right: 3px solid #c0671e;
 }
@@ -116,7 +116,7 @@
   font-family: 'Canela', Cormorant, serif;
   font-size: 2rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #4A0B1D;
   margin: 0 0 24px;
 }
 
@@ -160,7 +160,7 @@
 .avatarName {
   font-size: 18px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #4A0B1D;
   margin: 0 0 4px;
 }
 
@@ -189,7 +189,7 @@
 .cardTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #4A0B1D;
   margin: 0;
 }
 
@@ -226,7 +226,7 @@
 
 .fieldValue {
   font-size: 14.5px;
-  color: #1a1a1a;
+  color: #4A0B1D;
   font-weight: 500;
   margin: 0;
 }
@@ -239,7 +239,7 @@
 .fieldInput {
   font-size: 14.5px;
   font-family: inherit;
-  color: #1a1a1a;
+  color: #4A0B1D;
   border: 1.5px solid #c0671e;
   border-radius: 8px;
   padding: 8px 12px;
@@ -291,7 +291,7 @@
   font-family: inherit;
   transition: all 0.2s;
 }
-.cancelBtn:hover { border-color: #999; color: #333; }
+.cancelBtn:hover { border-color: #999; color: #4A0B1D; }
 
 /* Messages */
 .successMsg {
@@ -338,7 +338,7 @@
   font-family: 'Canela', Cormorant, serif;
   font-size: 1.6rem;
   font-weight: 700;
-  color: #1e2d1e;
+  color: #4A0B1D;
 }
 
 .statLabel {
@@ -376,7 +376,7 @@
   font-family: 'Canela', Cormorant, serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #4A0B1D;
   margin: 0 0 8px;
 }
 
@@ -429,7 +429,7 @@
 .orderId {
   font-size: 13.5px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #4A0B1D;
   margin: 0 0 2px;
   font-family: monospace;
 }
@@ -493,7 +493,7 @@
 .orderItemTitle {
   font-size: 13.5px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #4A0B1D;
   margin: 0 0 2px;
   white-space: nowrap;
   overflow: hidden;
@@ -509,7 +509,7 @@
 .orderItemTotal {
   font-size: 14px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #4A0B1D;
   flex-shrink: 0;
   margin: 0;
 }
@@ -534,7 +534,7 @@
 
 .orderTotal {
   font-size: 14px;
-  color: #1a1a1a;
+  color: #4A0B1D;
 }
 
 /* ── Responsive ─────────────────────────────────────────── */

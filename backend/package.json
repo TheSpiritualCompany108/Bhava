@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "sync-catalog": "node sync-catalog.js",
+    "test:catalog": "node test-catalog.js"
   },
   "dependencies": {
     "@vercel/blob": "^2.6.1",

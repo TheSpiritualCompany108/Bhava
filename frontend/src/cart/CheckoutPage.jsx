@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import useCartValidation from "../hooks/useCartValidation";
+import { imgSrc } from "../shop/shopUtils";
 import styles from "./CheckoutPage.module.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -13,21 +15,12 @@ const STATES = [
   "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
 ];
 
-const parsePrice = (str) => parseInt(String(str).replace(/[₹,]/g, ""), 10) || 0;
 const inr = (n) => `₹${n.toLocaleString("en-IN")}`;
-
-const resolveImg = (url) => {
-  if (!url) return "/Products/Home Page mala.png";
-  if (url.startsWith("http")) return url;
-  if (url.startsWith("/uploads") || url.startsWith("uploads")) {
-    return `${API_BASE}${url.startsWith("/") ? "" : "/"}${url}`;
-  }
-  return url.startsWith("/") ? url : `/${url}`;
-};
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { cartItems, clearCart, itemCount, total: subtotal } = useCart();
+  const { cartItems, clearCart, itemCount } = useCart();
+  const { loading: pricing, data: priced, error: priceError } = useCartValidation(cartItems);
 
   const token = localStorage.getItem("bhava_token");
   let user = null;
@@ -61,8 +54,12 @@ export default function CheckoutPage() {
     window.scrollTo({ top: 0 });
   }, []);
 
-  const discount = Math.round(subtotal * 0.3);
-  const total = subtotal - discount;
+  // Server-priced totals only (no client-side discounts or shipping maths)
+  const subtotal = priced?.subtotal ?? 0;
+  const shipping = typeof priced?.shipping === "number" ? priced.shipping : 0;
+  const total = priced?.total ?? 0;
+  const cartOk = !!priced?.allOk;
+  const payableCount = priced ? priced.lines.reduce((n, l) => n + (l.ok ? l.quantity : 0), 0) : itemCount;
 
   const set = (e) => {
     const { name, value } = e.target;
@@ -86,6 +83,10 @@ export default function CheckoutPage() {
 
   const placeOrder = async (ev) => {
     ev.preventDefault();
+    if (!cartOk) {
+      setSubmitError("Please review your cart — some items need your attention before you can order.");
+      return;
+    }
     if (!validate()) {
       const first = document.querySelector("[data-error='true']");
       first?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -98,7 +99,7 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          items: cartItems.map((i) => ({ productId: i.productId, quantity: i.quantity, title: i.title })),
+          items: cartItems.map((i) => ({ kind: i.kind, slug: i.slug, variant: i.variant, selection: i.selection, quantity: i.quantity })),
           address: {
             fullName: form.fullName,
             phone: form.phone,
@@ -120,6 +121,7 @@ export default function CheckoutPage() {
       }
       if (!res.ok || !json.success) {
         setSubmitError(json.message || "Could not place your order. Please try again.");
+        if (res.status === 409) setErrors({});
       } else {
         setPlaced({ orderId: json.orderId, total: json.total });
         clearCart();
@@ -168,7 +170,7 @@ export default function CheckoutPage() {
           <h1 className={styles.successTitle}>Your cart is empty</h1>
           <p className={styles.successText}>Add a few sacred offerings to your cart to checkout.</p>
           <div className={styles.successActions}>
-            <button className={styles.primaryBtn} onClick={() => navigate("/products")}>Browse Products</button>
+            <button className={styles.primaryBtn} onClick={() => navigate("/products")}>Browse the Shop</button>
           </div>
         </div>
       </div>
@@ -289,40 +291,44 @@ export default function CheckoutPage() {
 
           {/* ── Right: summary ── */}
           <aside className={styles.summary}>
+            <span className={styles.summaryKicker}>Your Offering</span>
             <h2 className={styles.summaryTitle}>Order Summary</h2>
             <ul className={styles.items}>
-              {cartItems.map((i) => (
-                <li key={i.productId}>
-                  <div className={styles.thumb}>
-                    <img
-                      src={resolveImg(i.image)}
-                      alt={i.title}
-                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/Products/Home Page mala.png"; }}
-                    />
-                    <b>{i.quantity}</b>
-                  </div>
-                  <div className={styles.itemMeta}>
-                    <span>{i.title}</span>
-                    <small>{i.price} each</small>
-                  </div>
-                  <strong>{inr(parsePrice(i.price) * i.quantity)}</strong>
-                </li>
-              ))}
+              {cartItems.map((i, idx) => {
+                const sv = priced?.lines?.[idx];
+                const unit = sv?.unitPrice ?? i.priceNum ?? 0;
+                return (
+                  <li key={i.productId}>
+                    <div className={styles.thumb}>
+                      <img src={imgSrc(i.image)} alt={i.title} />
+                      <b>{i.quantity}</b>
+                    </div>
+                    <div className={styles.itemMeta}>
+                      <span>{i.title}</span>
+                      <small>{[i.variantLabel, `${inr(unit)} each`].filter(Boolean).join(" · ")}</small>
+                      {sv && !sv.ok && <small style={{ color: "#a2331f" }}>{sv.message}</small>}
+                    </div>
+                    <strong>{sv && !sv.ok ? "—" : inr(unit * i.quantity)}</strong>
+                  </li>
+                );
+              })}
             </ul>
 
-            <div className={styles.row}><span>Items ({itemCount})</span><span>{inr(subtotal)}</span></div>
-            <div className={`${styles.row} ${styles.save}`}><span>Founding Member (30% off)</span><span>− {inr(discount)}</span></div>
-            <div className={styles.row}><span>Shipping</span><span className={styles.free}>FREE</span></div>
+            <div className={styles.row}><span>Items ({payableCount})</span><span>{priced ? inr(subtotal) : "…"}</span></div>
+            <div className={styles.row}><span>Shipping</span>{priced ? (shipping === 0 ? <span className={styles.free}>FREE</span> : <span>{inr(shipping)}</span>) : <span>…</span>}</div>
             <div className={styles.divider} />
-            <div className={`${styles.row} ${styles.totalRow}`}><span>Total</span><span>{inr(total)}</span></div>
-            <p className={styles.codNote}>Pay {inr(total)} on delivery</p>
+            <div className={`${styles.row} ${styles.totalRow}`}><span>Total</span><span>{priced ? inr(total) : "…"}</span></div>
+            <p className={styles.codNote}>Pay {priced ? inr(total) : "…"} on delivery · inclusive of applicable GST</p>
 
-            {submitError && <p className={styles.submitError}>{submitError}</p>}
+            {(submitError || priceError) && <p className={styles.submitError}>{submitError || priceError}</p>}
+            {priced && !cartOk && (
+              <p className={styles.submitError}>Some items are unavailable. <Link to="/cart">Review your cart</Link></p>
+            )}
 
-            <button type="submit" className={styles.placeBtn} disabled={placing}>
-              {placing ? "Placing your order…" : "Place Order"}
+            <button type="submit" className={styles.placeBtn} disabled={placing || pricing || !cartOk}>
+              {placing ? "Placing your order…" : pricing ? "Checking availability…" : "Place Order"}
             </button>
-            <p className={styles.secure}>🔒 Your details are safe · 7-day returns · Free shipping</p>
+            <p className={styles.secure}>🔒 Your details are safe</p>
           </aside>
         </form>
       </div>

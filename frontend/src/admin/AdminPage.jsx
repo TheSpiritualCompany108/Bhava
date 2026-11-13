@@ -1,3 +1,6 @@
+import ProductsPanel from "./catalog/ProductsPanel";
+import BundlesPanel from "./catalog/BundlesPanel";
+import InventoryDashboard from "./catalog/InventoryDashboard";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -1067,19 +1070,39 @@ export default function AdminPage() {
   const logout = () => { localStorage.removeItem("bhava_token"); navigate("/admin/login"); };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f7f4f0" }}>
+    <div className="adm-root" style={{ display: "flex", minHeight: "100vh", background: "#f7f4f0" }}>
+      {/* Responsive admin shell: on phones the sidebar becomes a scrollable tab row (no horizontal page overflow) */}
+      <style>{`
+        @media (max-width: 800px) {
+          .adm-root { flex-direction: column !important; }
+          .adm-top { padding: 10px 12px !important; }
+          .adm-top h2 { font-size: 16px !important; }
+          .adm-aside { width: 100% !important; max-height: none !important; padding: 62px 8px 6px !important; border-right: 0 !important; border-bottom: 1px solid #e0e0e0; overflow-x: auto !important; overflow-y: hidden !important; display: flex; align-items: center; gap: 6px; box-sizing: border-box; }
+          .adm-aside h3 { display: none !important; }
+          .adm-aside ul { display: flex !important; gap: 6px; margin: 0 !important; }
+          .adm-aside li { white-space: nowrap; margin-bottom: 0 !important; }
+          .adm-main { padding: 12px 10px 20px !important; max-height: none !important; overflow-x: hidden !important; }
+        }
+      `}</style>
       {/* TOP NAV */}
-      <div style={{ position: "fixed", top: 0, left: 0, right: 0, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "12px 20px", zIndex: 100, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {section === "homepage" ? "Homepage" : section === "quotes" ? "Quotes" : section === "mantraAudio" ? "108-Day Mantra" : section === "dhyanAudio" ? "21-Day Dhyān" : activeCategory}</h2>
+      <div className="adm-top" style={{ position: "fixed", top: 0, left: 0, right: 0, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "12px 20px", zIndex: 100, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {section === "homepage" ? "Homepage" : section === "quotes" ? "Quotes" : section === "mantraAudio" ? "108-Day Mantra" : section === "dhyanAudio" ? "21-Day Dhyān" : section === "inventory" ? "Inventory" : section === "catalogProducts" ? "Catalogue" : section === "catalogBundles" ? "Collections" : activeCategory}</h2>
         <button onClick={logout} style={{ padding: "8px 16px", background: "#E07B39", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}>Logout</button>
       </div>
 
       {/* LEFT SIDEBAR - CATEGORIES */}
-      <aside style={{ width: 200, background: "#f7f4f0", padding: "80px 12px 20px", borderRight: "1px solid #e0e0e0", overflowY: "auto", maxHeight: "100vh" }}>
+      <aside className="adm-aside" style={{ width: 200, background: "#f7f4f0", padding: "80px 12px 20px", borderRight: "1px solid #e0e0e0", overflowY: "auto", maxHeight: "100vh" }}>
         <h3 style={{ marginTop: 0, color: "#4A0B1D", fontSize: 14 }}>Categories</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
-          {categories.map(c => (
+          {categories.filter((c) => c !== "Products").map(c => (
             <li key={c} onClick={() => { setSection("tiles"); setActiveCategory(c); setSelectedTile(null); setEditingId(null); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "tiles" && c === activeCategory ? "#E07B39" : 'transparent', color: section === "tiles" && c === activeCategory ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>{c}</li>
+          ))}
+        </ul>
+
+        <h3 style={{ marginTop: 20, color: "#4A0B1D", fontSize: 14, borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>Shop</h3>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {[["catalogProducts", "🛍️ Catalogue"], ["catalogBundles", "🎁 Collections"], ["inventory", "📦 Inventory"]].map(([key, label]) => (
+            <li key={key} onClick={() => setSection(key)} style={{ cursor: "pointer", padding: "10px 12px", background: section === key ? "#E07B39" : "transparent", color: section === key ? "#fff" : "#000", borderRadius: 8, marginBottom: 6, fontSize: 13 }}>{label}</li>
           ))}
         </ul>
 
@@ -1090,10 +1113,15 @@ export default function AdminPage() {
           <li onClick={() => setSection("quotes")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "quotes" ? "#E07B39" : 'transparent', color: section === "quotes" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>📜 Quotes</li>
           <li onClick={() => setSection("mantraAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "mantraAudio" ? "#E07B39" : 'transparent', color: section === "mantraAudio" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🎵 108-Day Mantra</li>
           <li onClick={() => setSection("dhyanAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "dhyanAudio" ? "#E07B39" : 'transparent', color: section === "dhyanAudio" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🧘 21-Day Dhyān</li>
+
         </ul>
       </aside>
 
-      {section === "quotes" ? (
+      {section === "inventory" || section === "catalogProducts" || section === "catalogBundles" ? (
+        <main className="adm-main" style={{ flex: 1, minWidth: 0, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
+          {section === "inventory" ? <InventoryDashboard /> : section === "catalogProducts" ? <ProductsPanel /> : <BundlesPanel />}
+        </main>
+      ) : section === "quotes" ? (
       /* CENTER - QUOTES */
       <main style={{ flex: 1, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
         {quotesLoading && <div style={{ padding: 12, background: '#fffbe6', borderRadius: 6, marginBottom: 12 }}>Loading quotes…</div>}

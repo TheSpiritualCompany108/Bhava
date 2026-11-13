@@ -26,6 +26,7 @@ import AboutUs from "./pages/AboutUs";
 import AdminLogin from "./admin/AdminLogin";
 import AdminPage from "./admin/AdminPage";
 import ProductDetail from "./products/ProductDetail";
+import BundleDetail from "./products/BundleDetail";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/products/:id" element={<ProductDetail />} />
+            <Route path="/collection/:slug" element={<BundleDetail />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
 
