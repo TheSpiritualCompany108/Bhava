@@ -128,3 +128,16 @@
 .lbPrev { left: 10px; } .lbNext { right: 10px; }
 .imgBox img { cursor: zoom-in; }
 @media (max-width: 720px) { .lbBackdrop { padding: 0; } .lbBox { border-radius: 0; max-height: 100vh; height: 100vh; } .lbImg { max-height: calc(100vh - 110px); } }
+
+/* Inventory bulk update */
+.checkCol { width: 36px; text-align: center; }
+.checkCol input { width: 16px; height: 16px; cursor: pointer; accent-color: #E07B39; }
+.rowSelected td { background: #fff7ef; }
+.bulkBar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 12px; padding: 12px 14px; border-radius: 10px;
+  background: #fff1e4; border: 1px solid rgba(224, 123, 57, .35); font-size: 13.5px; color: #4A0B1D;
+}
+.bulkFill { margin-top: 4px; }
+.bulkFillRow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.bulkTableWrap { margin-top: 14px; max-height: 360px; overflow: auto; border: 1px solid #eee3d3; border-radius: 10px; }

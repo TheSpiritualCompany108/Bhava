@@ -9,7 +9,7 @@ import {
 } from "../data/catalog.js";
 import {
   ApiError, loadCtx, loadAdminCtx, loadStock, syncCatalog, validateProductInput, validateBundleInput, adminListProducts, adminListBundles,
-  inventoryList, inventorySummary, setStock, adjustStock, stockMovements, productReferences, bundleReferences, getSettings,
+  inventoryList, inventorySummary, setStock, adjustStock, bulkSetStock, stockMovements, productReferences, bundleReferences, getSettings,
 } from "../services/catalogService.js";
 
 // One response format everywhere: { success: true, ... } | { success: false, message, errors?: [{field,message}] }
@@ -209,6 +209,13 @@ export const adminSetStock = wrap(async (req, res) => {
 export const adminAdjustStock = wrap(async (req, res) => {
   const r = await adjustStock(String(req.body?.sku || ""), Number(req.body?.delta), { reason: req.body?.reason, actor: actorOf(req) });
   res.json({ success: true, message: `${r.sku}: stock is now ${r.stock}.`, ...r });
+});
+export const adminBulkSetStock = wrap(async (req, res) => {
+  const r = await bulkSetStock(req.body?.items || [], { reason: req.body?.reason, actor: actorOf(req) });
+  const msg = r.failed
+    ? `Updated ${r.updated} SKU(s); ${r.failed} failed.`
+    : `Updated stock for ${r.updated} SKU(s).`;
+  res.json({ success: true, message: msg, ...r });
 });
 export const adminMovements = wrap(async (req, res) => res.json({ success: true, items: await stockMovements(req.params.sku, 100) }));
 

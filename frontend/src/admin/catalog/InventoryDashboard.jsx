@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import s from "./AdminCatalog.module.css";
 import { api, imgUrl, fmtDate, useDebounced, useNotice } from "./adminApi";
 import { Notice, Modal, ErrorList, ImageLightbox } from "./common";
@@ -58,6 +58,117 @@ function StockDialog({ row, onClose, onDone }) {
   );
 }
 
+function BulkStockDialog({ rows, onClose, onDone }) {
+  const [qtyMap, setQtyMap] = useState(() => Object.fromEntries(rows.map((r) => [r.sku, String(r.stock)])));
+  const [fillAll, setFillAll] = useState("");
+  const [reason, setReason] = useState("Bulk stock count");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+
+  const items = rows.map((r) => ({ sku: r.sku, stock: Number(qtyMap[r.sku]) }));
+  const valid = items.length > 0 && items.every((i) => Number.isInteger(i.stock) && i.stock >= 0);
+
+  const applyFill = () => {
+    const n = Number(fillAll);
+    if (!Number.isInteger(n) || n < 0) return;
+    setQtyMap(Object.fromEntries(rows.map((r) => [r.sku, String(n)])));
+  };
+
+  const save = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const j = await api("/inventory/bulk", {
+        method: "PUT",
+        body: { items, reason },
+      });
+      onDone(j.message);
+    } catch (e) {
+      setError(e);
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal
+      title={`Bulk update stock — ${rows.length} SKU${rows.length === 1 ? "" : "s"}`}
+      onClose={onClose}
+      footer={<>
+        <button className={`${s.btn} ${s.btnGhost}`} onClick={onClose} disabled={busy}>Cancel</button>
+        <button className={s.btn} onClick={save} disabled={!valid || busy}>
+          {busy ? "Saving…" : `Update ${rows.length} SKU${rows.length === 1 ? "" : "s"}`}
+        </button>
+      </>}
+    >
+      <ErrorList error={error} />
+      <p className={s.hint} style={{ marginTop: 0 }}>
+        Set a new absolute quantity for each selected SKU. Use “Apply to all” to fill the same count everywhere, then tweak individual rows if needed.
+      </p>
+
+      <div className={s.bulkFill}>
+        <label className={s.label} htmlFor="bulk-fill">Apply same qty to all</label>
+        <div className={s.bulkFillRow}>
+          <input
+            id="bulk-fill"
+            className={s.input}
+            type="number"
+            min="0"
+            step="1"
+            value={fillAll}
+            onChange={(e) => setFillAll(e.target.value)}
+            placeholder="e.g. 20"
+          />
+          <button type="button" className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={applyFill} disabled={!Number.isInteger(Number(fillAll)) || Number(fillAll) < 0}>
+            Apply to all
+          </button>
+        </div>
+      </div>
+
+      <div className={s.field} style={{ marginTop: 12 }}>
+        <label className={s.label} htmlFor="bulk-reason">Reason (optional)</label>
+        <input id="bulk-reason" className={s.input} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={300} />
+      </div>
+
+      <div className={s.bulkTableWrap}>
+        <table className={s.moves}>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>Current</th>
+              <th>New stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.sku}>
+                <td>
+                  <b>{r.productName}</b>
+                  {r.variantLabel !== "—" ? <div className={s.muted}>{r.variantLabel}</div> : null}
+                </td>
+                <td className={s.mono}>{r.sku}</td>
+                <td>{r.stock}</td>
+                <td>
+                  <input
+                    className={s.input}
+                    style={{ width: 96 }}
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={qtyMap[r.sku] ?? ""}
+                    onChange={(e) => setQtyMap((m) => ({ ...m, [r.sku]: e.target.value }))}
+                    aria-label={`New stock for ${r.sku}`}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Modal>
+  );
+}
+
 function HistoryDialog({ row, onClose }) {
   const [items, setItems] = useState(null);
   const [error, setError] = useState(null);
@@ -106,8 +217,9 @@ export default function InventoryDashboard() {
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(1);
   const [preview, setPreview] = useState(null);
-  const [dialog, setDialog] = useState(null); // {type:'stock'|'history', row}
+  const [dialog, setDialog] = useState(null); // {type:'stock'|'history'|'bulk', row?}
   const [threshold, setThreshold] = useState("");
+  const [selected, setSelected] = useState(() => new Set());
   const q = useDebounced(search, 300);
 
   const load = useCallback(async () => {
@@ -128,7 +240,33 @@ export default function InventoryDashboard() {
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => { setPage(1); }, [q, category, stockStatus, active, sort, order, limit]);
+  useEffect(() => { setSelected(new Set()); }, [q, category, stockStatus, active, sort, order, page, limit]);
   useEffect(() => { api("/categories").then((j) => setCategories(j.items)).catch(() => {}); }, []);
+
+  const pageSkus = useMemo(() => (data?.items || []).map((r) => r.sku), [data]);
+  const allPageSelected = pageSkus.length > 0 && pageSkus.every((sku) => selected.has(sku));
+  const selectedRows = useMemo(
+    () => (data?.items || []).filter((r) => selected.has(r.sku)),
+    [data, selected],
+  );
+
+  const toggleSku = (sku) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(sku)) next.delete(sku);
+      else next.add(sku);
+      return next;
+    });
+  };
+
+  const togglePage = () => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allPageSelected) pageSkus.forEach((sku) => next.delete(sku));
+      else pageSkus.forEach((sku) => next.add(sku));
+      return next;
+    });
+  };
 
   const saveThreshold = async () => {
     try {
@@ -155,6 +293,14 @@ export default function InventoryDashboard() {
           <p className={s.sub}>Live stock per SKU, straight from the database. Collections hold no stock of their own — a purchase deducts every component SKU, and any collection with an out-of-stock component is blocked automatically.</p>
         </div>
         <div className={s.actions}>
+          <button
+            className={s.btn}
+            disabled={selected.size === 0}
+            onClick={() => setDialog({ type: "bulk" })}
+            title={selected.size === 0 ? "Select SKUs in the table first" : `Update ${selected.size} selected SKUs`}
+          >
+            Bulk update stock{selected.size ? ` (${selected.size})` : ""}
+          </button>
           <button className={`${s.btn} ${s.btnGhost}`} onClick={load} disabled={loading}>↻ Refresh</button>
         </div>
       </div>
@@ -204,6 +350,16 @@ export default function InventoryDashboard() {
         </div>
       )}
 
+      {selected.size > 0 && (
+        <div className={s.bulkBar}>
+          <span><b>{selected.size}</b> SKU{selected.size === 1 ? "" : "s"} selected</span>
+          <div className={s.rowActions}>
+            <button className={`${s.btn} ${s.btnSm}`} onClick={() => setDialog({ type: "bulk" })}>Bulk update stock</button>
+            <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => setSelected(new Set())}>Clear selection</button>
+          </div>
+        </div>
+      )}
+
       {loading && !data && <p className={s.loading}>Loading inventory…</p>}
       {data && data.total === 0 && (
         <div className={s.empty}>
@@ -217,11 +373,29 @@ export default function InventoryDashboard() {
           <div className={s.tableWrap}>
             <table className={s.table}>
               <thead>
-                <tr><th>Product</th><th>Category</th><th>Variant</th><th>SKU</th><th className={s.num}>Available</th><th className={s.num}>Reserved</th><th>Status</th><th>Active</th><th>Last updated</th><th>Actions</th></tr>
+                <tr>
+                  <th className={s.checkCol}>
+                    <input
+                      type="checkbox"
+                      checked={allPageSelected}
+                      onChange={togglePage}
+                      aria-label="Select all SKUs on this page"
+                    />
+                  </th>
+                  <th>Product</th><th>Category</th><th>Variant</th><th>SKU</th><th className={s.num}>Available</th><th className={s.num}>Reserved</th><th>Status</th><th>Active</th><th>Last updated</th><th>Actions</th>
+                </tr>
               </thead>
               <tbody>
                 {data.items.map((r) => (
-                  <tr key={r.sku}>
+                  <tr key={r.sku} className={selected.has(r.sku) ? s.rowSelected : undefined}>
+                    <td data-label="Select" className={s.checkCol}>
+                      <input
+                        type="checkbox"
+                        checked={selected.has(r.sku)}
+                        onChange={() => toggleSku(r.sku)}
+                        aria-label={`Select ${r.sku}`}
+                      />
+                    </td>
                     <td data-label="Product">
                       <div style={{ display: "flex", gap: 10, alignItems: "center", textAlign: "left" }}>
                         <button type="button" className={s.thumbBtn} title="Preview / download image" aria-label={`Preview ${r.productName} image`}
@@ -266,6 +440,18 @@ export default function InventoryDashboard() {
 
       {dialog?.type === "stock" && (
         <StockDialog row={dialog.row} onClose={() => setDialog(null)} onDone={(msg) => { setDialog(null); say("ok", msg); load(); }} />
+      )}
+      {dialog?.type === "bulk" && selectedRows.length > 0 && (
+        <BulkStockDialog
+          rows={selectedRows}
+          onClose={() => setDialog(null)}
+          onDone={(msg) => {
+            setDialog(null);
+            setSelected(new Set());
+            say("ok", msg);
+            load();
+          }}
+        />
       )}
       {dialog?.type === "history" && <HistoryDialog row={dialog.row} onClose={() => setDialog(null)} />}
       {preview && <ImageLightbox images={preview} onClose={() => setPreview(null)} />}
