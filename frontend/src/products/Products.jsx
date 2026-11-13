@@ -69,8 +69,30 @@ export default function Products() {
   }, [searchQuery, params, setParams]);
 
   const [bannerData, bannerLoaded] = useHomepageSectionState("productsBanner");
-  const rawBanner = bannerData?.bannerImage || bannerData?.image || bannerData?.items?.banner?.image;
-  const bannerImgSrc = rawBanner ? resolveHomepageImageUrl(rawBanner) : "/Slide 02.png";
+  const bannerSlides = useMemo(() => {
+    const fromSlides = Array.isArray(bannerData?.slides)
+      ? bannerData.slides
+          .map((s) => {
+            const img = s?.image || bannerData?.items?.[s?.id]?.image || "";
+            return img ? { id: s.id || img, image: img } : null;
+          })
+          .filter(Boolean)
+      : [];
+    if (fromSlides.length) return fromSlides;
+    const legacy = bannerData?.bannerImage || bannerData?.image || bannerData?.items?.banner?.image;
+    if (legacy) return [{ id: "banner", image: legacy }];
+    return [{ id: "default", image: "/Slide 02.png" }];
+  }, [bannerData]);
+  const [bannerIndex, setBannerIndex] = useState(0);
+  const bannerSrcs = useMemo(
+    () =>
+      bannerSlides.map((s) => {
+        const raw = s.image || "/Slide 02.png";
+        if (!raw || raw === "/Slide 02.png" || raw.startsWith("/Slide") || raw.startsWith("/Products")) return raw;
+        return resolveHomepageImageUrl(raw);
+      }),
+    [bannerSlides],
+  );
   const kicker = bannerData?.kicker || "The Spiritual Company";
   const title = bannerData?.title || "Shop Bhava";
   const subtitle =
@@ -105,6 +127,26 @@ export default function Products() {
     const t = setTimeout(() => setToast(null), 3500);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    setBannerIndex(0);
+  }, [bannerSlides.length]);
+
+  // Preload so crossfade never shows a blank frame
+  useEffect(() => {
+    bannerSrcs.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, [bannerSrcs]);
+
+  useEffect(() => {
+    if (bannerSlides.length < 2) return undefined;
+    const t = setInterval(() => {
+      setBannerIndex((i) => (i + 1) % bannerSlides.length);
+    }, 5000);
+    return () => clearInterval(t);
+  }, [bannerSlides.length]);
 
   useEffect(() => {
     document.body.style.overflow = filtersOpen ? "hidden" : "";
@@ -184,14 +226,32 @@ export default function Products() {
       )}
 
       <section className={styles.bannerSection}>
-        <div className={styles.bannerContainer}>
-          <img
-            src={bannerImgSrc}
-            alt="Bhava — shop sacred beads, incense, Sambrani and camphor"
-            className={styles.bannerImg}
-            fetchPriority="high"
-            style={{ visibility: bannerLoaded ? "visible" : "hidden" }}
-          />
+        <div className={styles.bannerContainer} style={{ visibility: bannerLoaded ? "visible" : "hidden" }}>
+          {bannerSrcs.map((src, i) => (
+            <img
+              key={bannerSlides[i]?.id || src}
+              src={src}
+              alt={i === bannerIndex ? "Bhava — shop sacred beads, incense, Sambrani and camphor" : ""}
+              className={`${styles.bannerImg} ${i === bannerIndex ? styles.bannerImgActive : ""}`}
+              fetchPriority={i === 0 ? "high" : "low"}
+              aria-hidden={i !== bannerIndex}
+            />
+          ))}
+          {bannerSlides.length > 1 && (
+            <div className={styles.bannerDots} role="tablist" aria-label="Banner slides">
+              {bannerSlides.map((s, i) => (
+                <button
+                  key={s.id || i}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === bannerIndex}
+                  aria-label={`Banner slide ${i + 1}`}
+                  className={`${styles.bannerDot} ${i === bannerIndex ? styles.bannerDotOn : ""}`}
+                  onClick={() => setBannerIndex(i)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

@@ -46,6 +46,11 @@ export default function FilterDrawer({
   const f = shopFilters || {};
   const { tab, fragrance, format, priceRange, intention, availability } = values;
 
+  const pick = (key, value) => {
+    onSet(key, value);
+    onClose();
+  };
+
   return (
     <>
       <div
@@ -70,7 +75,7 @@ export default function FilterDrawer({
           {f.category !== false && (
             <Section title="Category">
               {tabs.map((t) => (
-                <Opt key={t.id} active={tab === t.id} onClick={() => onSet("category", t.id === "all" ? "" : t.id)}>
+                <Opt key={t.id} active={tab === t.id} onClick={() => pick("category", t.id === "all" ? "" : t.id)}>
                   {t.label}
                 </Opt>
               ))}
@@ -79,9 +84,9 @@ export default function FilterDrawer({
 
           {f.fragrance !== false && (
             <Section title="Fragrance">
-              <Opt active={!fragrance} onClick={() => onSet("fragrance", "")}>All fragrances</Opt>
+              <Opt active={!fragrance} onClick={() => pick("fragrance", "")}>All fragrances</Opt>
               {FRAGRANCE_FILTERS.map((id) => (
-                <Opt key={id} active={fragrance === id} onClick={() => onSet("fragrance", fragrance === id ? "" : id)}>
+                <Opt key={id} active={fragrance === id} onClick={() => pick("fragrance", fragrance === id ? "" : id)}>
                   {catalog?.fragrances?.[id]?.label || id}
                 </Opt>
               ))}
@@ -90,9 +95,9 @@ export default function FilterDrawer({
 
           {f.format !== false && (
             <Section title="Format">
-              <Opt active={!format} onClick={() => onSet("format", "")}>All formats</Opt>
+              <Opt active={!format} onClick={() => pick("format", "")}>All formats</Opt>
               {FORMAT_FILTERS.map((x) => (
-                <Opt key={x.id} active={format === x.id} onClick={() => onSet("format", format === x.id ? "" : x.id)}>
+                <Opt key={x.id} active={format === x.id} onClick={() => pick("format", format === x.id ? "" : x.id)}>
                   {x.label}
                 </Opt>
               ))}
@@ -101,9 +106,9 @@ export default function FilterDrawer({
 
           {f.price !== false && (
             <Section title="Price">
-              <Opt active={!priceRange} onClick={() => onSet("price", "")}>All prices</Opt>
+              <Opt active={!priceRange} onClick={() => pick("price", "")}>All prices</Opt>
               {PRICE_FILTERS.map((x) => (
-                <Opt key={x.id} active={priceRange === x.id} onClick={() => onSet("price", priceRange === x.id ? "" : x.id)}>
+                <Opt key={x.id} active={priceRange === x.id} onClick={() => pick("price", priceRange === x.id ? "" : x.id)}>
                   {x.label}
                 </Opt>
               ))}
@@ -112,9 +117,9 @@ export default function FilterDrawer({
 
           {f.intention !== false && (
             <Section title="Intention">
-              <Opt active={!intention} onClick={() => onSet("intention", "")}>All intentions</Opt>
+              <Opt active={!intention} onClick={() => pick("intention", "")}>All intentions</Opt>
               {INTENTION_FILTERS.map((x) => (
-                <Opt key={x.id} active={intention === x.id} onClick={() => onSet("intention", intention === x.id ? "" : x.id)}>
+                <Opt key={x.id} active={intention === x.id} onClick={() => pick("intention", intention === x.id ? "" : x.id)}>
                   {x.label}
                 </Opt>
               ))}
@@ -123,8 +128,8 @@ export default function FilterDrawer({
 
           {f.availability !== false && (
             <Section title="Availability">
-              <Opt active={!availability} onClick={() => onSet("availability", "")}>All</Opt>
-              <Opt active={availability === "in-stock"} onClick={() => onSet("availability", availability === "in-stock" ? "" : "in-stock")}>
+              <Opt active={!availability} onClick={() => pick("availability", "")}>All</Opt>
+              <Opt active={availability === "in-stock"} onClick={() => pick("availability", availability === "in-stock" ? "" : "in-stock")}>
                 In stock
               </Opt>
             </Section>

@@ -54,6 +54,26 @@ export const upsertSection = async (req, res, next) => {
         const itemKey = file.fieldname.slice("image__".length);
         data.items = data.items || {};
         data.items[itemKey] = { ...(data.items[itemKey] || {}), image: url };
+        // Keep productsBanner slides[] in sync when admin uploads per-slide images
+        if (Array.isArray(data.slides)) {
+          data.slides = data.slides.map((s) =>
+            s && s.id === itemKey ? { ...s, image: url } : s,
+          );
+        }
+      }
+    }
+
+    // Prefer first slide as the legacy single-banner fields (older clients)
+    if (Array.isArray(data.slides) && data.slides.length) {
+      const firstImg =
+        data.slides[0]?.image ||
+        data.items?.[data.slides[0]?.id]?.image ||
+        data.bannerImage ||
+        data.image ||
+        "";
+      if (firstImg) {
+        data.bannerImage = firstImg;
+        data.image = firstImg;
       }
     }
 
