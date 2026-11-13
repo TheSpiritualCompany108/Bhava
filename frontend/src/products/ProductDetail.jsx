@@ -342,7 +342,11 @@ function ProductDetailInner({ slug }) {
             <div className={styles.trustGrid}>
               <div className={styles.trustItem}><span className={styles.trustIcon}>✦</span> Thoughtfully curated</div>
               <div className={styles.trustItem}><span className={styles.trustIcon}>◈</span> Secure checkout</div>
-              {RETURNS_POLICY_LIVE && <div className={styles.trustItem}><span className={styles.trustIcon}>◎</span> Easy returns guidance</div>}
+              {RETURNS_POLICY_LIVE ? (
+                <div className={styles.trustItem}><span className={styles.trustIcon}>◎</span> Easy returns guidance</div>
+              ) : (
+                <div className={styles.trustItem}><span className={styles.trustIcon}>◎</span> Inclusive of GST</div>
+              )}
               <div className={styles.trustItem}><span className={styles.trustIcon}>◉</span> Packed with care</div>
             </div>
 
