@@ -5,7 +5,6 @@ import Footer from "./Footer";
 import GuruChat from "./GuruChat";
 import BhavaOptionDialog from "./BhavaOptionDialog";
 import BhavaVoiceCall from "./BhavaVoiceCall";
-import styles from "./Layout.module.css";
 import { warmupVoiceBackend } from "../utils/voiceBackendWarmup";
 
 function ScrollToTopOnPush() {
@@ -75,12 +74,7 @@ function Layout() {
 
   return (
     <>
-      {!isAdminRoute && (
-        <>
-          <div className={styles.betaTag}>BETA</div>
-          <Navbar />
-        </>
-      )}
+      {!isAdminRoute && <Navbar />}
       <ScrollToTopOnPush />
       <Outlet />
       {!isAdminRoute && <Footer />}

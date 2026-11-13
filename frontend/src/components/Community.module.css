@@ -1,132 +1,410 @@
-/* ========================= SECTION ========================= */
-.communitySection {
+.section {
   position: relative;
-  background-color: #FBF8F2;
-  padding: 60px 0 80px;
+  overflow: hidden;
+  padding: 88px 0 96px;
+  background:
+    radial-gradient(ellipse 70% 55% at 12% 18%, rgba(224, 123, 57, 0.14), transparent 58%),
+    radial-gradient(ellipse 55% 50% at 92% 88%, rgba(74, 11, 29, 0.1), transparent 55%),
+    linear-gradient(180deg, #f7efe3 0%, #fbf6ee 48%, #f3e8d8 100%);
 }
 
-/* ========================= HEADER ========================= */
-.communityHeader {
-  text-align: left;
-  margin-bottom: 40px;
-  padding: 0 40px;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+.glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(74, 11, 29, 0.07) 1px, transparent 0);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 48px;
 }
 
 .kicker {
-  margin: 0 0 8px;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
-  font-size: 14px;
+  margin: 0 0 12px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #e07b39;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: #c0671e;
 }
 
-.communityTitle {
-  font-size: 40px;
-  font-weight: 700;
-  color: #4A0B1D;
-  font-family: 'Canela', Cormorant, serif;
-  margin: 0;
+.title {
+  margin: 0 0 14px;
+  font-family: "Canela", Cormorant, Georgia, serif;
+  font-size: clamp(32px, 4.5vw, 46px);
+  font-weight: 500;
+  line-height: 1.15;
+  color: #4a0b1d;
 }
 
-/* ========================= GRID ========================= */
+.sub {
+  margin: 0 auto 28px;
+  max-width: 540px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  color: #6b4a52;
+}
+
+.trustBar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.82);
+  border: 1px solid rgba(74, 11, 29, 0.1);
+  box-shadow: 0 10px 30px rgba(74, 11, 29, 0.06);
+}
+
+.trustItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trustNum {
+  font-family: "Canela", Cormorant, Georgia, serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #4a0b1d;
+  line-height: 1;
+}
+
+.trustLabel {
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #7a5a62;
+  letter-spacing: 0.02em;
+}
+
+.trustDivider {
+  width: 1px;
+  height: 22px;
+  background: rgba(74, 11, 29, 0.14);
+}
+
+.trustSeal {
+  color: #e07b39;
+  font-size: 14px;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  line-height: 1;
+}
+
+.starOn {
+  color: #e07b39;
+  font-size: 15px;
+}
+
+.starOff {
+  color: rgba(74, 11, 29, 0.22);
+  font-size: 15px;
+}
+
+.layout {
+  display: grid;
+  gap: 22px;
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 40px;
-  box-sizing: border-box;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
 }
 
-.testimonialCard {
-  background: #F4EFE6;
-  border: 1px solid rgba(74, 11, 29, 0.12);
-  border-radius: 18px;
-  padding: 40px 32px;
-  box-shadow: 0 8px 24px rgba(18, 38, 28, 0.06);
-  box-sizing: border-box;
+.card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  min-height: 100%;
+  padding: 26px 24px 22px;
+  border-radius: 20px;
+  background: rgba(255, 252, 247, 0.92);
+  border: 1px solid rgba(74, 11, 29, 0.08);
+  box-shadow: 0 12px 28px rgba(74, 11, 29, 0.06);
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
 }
 
-.testimonialCard:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 34px rgba(74, 11, 29, 0.14);
-  border-color: rgba(74, 11, 29, 0.22);
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(145deg, rgba(224, 123, 57, 0.08), transparent 42%);
+  opacity: 0.7;
 }
 
-.testimonialCardAccent {
-  border: 1.5px solid #e07b39;
+.card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(224, 123, 57, 0.35);
+  box-shadow: 0 20px 40px rgba(74, 11, 29, 0.12);
 }
 
-.testimonialCardAccent:hover {
-  box-shadow: 0 18px 34px rgba(224, 123, 57, 0.28);
-  border-color: #e07b39;
+.cardFeatured {
+  padding: 36px 40px 30px;
+  background:
+    linear-gradient(135deg, rgba(74, 11, 29, 0.94), rgba(74, 11, 29, 0.82)),
+    #4a0b1d;
+  border-color: transparent;
+  color: #f8edde;
+  box-shadow: 0 24px 50px rgba(74, 11, 29, 0.28);
+}
+
+.cardFeatured::before {
+  background: radial-gradient(circle at 85% 15%, rgba(224, 123, 57, 0.35), transparent 45%);
+  opacity: 1;
+}
+
+.cardFeatured:hover {
+  transform: translateY(-4px);
+  border-color: transparent;
+  box-shadow: 0 28px 56px rgba(74, 11, 29, 0.34);
+}
+
+.cardTop {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .quoteMark {
-  font-family: 'Canela', Cormorant, serif;
-  font-size: 44px;
+  font-family: "Canela", Cormorant, Georgia, serif;
+  font-size: 64px;
+  line-height: 0.7;
   color: #e07b39;
-  line-height: 1;
-  margin-bottom: 12px;
+  opacity: 0.85;
 }
 
-.testimonialText {
-  font-size: 16px;
-  line-height: 1.7;
-  color: #4A0B1D;
-  font-family: 'Canela', Cormorant, serif;
+.cardFeatured .quoteMark {
+  color: #f0b27a;
+}
+
+.cardFeatured .starOn {
+  color: #f0b27a;
+}
+
+.cardFeatured .starOff {
+  color: rgba(248, 237, 222, 0.28);
+}
+
+.cardTitle {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 10px;
+  font-family: "Canela", Cormorant, Georgia, serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: #4a0b1d;
+}
+
+.cardFeatured .cardTitle {
+  color: #f8edde;
+  font-size: 28px;
+}
+
+.cardBody {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 22px;
+  flex: 1;
+  font-family: "Canela", Cormorant, Georgia, serif;
+  font-size: 17px;
   font-style: italic;
   font-weight: 400;
-  margin: 0 0 28px;
-  flex-grow: 1;
+  line-height: 1.65;
+  color: #4a0b1d;
 }
 
-.testimonialAuthor {
-  font-size: 18px;
-  font-weight: 700;
-  color: #4A0B1D;
-  font-family: 'Canela', Cormorant, serif;
-  margin: 0;
+.cardFeatured .cardBody {
+  color: rgba(248, 237, 222, 0.92);
+  font-size: 22px;
+  line-height: 1.55;
+  max-width: 34em;
+}
+
+.cardMeta {
+  position: relative;
+  z-index: 1;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(74, 11, 29, 0.08);
 }
 
-.testimonialLocation {
-  font-size: 12px;
+.cardFeatured .cardMeta {
+  border-top-color: rgba(248, 237, 222, 0.16);
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(145deg, #e07b39, #c0671e);
+  color: #fff;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 13px;
   font-weight: 700;
-  color: #e07b39;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 12px rgba(224, 123, 57, 0.35);
 }
 
-/* ========================= RESPONSIVE ========================= */
-@media (max-width: 1024px) {
+.cardFeatured .avatar {
+  background: linear-gradient(145deg, #f0b27a, #e07b39);
+  color: #4a0b1d;
+}
+
+.metaText {
+  min-width: 0;
+}
+
+.author {
+  margin: 0 0 4px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4a0b1d;
+}
+
+.cardFeatured .author {
+  color: #f8edde;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #c0671e;
+}
+
+.cardFeatured .verified {
+  color: #f0b27a;
+}
+
+.productLink {
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #7a5a62;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.productLink:hover {
+  color: #c0671e;
+  border-bottom-color: rgba(192, 103, 30, 0.45);
+}
+
+.cardFeatured .productLink {
+  color: rgba(248, 237, 222, 0.72);
+}
+
+.cardFeatured .productLink:hover {
+  color: #f8edde;
+  border-bottom-color: rgba(248, 237, 222, 0.5);
+}
+
+@media (min-width: 900px) {
+  /* featured quote spans the full width; the other reviews sit below in a 2 x 2 grid (no tall empty card) */
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .cardFeatured {
+    min-height: 0;
+    padding: 44px 56px 36px;
+    align-items: stretch;
+  }
+
+  .cardFeatured .cardBody {
+    max-width: 42em;
+    font-size: 26px;
+    margin-bottom: 30px;
+  }
+
+  .cardFeatured .quoteMark {
+    font-size: 84px;
   }
 }
 
-@media (max-width: 768px) {
-  .communityHeader { padding: 0 24px; }
+@media (max-width: 720px) {
+  .section {
+    padding: 64px 0 72px;
+  }
+
+  .trustBar {
+    border-radius: 18px;
+    gap: 12px;
+  }
+
+  .trustDivider {
+    display: none;
+  }
+
   .grid {
     grid-template-columns: 1fr;
-    padding: 0 24px;
   }
-  .communityTitle { font-size: 32px; }
-  .testimonialCard { padding: 32px 28px; }
-}
 
-@media (max-width: 480px) {
-  .communitySection { padding: 48px 0 64px; }
+  .cardFeatured {
+    padding: 28px 22px 24px;
+  }
+
+  .cardFeatured .cardBody {
+    font-size: 18px;
+  }
+
+  .cardFeatured .cardTitle {
+    font-size: 22px;
+  }
 }
