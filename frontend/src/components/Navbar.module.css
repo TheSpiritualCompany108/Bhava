@@ -559,8 +559,8 @@
   z-index: 60;
 }
 
+/* Hover opens on desktop; click uses .submenuOpen. No sticky focus-within. */
 .hasSubmenu:hover > .submenu,
-.hasSubmenu:focus-within > .submenu,
 .hasSubmenu.submenuOpen > .submenu {
   opacity: 1;
   visibility: visible;

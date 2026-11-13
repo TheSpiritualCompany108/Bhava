@@ -1,5 +1,10 @@
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import User from "../models/User.js";
+
+function realUserId(raw) {
+  return mongoose.isValidObjectId(raw) ? raw : null;
+}
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -140,6 +145,93 @@ export const googleLogin = async (req, res) => {
   }
 };
 
+function serializeAddress(a) {
+  return {
+    id: a.clientId || String(a._id),
+    fullName: a.fullName || "",
+    countryCode: a.countryCode || "+91",
+    phone: a.phone || "",
+    line1: a.line1 || "",
+    line2: a.line2 || "",
+    city: a.city || "",
+    state: a.state || "",
+    pincode: a.pincode || "",
+    addressType: a.addressType === "Office" ? "Office" : "Home",
+    makeDefault: !!a.makeDefault,
+  };
+}
+
+function normalizeAddressInput(raw = {}) {
+  const clean = (v) => String(v || "").trim();
+  let countryCode = clean(raw.countryCode) || "+91";
+  if (!countryCode.startsWith("+")) countryCode = `+${countryCode}`;
+  const digits = clean(raw.phone).replace(/\D/g, "");
+  const phone = countryCode === "+91" ? digits.slice(-10) : digits.slice(0, 15);
+  const addressType = clean(raw.addressType) === "Office" ? "Office" : "Home";
+  return {
+    clientId: clean(raw.id || raw.clientId) || `addr_${Date.now()}`,
+    fullName: clean(raw.fullName),
+    countryCode,
+    phone,
+    line1: clean(raw.line1),
+    line2: clean(raw.line2),
+    city: clean(raw.city),
+    state: clean(raw.state),
+    pincode: clean(raw.pincode),
+    addressType,
+    makeDefault: !!raw.makeDefault,
+  };
+}
+
+function validateAddress(a) {
+  if (a.fullName.length < 2) return "Please enter your full name.";
+  if (a.countryCode === "+91") {
+    if (!/^[6-9]\d{9}$/.test(a.phone)) return "Please enter a valid 10-digit mobile number.";
+  } else if (!/^\d{7,15}$/.test(a.phone)) {
+    return "Please enter a valid mobile number.";
+  }
+  if (a.line1.length < 5) return "Please enter your full address.";
+  if (!a.city) return "Please enter your city.";
+  if (!a.state) return "Please select your state.";
+  if (!/^\d{6}$/.test(a.pincode)) return "Please enter a valid 6-digit pincode.";
+  return "";
+}
+
+/** Upsert one address onto a user document (mutates + saves). */
+export async function upsertUserAddress(userId, rawAddress, { makeDefault = false } = {}) {
+  if (!userId) return null;
+  const user = await User.findById(userId);
+  if (!user) return null;
+
+  const entry = normalizeAddressInput({ ...rawAddress, makeDefault: makeDefault || rawAddress.makeDefault });
+  const err = validateAddress(entry);
+  if (err) throw Object.assign(new Error(err), { status: 400 });
+
+  const same = (a) =>
+    (entry.clientId && a.clientId === entry.clientId) ||
+    (a.phone === entry.phone &&
+      a.line1.toLowerCase() === entry.line1.toLowerCase() &&
+      a.pincode === entry.pincode);
+
+  const idx = user.addresses.findIndex(same);
+  if (idx >= 0) {
+    Object.assign(user.addresses[idx], entry);
+  } else {
+    if (user.addresses.length === 0) entry.makeDefault = true;
+    user.addresses.push(entry);
+  }
+
+  if (entry.makeDefault || makeDefault) {
+    const targetId = entry.clientId;
+    user.addresses.forEach((a) => {
+      a.makeDefault = a.clientId === targetId;
+    });
+  }
+
+  await user.save();
+  return user.addresses.map(serializeAddress);
+}
+
 // GET /api/auth/me  (protected)
 export const getMe = async (req, res) => {
   try {
@@ -148,6 +240,115 @@ export const getMe = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
     res.status(200).json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// GET /api/auth/addresses (protected)
+export const getAddresses = async (req, res) => {
+  try {
+    const userId = realUserId(req.userId);
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Please sign in with your customer account.",
+      });
+    }
+    const user = await User.findById(userId).select("addresses");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    res.status(200).json({
+      success: true,
+      addresses: (user.addresses || []).map(serializeAddress),
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// PUT /api/auth/addresses (protected) — replace / sync full address book
+export const putAddresses = async (req, res) => {
+  try {
+    const userId = realUserId(req.userId);
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Please sign in with your customer account.",
+      });
+    }
+    const list = Array.isArray(req.body?.addresses) ? req.body.addresses : null;
+    if (!list) {
+      return res.status(400).json({ success: false, message: "addresses array is required." });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const normalized = [];
+    for (const raw of list) {
+      const entry = normalizeAddressInput(raw);
+      const err = validateAddress(entry);
+      if (err) return res.status(400).json({ success: false, message: err });
+      normalized.push(entry);
+    }
+
+    if (normalized.length && !normalized.some((a) => a.makeDefault)) {
+      normalized[0].makeDefault = true;
+    }
+    if (normalized.filter((a) => a.makeDefault).length > 1) {
+      let seen = false;
+      for (const a of normalized) {
+        if (a.makeDefault && !seen) { seen = true; continue; }
+        a.makeDefault = false;
+      }
+    }
+
+    user.addresses = normalized;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      addresses: user.addresses.map(serializeAddress),
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// DELETE /api/auth/addresses/:id (protected)
+export const deleteAddress = async (req, res) => {
+  try {
+    const userId = realUserId(req.userId);
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Please sign in with your customer account.",
+      });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    const id = String(req.params.id || "");
+    const before = user.addresses.length;
+    user.addresses = user.addresses.filter(
+      (a) => a.clientId !== id && String(a._id) !== id
+    );
+    if (user.addresses.length === before) {
+      return res.status(404).json({ success: false, message: "Address not found." });
+    }
+    if (user.addresses.length && !user.addresses.some((a) => a.makeDefault)) {
+      user.addresses[0].makeDefault = true;
+    }
+    await user.save();
+    res.status(200).json({
+      success: true,
+      addresses: user.addresses.map(serializeAddress),
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
   }

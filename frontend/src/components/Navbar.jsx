@@ -23,6 +23,7 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const shopMenuRef = useRef(null);
   const { itemCount } = useCart();
 
   useEffect(() => {
@@ -32,6 +33,7 @@ function Navbar() {
 
   useEffect(() => {
     setMenuOpen(false);
+    setShopOpen(false);
   }, [location.pathname, location.search]);
 
   useEffect(() => {
@@ -39,27 +41,37 @@ function Navbar() {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
       }
+      if (shopMenuRef.current && !shopMenuRef.current.contains(e.target)) {
+        setShopOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   useEffect(() => {
-    if (!menuOpen) return undefined;
+    if (!menuOpen && !shopOpen) return undefined;
     const onKey = (e) => {
-      if (e.key === "Escape") setMenuOpen(false);
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        setShopOpen(false);
+      }
     };
     document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+    if (menuOpen) document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [menuOpen]);
+  }, [menuOpen, shopOpen]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem("bhava_token");
     localStorage.removeItem("bhava_user");
+    try {
+      const { clearSharedAddressCache } = await import("../account/addressBook");
+      clearSharedAddressCache();
+    } catch { /* ignore */ }
     setUser(null);
     setDropdownOpen(false);
     navigate("/");
@@ -76,7 +88,10 @@ function Navbar() {
         .toUpperCase()
     : "";
 
-  const closeMenu = () => setMenuOpen(false);
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setShopOpen(false);
+  };
 
   return (
     <nav className={styles.navbarContainer}>
@@ -127,7 +142,11 @@ function Navbar() {
                   <span className={styles.askBhavaText}>Ask Bhava:</span>
                 </button>
               </li>
-              <li className={`${styles.navItem} ${styles.hasSubmenu} ${shopOpen ? styles.submenuOpen : ""}`}>
+              <li
+                ref={shopMenuRef}
+                className={`${styles.navItem} ${styles.hasSubmenu} ${shopOpen ? styles.submenuOpen : ""}`}
+                onMouseLeave={() => setShopOpen(false)}
+              >
                 <button
                   type="button"
                   className={`${styles.navLink} ${/^\/(products?|collection)(\/|$)/.test(location.pathname) ? styles.navLinkActive : ""}`}
@@ -140,7 +159,7 @@ function Navbar() {
                 <ul className={styles.submenu} aria-label="Shop categories">
                   {SHOP_NAV.map((n) => (
                     <li key={n.label}>
-                      <Link to={n.to} className={styles.submenuLink} onClick={() => { setMenuOpen(false); setShopOpen(false); }}>
+                      <Link to={n.to} className={styles.submenuLink} onClick={closeMenu}>
                         {n.label}
                       </Link>
                     </li>

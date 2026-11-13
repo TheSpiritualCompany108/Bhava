@@ -52,12 +52,14 @@ const orderSchema = new mongoose.Schema(
     // Shipping address (optional at pre-order stage)
     address: {
       fullName: { type: String, default: "" },
+      countryCode: { type: String, default: "+91" },
       phone:    { type: String, default: "" },
       line1:   { type: String, default: "" },
       line2:   { type: String, default: "" },
       city:    { type: String, default: "" },
       state:   { type: String, default: "" },
       pincode: { type: String, default: "" },
+      addressType: { type: String, enum: ["Home", "Office"], default: "Home" },
     },
 
     // Price breakdown for checkout orders
@@ -75,6 +77,9 @@ const orderSchema = new mongoose.Schema(
 
     // Set once when a cancelled order has had its component stock returned (prevents double restock)
     stockRestored: { type: Boolean, default: false },
+
+    // Soft-hide from the customer's My Orders list (order kept for inventory / admin)
+    hiddenFromUser: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
