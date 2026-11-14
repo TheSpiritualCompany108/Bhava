@@ -110,7 +110,11 @@ function Navbar() {
           >
             <img src="/bhava-icon.png" alt="Bhava: Logo" className={styles.logo} />
             <h2 className={styles.heading}>
-              BHAVA:
+              BHAVA
+              <span className={styles.dotsBhava} aria-hidden="true">
+                <span className={styles.dotName} />
+                <span className={styles.dotName} />
+              </span>
             </h2>
             <span className={styles.betaTag} aria-label="Beta">BETA</span>
           </div>

@@ -31,7 +31,7 @@ export function productQrDisplayPath(slug) {
 async function waitForFonts() {
   if (!document.fonts?.ready) return;
   try {
-    await document.fonts.load('500 72px "Canela"');
+    await document.fonts.load('400 68px "Canela"');
     await document.fonts.load('500 28px "Neue Haas Grotesk"');
     await document.fonts.ready;
   } catch {
@@ -110,15 +110,28 @@ async function buildBrandedQrCard(targetUrl, displayPath) {
   );
   ctx.stroke();
 
-  // BHAVA:
+  // BHAVA: — light Canela wordmark with a manually aligned colon
   ctx.fillStyle = CARD.brand;
-  ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = '500 72px "Canela", "Cormorant Garamond", Georgia, serif';
-  ctx.fillText("BHAVA:", CARD.width / 2, 130);
+  ctx.font = '400 68px "Canela", "Cormorant Garamond", Georgia, serif';
+  const brandWord = "BHAVA";
+  const brandWidth = ctx.measureText(brandWord).width;
+  const colonGap = 12;
+  const colonWidth = 8;
+  const brandX = (CARD.width - brandWidth - colonGap - colonWidth) / 2;
+  ctx.textAlign = "left";
+  ctx.fillText(brandWord, brandX, 130);
+
+  // Draw the colon as two equal dots, avoiding the font's uneven colon glyph.
+  const colonX = brandX + brandWidth + colonGap + colonWidth / 2;
+  ctx.beginPath();
+  ctx.arc(colonX, 112, 3.7, 0, Math.PI * 2);
+  ctx.arc(colonX, 134, 3.7, 0, Math.PI * 2);
+  ctx.fill();
 
   // Sacred Collections
   ctx.fillStyle = CARD.ink;
+  ctx.textAlign = "center";
   ctx.font = '500 26px "Neue Haas Grotesk", Inter, Arial, sans-serif';
   ctx.fillText("Sacred Collections", CARD.width / 2, 190);
 
