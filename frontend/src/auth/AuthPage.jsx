@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { clearSharedAddressCache } from "../account/addressBook";
 import styles from "./AuthPage.module.css";
@@ -16,9 +16,13 @@ function AuthPage() {
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [error, setError] = useState("");
-  const [info, setInfo] = useState("");   // shown when redirected to signup
+  const [info, setInfo] = useState("");   // shown when redirected to signup / review
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    if (location.state?.info) setInfo(location.state.info);
+  }, [location.state]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));

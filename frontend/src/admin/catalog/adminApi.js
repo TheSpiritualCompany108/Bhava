@@ -4,7 +4,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 /** Admin catalogue API. Throws Error(message) with .errors for field-level problems. */
 export async function api(path, { method = "GET", body, form } = {}) {
-  const token = localStorage.getItem("bhava_token");
+  const token = localStorage.getItem("bhava_admin_token");
   const headers = { Authorization: `Bearer ${token}` };
   if (!form) headers["Content-Type"] = "application/json";
   let res, j;

@@ -374,6 +374,13 @@
   color: #999;
   margin: 0 0 28px;
 }
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
 .continuBtn {
   background: #4A0B1D;
   color: #fff;
@@ -385,8 +392,26 @@
   cursor: pointer;
   font-family: inherit;
   transition: opacity 0.2s;
+  min-height: 48px;
 }
 .continuBtn:hover { opacity: 0.85; }
+.emptyBackBtn {
+  background: transparent;
+  color: #4A0B1D;
+  border: 1.5px solid #4A0B1D;
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+  min-height: 48px;
+}
+.emptyBackBtn:hover {
+  background: #4A0B1D;
+  color: #fff;
+}
 
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 900px) {

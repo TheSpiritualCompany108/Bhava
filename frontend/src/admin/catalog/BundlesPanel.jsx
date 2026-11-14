@@ -1,20 +1,39 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import s from "./AdminCatalog.module.css";
-import { api, money, useDebounced, useNotice, slugify } from "./adminApi";
-import { Notice, Confirm, ErrorList, StatusBadge, Modal } from "./common";
+import { api, money, imgUrl, useDebounced, useNotice, slugify } from "./adminApi";
+import { Notice, Confirm, ErrorList, StatusBadge, Modal, ImageLightbox } from "./common";
 
 const VIA_FOR_MODE = { single: ["fragrance", "fixed"], pair: ["pair", "fixed"], camphor: ["camphor", "fixed"], all: ["fixed"], fixed: ["fixed"], none: ["fixed"] };
 const VIA_LABEL = { fragrance: "Customer's fragrance (shared)", camphor: "Customer's camphor fragrance", pair: "Customer's fragrance pair", fixed: "Fixed variant" };
-const EMPTY = { slug: "", name: "", group: "", tagline: "", description: "", status: "active", featured: false, launchPriority: "", homeModule: "", sortOrder: 0, approvalNotes: "", components: [{ bracelet: true }] };
+const EMPTY = { slug: "", name: "", group: "", tagline: "", description: "", image: "", status: "active", featured: false, launchPriority: "", homeModule: "", sortOrder: 0, approvalNotes: "", components: [{ bracelet: true }] };
 
 function BundleForm({ slug, bundle, products, onClose, onSaved }) {
   const editing = !!slug;
-  const [form, setForm] = useState(bundle ? { ...EMPTY, ...bundle, launchPriority: bundle.launchPriority ?? "" } : EMPTY);
+  const [form, setForm] = useState(bundle ? { ...EMPTY, ...bundle, image: bundle.image || "", launchPriority: bundle.launchPriority ?? "" } : EMPTY);
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [lightbox, setLightbox] = useState(false);
   const [error, setError] = useState(null);
+  const fileRef = useRef(null);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const pmap = useMemo(() => Object.fromEntries(products.map((p) => [p.slug, p])), [products]);
   const fieldErr = (n) => error?.errors?.find((e) => e.field === n)?.message;
+
+  const uploadImage = async (file) => {
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const { url } = await api("/upload", { method: "POST", form: fd });
+      set("image", url);
+    } catch (e) {
+      setError(e);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const setComp = (i, patch) => set("components", form.components.map((c, j) => (j === i ? patch : c)));
   const bracelets = products.filter((p) => p.mode === "none");
@@ -44,9 +63,40 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
     <Modal title={editing ? `Edit collection — ${form.name}` : "Add collection"} onClose={onClose}
       footer={<>
         <button className={`${s.btn} ${s.btnGhost}`} onClick={onClose} disabled={busy}>Cancel</button>
-        <button className={s.btn} onClick={save} disabled={busy}>{busy ? "Saving…" : editing ? "Save changes" : "Create collection"}</button>
+        <button className={s.btn} onClick={save} disabled={busy || uploading}>{busy ? "Saving…" : editing ? "Save changes" : "Create collection"}</button>
       </>}>
       <ErrorList error={error} />
+      <div className={s.sect}>Collection image</div>
+      <div className={s.field}>
+        <label className={s.label}>Hero image (shown on shop cards &amp; product page)</label>
+        <div className={s.imgs}>
+          {form.image && (
+            <div className={s.imgBox}>
+              <img src={imgUrl(form.image)} alt="Collection" title="Click to preview" onClick={() => setLightbox(true)} />
+              <button type="button" className={s.imgX} onClick={() => set("image", "")} aria-label="Remove collection image">✕</button>
+            </div>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            hidden
+            onChange={(e) => { uploadImage(e.target.files?.[0]); e.target.value = ""; }}
+          />
+          <button type="button" className={`${s.btn} ${s.btnGhost}`} onClick={() => fileRef.current?.click()} disabled={uploading}>
+            {uploading ? "Uploading…" : form.image ? "Replace image" : "Upload collection image"}
+          </button>
+        </div>
+        <span className={s.hint}>JPG, PNG or WebP · use a set / lifestyle shot — not a single product packshot.</span>
+        {fieldErr("image") && <span className={s.errText}>{fieldErr("image")}</span>}
+      </div>
+      {lightbox && form.image && (
+        <ImageLightbox
+          images={[{ url: form.image, name: form.slug || "collection" }]}
+          start={0}
+          onClose={() => setLightbox(false)}
+        />
+      )}
       <div className={s.grid2}>
         <div className={s.field}>
           <label className={s.label} htmlFor="bf-name">Name</label>
@@ -200,7 +250,17 @@ export default function BundlesPanel() {
               {items.map((b) => (
                 <tr key={b.slug}>
                   <td data-label="#" className={s.muted}>{b.sortOrder}</td>
-                  <td data-label="Collection"><div className={s.name} style={{ textAlign: "left" }}>{b.name}</div><div className={s.muted}>{b.group}{b.homeModule ? ` · home: ${b.homeModule}` : ""}</div></td>
+                  <td data-label="Collection">
+                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                      {b.image
+                        ? <img className={s.thumb} src={imgUrl(b.image)} alt="" loading="lazy" width={40} height={40} style={{ objectFit: "cover", borderRadius: 6 }} />
+                        : <span className={s.thumb} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 40, height: 40, borderRadius: 6, background: "#f5f0e6", fontSize: 11, color: "#9a7f70" }}>—</span>}
+                      <div>
+                        <div className={s.name} style={{ textAlign: "left" }}>{b.name}</div>
+                        <div className={s.muted}>{b.group}{b.homeModule ? ` · home: ${b.homeModule}` : ""}</div>
+                      </div>
+                    </div>
+                  </td>
                   <td data-label="Components" style={{ maxWidth: 320, fontSize: 12.5 }}>{b.contentsText}</td>
                   <td data-label="Price" className={`${s.num} ${s.name}`}>{money(b.price)}</td>
                   <td data-label="Launch">{b.featured ? <span className={`${s.badge} ${s.bStar}`}>★ Priority {b.launchPriority ?? "—"}</span> : <span className={s.muted}>—</span>}</td>

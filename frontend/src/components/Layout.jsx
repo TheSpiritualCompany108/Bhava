@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigationType } from "react-router-dom";
 import Navbar from "./Navbar";
+import PageBack from "./PageBack";
+import AskBhavaFab from "./AskBhavaFab";
 import Footer from "./Footer";
 import GuruChat from "./GuruChat";
 import BhavaOptionDialog from "./BhavaOptionDialog";
@@ -75,11 +77,13 @@ function Layout() {
   return (
     <>
       {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && <PageBack />}
       <ScrollToTopOnPush />
       <Outlet />
       {!isAdminRoute && <Footer />}
       {!isAdminRoute && (
         <>
+          <AskBhavaFab />
           <GuruChat />
           <BhavaVoiceCall />
           <BhavaOptionDialog

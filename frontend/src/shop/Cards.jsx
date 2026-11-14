@@ -4,25 +4,32 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./Shop.module.css";
 import { useCart } from "../context/CartContext";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
-import { inr, imgSrc, productInStock, bundleInStock, variantInStock, productLine, bundleContentLines, braceletsSamePrice } from "./shopUtils";
+import { inr, productInStock, bundleInStock, variantInStock, productLine, bundleContentLines, braceletsSamePrice, bundleThumbImage } from "./shopUtils";
 import { addToCartEvent } from "../utils/analytics";
 import ResponsiveImg from "../components/ResponsiveImg";
 
 const FRAG_ORDER = ["guggal", "oud", "sandalwood"];
 
 export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const navigate = useNavigate();
   const [quickOpen, setQuickOpen] = useState(false);
   const inStock = productInStock(catalog, p);
   const single = p.variants.length === 1;
   const multiFrag = p.mode === "single" || p.mode === "camphor";
   const offered = FRAG_ORDER.filter((f) => p.variants.some((v) => v.fragrances.includes(f)));
-  // Dense = Sacred Beads card size (no fragrance chips, solid CTA, same body rhythm)
   const showFrags = !dense && p.mode !== "none";
+
+  const singleLineId = single ? `product:${p.slug}:${p.variants[0].key}` : null;
+  const inCartLine = singleLineId ? cartItems.find((i) => i.productId === singleLineId) : null;
+  const anyVariantInCart = cartItems.some((i) => i.kind === "product" && i.slug === p.slug);
 
   const quickAdd = (e) => {
     e.preventDefault();
+    if (inCartLine) {
+      navigate("/cart");
+      return;
+    }
     const btn = e.currentTarget;
     const line = productLine(p, p.variants[0].key, 1);
     addToCart(line);
@@ -45,16 +52,12 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
           />
         </Link>
         {!inStock && <span className={`${styles.ribbon} ${styles.ribbonOff}`}>Out of stock</span>}
-        <button type="button" className={styles.quickBtn} onClick={() => setQuickOpen(true)} aria-label={`Quick view ${p.name}`}>
-          Quick View <span aria-hidden="true">👁</span>
-        </button>
       </div>
       <Link to={`/product/${p.slug}`} className={styles.cardLink} aria-label={`${p.name} — ${inr(p.price)}`}>
         <div className={styles.cardBody}>
           <span className={styles.cardType}>{catalog.categories.find((c) => c.id === p.category)?.label}</span>
           <h3 className={styles.cardTitle}>{p.name}</h3>
           {p.tagline && <p className={styles.cardTagline}>{p.tagline}</p>}
-          {p.pack && <p className={dense ? styles.cardTagline : styles.cardPack}>{p.pack}</p>}
           {showFrags && (
             <div className={styles.dots} aria-label="Fragrances">
               {p.mode === "pair" || p.mode === "all"
@@ -70,27 +73,53 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
       <div className={styles.cardFoot}>
         <span className={styles.price}>{inr(p.price)}</span>
         {!inStock ? (
-          <button className={`${styles.btn} ${styles.btnDisabled}`} disabled>Out of stock</button>
+          <button type="button" className={`${styles.btn} ${styles.btnDisabled}`} disabled>Out of stock</button>
         ) : single && !multiFrag ? (
-          <button className={styles.btn} onClick={quickAdd}>Add to Cart +</button>
+          <button type="button" className={styles.btn} onClick={quickAdd}>
+            <span data-label>
+              {inCartLine ? "Go to Cart →" : "Add to Cart +"}
+            </span>
+          </button>
         ) : (
           <button
-            className={dense ? styles.btn : `${styles.btn} ${styles.btnGhost}`}
-            onClick={() => navigate(`/product/${p.slug}`)}
+            type="button"
+            className={styles.btn}
+            onClick={() => setQuickOpen(true)}
+            aria-haspopup="dialog"
           >
-            {p.mode === "pair" ? "Choose pair" : "Choose fragrance"}
+            {anyVariantInCart
+              ? (p.mode === "pair" ? "Add another pair" : "Add another")
+              : (p.mode === "pair" ? "Choose pair" : "Choose fragrance")}
           </button>
         )}
       </div>
-      {quickOpen && <QuickView product={p} catalog={catalog} onClose={() => setQuickOpen(false)} onAdded={onAdded} />}
+      {quickOpen && (
+        <QuickView
+          product={p}
+          catalog={catalog}
+          onClose={() => setQuickOpen(false)}
+          onAdded={onAdded}
+        />
+      )}
     </article>
   );
 }
 
 export function BundleCard({ bundle: b, catalog }) {
   const inStock = bundleInStock(catalog, b.slug);
+  const thumb = bundleThumbImage(catalog, b);
   return (
     <Link to={`/collection/${b.slug}`} className={`${styles.bundleCard} ${inStock ? "" : styles.cardDim}`}>
+      <div className={styles.bundleImg}>
+        <ResponsiveImg
+          src={thumb}
+          alt={b.name}
+          loading="lazy"
+          width={640}
+          height={480}
+          sizes="(max-width: 600px) 90vw, 320px"
+        />
+      </div>
       <span className={styles.cardType}>{b.group}</span>
       <h3 className={styles.cardTitle}>{b.name}</h3>
       {b.tagline && <p className={styles.cardTagline}>{b.tagline}</p>}

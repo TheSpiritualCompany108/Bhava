@@ -8,12 +8,13 @@ import { QuantityDecrease, QuantityValue, QuantityIncrease } from "../components
 import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { ProductCard } from "../shop/Cards";
 import { faqsFor, PENDING_USE_SAFETY, PENDING_RETURNS, FOOTNOTE_PRICE } from "../shop/content";
-import { inr, imgSrc, shippingCopy, bundleContentLines, productMaxQty, getProduct, getBundle, variantInStock, productInStock, productLine } from "../shop/shopUtils";
-import { RETURNS_POLICY_LIVE, DISPATCH_SLA } from "../shop/storeFlags";
+import { inr, imgSrc, shippingCopy, bundleContentLines, bundleThumbImage, productMaxQty, getProduct, getBundle, variantInStock, productInStock, productLine } from "../shop/shopUtils";
+import { RETURNS_POLICY_LIVE } from "../shop/storeFlags";
 import { viewItem, selectItem, addToCartEvent } from "../utils/analytics";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 import ReviewsSection, { Stars } from "./ReviewsSection";
 import ResponsiveImg from "../components/ResponsiveImg";
+import { InlineBack } from "../components/PageBack";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -252,6 +253,7 @@ function ProductDetailInner({ slug }) {
           </div>
 
           <div className={styles.detailsCol}>
+            <InlineBack fallback="/products" />
             <span className={styles.categoryTag}>{category?.label}</span>
             <h1 className={styles.title}>{product.name}</h1>
             {product.tagline && <p className={styles.tagline}>{product.tagline}</p>}
@@ -275,14 +277,14 @@ function ProductDetailInner({ slug }) {
               <span className={styles.taxNote}>{FOOTNOTE_PRICE}</span>
             </div>
 
-            <div className={styles.stockStatus} aria-live="polite">
-              <span className={styles.stockDot} style={inStock ? undefined : { background: "#a2331f" }}></span>
-              <span className={inStock ? shop.stockOk : shop.stockOut}>
-                {inStock
-                  ? (DISPATCH_SLA ? "In stock · Ready to ship" : "In stock")
-                  : variant ? "This option is out of stock" : "Out of stock"}
-              </span>
-            </div>
+            {!inStock && (
+              <div className={styles.stockStatus} aria-live="polite">
+                <span className={styles.stockDot} style={{ background: "#a2331f" }} />
+                <span className={shop.stockOut}>
+                  {variant ? "This option is out of stock" : "Out of stock"}
+                </span>
+              </div>
+            )}
 
             {product.intention && (
               <div className={styles.intentionBox}>
@@ -418,7 +420,17 @@ function ProductDetailInner({ slug }) {
                 const b = getBundle(catalog, u.slug);
                 return b ? (
                   <Link key={u.slug} to={`/collection/${b.slug}`} className={shop.promo}>
-                    <div>
+                    <span className={shop.promoImg} aria-hidden="true">
+                      <ResponsiveImg
+                        src={bundleThumbImage(catalog, b)}
+                        alt=""
+                        loading="lazy"
+                        width={120}
+                        height={140}
+                        sizes="72px"
+                      />
+                    </span>
+                    <div className={shop.promoBody}>
                       <div className={shop.promoK}>{u.kicker}</div>
                       <div className={shop.promoT}>{b.name} — {inr(b.price)}</div>
                       <div className={shop.promoS}>{b.description}</div>
@@ -430,7 +442,17 @@ function ProductDetailInner({ slug }) {
               const up = getProduct(catalog, u.slug);
               return up ? (
                 <Link key={u.slug} to={`/product/${up.slug}`} className={shop.promo}>
-                  <div>
+                  <span className={shop.promoImg} aria-hidden="true">
+                    <ResponsiveImg
+                      src={up.image}
+                      alt=""
+                      loading="lazy"
+                      width={120}
+                      height={140}
+                      sizes="72px"
+                    />
+                  </span>
+                  <div className={shop.promoBody}>
                     <div className={shop.promoK}>{u.kicker}</div>
                     <div className={shop.promoT}>{up.name} — {inr(up.price)}</div>
                     <div className={shop.promoS}>{up.pack}</div>
@@ -443,7 +465,17 @@ function ProductDetailInner({ slug }) {
             {/* ── One highly relevant curated collection ── */}
             {bundle && (
               <Link to={`/collection/${bundle.slug}`} className={shop.promo} style={{ borderStyle: "dashed" }}>
-                <div>
+                <span className={shop.promoImg} aria-hidden="true">
+                  <ResponsiveImg
+                    src={bundleThumbImage(catalog, bundle)}
+                    alt=""
+                    loading="lazy"
+                    width={120}
+                    height={140}
+                    sizes="72px"
+                  />
+                </span>
+                <div className={shop.promoBody}>
                   <div className={shop.promoK}>Curated collection</div>
                   <div className={shop.promoT}>{bundle.name} — {inr(bundle.price)}</div>
                   <div className={shop.promoS}>{bundleContentLines(catalog, bundle).join(" · ")}</div>

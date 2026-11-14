@@ -149,7 +149,7 @@ export function liveBundlePrice(catalog, b, selection) {
 export const bundleLine = (b, selection, quantity = 1, unitPrice) => ({
   productId: `bundle:${b.slug}:${selection.fragrance || ""}|${selection.camphor || ""}|${selection.pair || ""}|${[...(selection.bracelets || [])].sort().join("+")}`,
   kind: "bundle", slug: b.slug, selection, quantity,
-  title: b.name, priceNum: unitPrice ?? b.price, image: "/Products/Home Page Incense.png",
+  title: b.name, priceNum: unitPrice ?? b.price, image: b.image || "/Products/Home Page Incense.png",
   variantLabel: [selection.fragrance && cap(selection.fragrance), selection.pair && selection.pair.split("-").map(cap).join(" + "), selection.camphor && `Camphor: ${cap(selection.camphor)}`].filter(Boolean).join(" · "),
 });
 
@@ -220,6 +220,86 @@ export function bundleContentLines(catalog, b) {
     const how = frag ? ` (${frag.label})` : "";
     return `1 × ${p?.name || c.product}${how}`;
   });
+}
+
+/** Soften catalog pack facts for UI — middots, drop redundant notes. */
+export function formatPackFacts(pack) {
+  if (!pack) return "";
+  let s = String(pack).trim();
+  s = s.replace(/\s*;?\s*one fragrance per pack\.?/gi, "");
+  s = s.replace(/\s*;?\s*one selected pair\.?/gi, "");
+  s = s.replace(/\bnet weight\b/gi, "");
+  s = s.replace(/\s{2,}/g, " ").replace(/\s*;\s*/g, " · ").replace(/\.\s*$/, "").trim();
+  s = s.replace(/^(\d+)\s+units$/i, "Pack of $1");
+  s = s.replace(/^(\d+)\s+cones$/i, "Pack of $1 cones");
+  s = s.replace(/\s*·\s*$/, "").replace(/^\s*·\s*/, "").replace(/\s·\s·/g, " · ").trim();
+  return s;
+}
+
+/** One polished meta line under a collection “What's included” row. */
+export function includeMetaLine({ pack, via, fragranceLabel }) {
+  let status = "";
+  if (fragranceLabel) status = fragranceLabel;
+  else if (via === "camphor") status = "Select camphor fragrance";
+  else if (via === "pair") status = "Select fragrance pair";
+  else if (via === "fragrance") status = "Select your fragrance";
+
+  const facts = formatPackFacts(pack);
+  return [status, facts].filter(Boolean).join(" · ");
+}
+
+/**
+ * Collection-level thumb for curated bundles (not a single product packshot).
+ * Prefers admin-uploaded `b.image`; otherwise format / home lifestyle art.
+ */
+export function bundleThumbImage(_catalog, b) {
+  if (!b) return "/Products/Home Page Incense.png";
+  if (b.image) return b.image;
+
+  const comps = b.components || [];
+  let hasBracelet = comps.some((c) => c.bracelet || /bracelet/i.test(c.product || ""));
+  let hasSticks = false;
+  let hasBamboo = false;
+  let hasCones = false;
+  let hasSmoke = false;
+
+  for (const c of comps) {
+    if (c.bracelet) continue;
+    const p = getProduct(_catalog, c.product);
+    const cat = p?.category || "";
+    if (cat === "incense-sticks") hasSticks = true;
+    else if (cat === "bamboo-less-incense") hasBamboo = true;
+    else if (cat === "incense-cones") hasCones = true;
+    else if (cat === "sambrani-camphor") hasSmoke = true;
+    else if (cat === "sacred-beads") hasBracelet = true;
+  }
+
+  const group = String(b.group || "").toLowerCase();
+
+  // Multi-category / bracelet + ritual → devotion-box lifestyle (reads as a set)
+  if (hasBracelet && (hasSticks || hasBamboo || hasCones || hasSmoke || group.includes("+"))) {
+    return "/Products/Home Page Devotion Box.png";
+  }
+  if (group.includes("bracelet collection") || (hasBracelet && !hasSticks && !hasBamboo && !hasCones && !hasSmoke)) {
+    return "/Products/Home Page mala.png";
+  }
+  if (hasSmoke && !hasSticks && !hasBamboo && !hasCones) {
+    return "/Products/Home Page Sambrani.png";
+  }
+  if (hasCones && !hasSticks && !hasBamboo) {
+    return "/Products/Format Incense Cones.jpg";
+  }
+  if (hasBamboo && !hasSticks) {
+    return "/Products/Format Bamboo-less Incense.jpg";
+  }
+  if (hasSticks && hasBamboo) {
+    // Classic Pair etc. — format art, not Discovery/Pure Ritual packshots
+    return "/Products/Format Incense Sticks.jpg";
+  }
+  if (hasSticks || group.includes("incense") || group.includes("ritual")) {
+    return "/Products/Home Page Incense.png";
+  }
+  return "/Products/Home Page Devotion Box.png";
 }
 
 

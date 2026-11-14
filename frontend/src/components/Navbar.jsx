@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import { useCart } from "../context/CartContext";
-import { warmupVoiceBackend } from "../utils/voiceBackendWarmup";
 import ExpandingSearchDock from "./ui/ExpandingSearchDock";
+import { getCustomerToken } from "../utils/customerAuth";
 
 const SHOP_NAV = [
   { label: "Shop All", to: "/products" },
@@ -27,6 +27,8 @@ function Navbar() {
   const { itemCount } = useCart();
 
   useEffect(() => {
+    // Drop stale admin JWT from the customer token key (shared-key bug).
+    getCustomerToken();
     const stored = localStorage.getItem("bhava_user");
     setUser(stored ? JSON.parse(stored) : null);
   }, [location.pathname]);
@@ -128,20 +130,6 @@ function Navbar() {
 
           <div className={`${styles.navPanel} ${menuOpen ? styles.navPanelOpen : ""}`}>
             <ul className={styles.nav}>
-              <li className={styles.navItem}>
-                <button
-                  type="button"
-                  className={`${styles.navLink} ${styles.askBhava}`}
-                  onClick={() => {
-                    closeMenu();
-                    warmupVoiceBackend();
-                    window.dispatchEvent(new Event("bhava:dialog:open"));
-                  }}
-                >
-                  <span className={styles.askBhavaSparkle} aria-hidden="true">✨</span>
-                  <span className={styles.askBhavaText}>Ask Bhava:</span>
-                </button>
-              </li>
               <li
                 ref={shopMenuRef}
                 className={`${styles.navItem} ${styles.hasSubmenu} ${shopOpen ? styles.submenuOpen : ""}`}
@@ -249,11 +237,14 @@ function Navbar() {
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
-              {itemCount > 0 && (
-                <span className={styles.cartBadge}>
-                  {itemCount > 99 ? "99+" : itemCount}
-                </span>
-              )}
+              <span
+                className={styles.cartBadge}
+                data-cart-badge
+                data-empty={itemCount === 0 ? "1" : "0"}
+                aria-hidden={itemCount === 0}
+              >
+                {itemCount > 99 ? "99+" : itemCount}
+              </span>
             </button>
 
             {user ? (

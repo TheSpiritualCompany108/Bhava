@@ -30,6 +30,50 @@
 .chips { margin-top: 10px; }
 .qtyChip { display: inline-flex; align-items: center; background: #f6efe3; border-radius: 4px; padding: 4px 8px; font-size: 13px; font-weight: 700; }
 .qtyChip select { border: 0; background: transparent; font: inherit; font-weight: 700; color: #4A0B1D; cursor: pointer; }
+
+.qtyStepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: #f6efe3;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(74, 11, 29, 0.1);
+}
+.qtyBtn {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  color: #4A0B1D;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+.qtyBtn:hover:not(:disabled) {
+  color: #E07B39;
+  opacity: 1;
+}
+.qtyBtn:active:not(:disabled) {
+  color: #c45f22;
+}
+.qtyBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.qtyValue {
+  min-width: 28px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4A0B1D;
+  font-variant-numeric: tabular-nums;
+}
 .priceRow { margin: 10px 0 0; font-size: 16px; }
 .muted { color: #8a7a7e; font-size: 13px; font-weight: 400; }
 .note { margin: 6px 0 0; font-size: 12px; color: #8a7a7e; }

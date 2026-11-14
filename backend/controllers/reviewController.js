@@ -3,6 +3,10 @@ import Review from "../models/Review.js";
 import CatalogProduct from "../models/CatalogProduct.js";
 import User from "../models/User.js";
 import Order from "../models/Order.js";
+import { uploadToBlob } from "../utils/uploadToBlob.js";
+
+const MAX_REVIEW_IMAGES = 4;
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
 
 const SORTS = {
   recent: { createdAt: -1 },
@@ -34,6 +38,7 @@ const shape = (r) => ({
   rating: r.rating,
   title: r.title,
   body: r.body,
+  images: Array.isArray(r.images) ? r.images.filter(Boolean) : [],
   verified: r.verified,
   productId: r.productId || "",
   createdAt: r.createdAt,
@@ -78,7 +83,8 @@ export const getReviews = async (req, res) => {
   }
 };
 
-// POST /api/reviews/:productId  (protected)  body: { rating, title, body }
+// POST /api/reviews/:productId  (protected)
+// Accepts JSON or multipart/form-data with optional images[] (max 4)
 export const createReview = async (req, res) => {
   try {
     const productId = slugOf(req.params.productId);
@@ -86,12 +92,28 @@ export const createReview = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid product" });
     }
     if (!mongoose.isValidObjectId(req.userId)) {
-      return res.status(403).json({ success: false, message: "Please sign in with a customer account to review." });
+      const isAdminSession = req.userId === "admin" || req.userRole === "admin";
+      return res.status(403).json({
+        success: false,
+        message: isAdminSession
+          ? "You're signed in as admin. Sign out, then sign in with your customer account to review."
+          : "Please sign in with a customer account to review.",
+      });
     }
 
     const rating = Number(req.body.rating);
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
       return res.status(400).json({ success: false, message: "Please select a rating from 1 to 5 stars" });
+    }
+
+    const files = Array.isArray(req.files) ? req.files.slice(0, MAX_REVIEW_IMAGES) : [];
+    for (const f of files) {
+      if (!ALLOWED_IMAGE_TYPES.has(String(f.mimetype || "").toLowerCase())) {
+        return res.status(400).json({
+          success: false,
+          message: "Images must be JPG, PNG or WebP.",
+        });
+      }
     }
 
     const [product, user] = await Promise.all([
@@ -111,12 +133,18 @@ export const createReview = async (req, res) => {
       ],
     });
 
+    const images = [];
+    for (const file of files) {
+      images.push(await uploadToBlob(file, "reviews"));
+    }
+
     const payload = {
       rating,
       title: (req.body.title || "").trim(),
       body: (req.body.body || "").trim(),
       name: user.name,
       verified: Boolean(hasOrdered),
+      images,
     };
 
     // One review per customer — no edit after submit

@@ -109,7 +109,21 @@ export default function CartPage() {
           </svg>
           <h2 className={styles.emptyTitle}>Your cart is empty</h2>
           <p className={styles.emptyText}>Explore our sacred beads, incense, Sambrani and camphor.</p>
-          <button className={styles.continuBtn} onClick={() => navigate("/products")}>Browse the Shop</button>
+          <div className={styles.emptyActions}>
+            <button type="button" className={styles.continuBtn} onClick={() => navigate("/products")}>
+              Browse the Shop
+            </button>
+            <button
+              type="button"
+              className={styles.emptyBackBtn}
+              onClick={() => {
+                if (window.history.length > 1) navigate(-1);
+                else navigate("/");
+              }}
+            >
+              ← Back
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -173,7 +187,6 @@ export default function CartPage() {
               // quantity options stop at real stock (server-computed), never above the per-line cap
               const lineMax = !sv ? MAX_LINE_QTY : sv.ok ? Math.min(MAX_LINE_QTY, sv.maxQty ?? MAX_LINE_QTY) : sv.available ?? 0;
               const unit = sv?.unitPrice ?? item.priceNum;
-              const opts = Array.from({ length: Math.max(item.quantity, Math.min(lineMax, MAX_LINE_QTY)) }, (_, i) => i + 1);
               return (
                 <article key={item.productId} className={`${x.item} ${blocked ? x.itemBad : ""}`}>
                   <Link to={item.kind === "bundle" ? `/collection/${item.slug}` : `/product/${item.slug}`} className={x.thumb}>
@@ -196,12 +209,27 @@ export default function CartPage() {
                     )}
 
                     <div className={x.chips}>
-                      <label className={x.qtyChip}>
-                        Qty:&nbsp;
-                        <select value={item.quantity} onChange={(e) => updateQuantity(item.productId, Number(e.target.value))} aria-label={`Quantity for ${item.title}`}>
-                          {opts.map((n) => <option key={n} value={n} disabled={n > lineMax && n !== item.quantity}>{n}</option>)}
-                        </select>
-                      </label>
+                      <div className={x.qtyStepper} role="group" aria-label={`Quantity for ${item.title}`}>
+                        <button
+                          type="button"
+                          className={x.qtyBtn}
+                          disabled={item.quantity <= 1}
+                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                          aria-label="Decrease quantity"
+                        >
+                          −
+                        </button>
+                        <span className={x.qtyValue} aria-live="polite">{item.quantity}</span>
+                        <button
+                          type="button"
+                          className={x.qtyBtn}
+                          disabled={item.quantity >= lineMax}
+                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                          aria-label="Increase quantity"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
 
                     <p className={x.priceRow}>

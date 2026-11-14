@@ -1,0 +1,158 @@
+.fab {
+  --fab-size: 56px;
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 950;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  width: var(--fab-size);
+  height: var(--fab-size);
+  padding: 8px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  overflow: hidden;
+  background: #4A0B1D;
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(74, 11, 29, 0.35);
+  font-family: "Canela", Cormorant, serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition:
+    width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    gap 0.3s ease,
+    padding-right 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.2s ease;
+}
+
+.fab:hover,
+.fab:focus-visible {
+  width: 168px;
+  gap: 10px;
+  padding-right: 18px;
+  background: #661424;
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(74, 11, 29, 0.42);
+}
+
+.fab:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.fab:focus-visible {
+  outline: 3px solid #E07B39;
+  outline-offset: 3px;
+}
+
+.ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(224, 123, 57, 0.55);
+  pointer-events: none;
+  animation: fabPulse 2.4s ease-in-out infinite;
+  transition: opacity 0.25s ease;
+}
+
+.fab:hover .ring,
+.fab:focus-visible .ring {
+  opacity: 0;
+}
+
+.logoWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: #4A0B1D;
+  overflow: hidden;
+}
+
+.logo {
+  width: 96%;
+  height: 96%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  mix-blend-mode: lighten;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fab:hover .logo,
+.fab:focus-visible .logo {
+  transform: scale(1.06);
+}
+
+.label {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition:
+    opacity 0.22s ease 0.06s,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fab:hover .label,
+.fab:focus-visible .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@keyframes fabPulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.04); }
+}
+
+@media (max-width: 600px) {
+  .fab {
+    --fab-size: 52px;
+    right: 16px;
+    bottom: 16px;
+  }
+  .fab:hover,
+  .fab:focus-visible {
+    width: 156px;
+  }
+  .logoWrap {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Phones: no hover expand — tap opens dialog; aria-label is enough */
+@media (hover: none) {
+  .fab:hover {
+    width: var(--fab-size);
+    gap: 0;
+    padding-right: 8px;
+    transform: none;
+    background: #4A0B1D;
+    box-shadow: 0 10px 28px rgba(74, 11, 29, 0.35);
+  }
+  .fab:hover .label {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  .fab:hover .logo {
+    transform: none;
+  }
+  .fab:hover .ring {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring { animation: none; }
+  .fab,
+  .label,
+  .logo { transition: none; }
+}

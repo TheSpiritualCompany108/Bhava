@@ -296,14 +296,14 @@ export default function AdminPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     if (!token) { navigate("/admin/login"); return; }
     // fetch tiles for active category
     fetchTiles();
   }, [activeCategory]);
 
   useEffect(() => {
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     if (!token) { navigate("/admin/login"); return; }
     if (section === "quotes") fetchQuotes();
     if (section === "mantraAudio") fetchMantraAudio();
@@ -440,7 +440,7 @@ export default function AdminPage() {
     setHomepageSaving(true);
     setHomepageError("");
     setHomepageSaved(false);
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     const fd = new FormData();
     fd.append("data", JSON.stringify(homepageData));
     Object.entries(homepageImages).forEach(([itemId, file]) => {
@@ -472,7 +472,7 @@ export default function AdminPage() {
     setQuotesLoading(true);
     setQuotesError("");
     try {
-      const token = localStorage.getItem("bhava_token");
+      const token = localStorage.getItem("bhava_admin_token");
       const res = await fetch(`${API_BASE}/api/admin/quotes`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       const json = await res.json();
       if (res.ok && json.success) {
@@ -501,7 +501,7 @@ export default function AdminPage() {
 
   const handleQuoteSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     try {
       const url = editingQuoteId ? `${API_BASE}/api/admin/quotes/${editingQuoteId}` : `${API_BASE}/api/admin/quotes`;
       const method = editingQuoteId ? "PUT" : "POST";
@@ -531,7 +531,7 @@ export default function AdminPage() {
 
   const handleQuoteDelete = async (id) => {
     if (!confirm("Delete this quote?")) return;
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     const res = await fetch(`${API_BASE}/api/admin/quotes/${id}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
     const json = await res.json();
     if (json.success) fetchQuotes(); else alert(json.message || "Error");
@@ -541,7 +541,7 @@ export default function AdminPage() {
     setMantraAudioLoading(true);
     setMantraAudioError("");
     try {
-      const token = localStorage.getItem("bhava_token");
+      const token = localStorage.getItem("bhava_admin_token");
       const res = await fetch(`${API_BASE}/api/admin/mantra-audio`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       const json = await res.json();
       if (res.ok && json.success) {
@@ -569,7 +569,7 @@ export default function AdminPage() {
     if (!file) return;
     setUploadingDay(day);
     setMantraAudioError("");
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     const fd = new FormData();
     fd.append("audio", file);
     try {
@@ -593,7 +593,7 @@ export default function AdminPage() {
 
   const handleMantraAudioDelete = async (day) => {
     if (!confirm(`Delete the audio for Day ${day}?`)) return;
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     const res = await fetch(`${API_BASE}/api/admin/mantra-audio/${day}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
     const json = await res.json();
     if (json.success) {
@@ -611,7 +611,7 @@ export default function AdminPage() {
     const draft = mantraDraft[day] || { theme: "", mantra: "", note: "" };
     setSavingContentDay(day);
     setMantraAudioError("");
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     try {
       const res = await fetch(`${API_BASE}/api/admin/mantra-audio/${day}`, {
         method: "PUT",
@@ -635,7 +635,7 @@ export default function AdminPage() {
     setDhyanAudioLoading(true);
     setDhyanAudioError("");
     try {
-      const token = localStorage.getItem("bhava_token");
+      const token = localStorage.getItem("bhava_admin_token");
       const res = await fetch(`${API_BASE}/api/admin/dhyan-audio`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       const json = await res.json();
       if (res.ok && json.success) {
@@ -663,7 +663,7 @@ export default function AdminPage() {
     if (!file) return;
     setUploadingDhyanDay(day);
     setDhyanAudioError("");
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     const fd = new FormData();
     fd.append("audio", file);
     try {
@@ -687,7 +687,7 @@ export default function AdminPage() {
 
   const handleDhyanAudioDelete = async (day) => {
     if (!confirm(`Delete the audio for Day ${day}?`)) return;
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     const res = await fetch(`${API_BASE}/api/admin/dhyan-audio/${day}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
     const json = await res.json();
     if (json.success) {
@@ -705,7 +705,7 @@ export default function AdminPage() {
     const draft = dhyanDraft[day] || { name: "", deity: "" };
     setSavingDhyanContentDay(day);
     setDhyanAudioError("");
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     try {
       const res = await fetch(`${API_BASE}/api/admin/dhyan-audio/${day}`, {
         method: "PUT",
@@ -729,7 +729,7 @@ export default function AdminPage() {
     setLoading(true);
     setError("");
     try {
-      const token = localStorage.getItem("bhava_token");
+      const token = localStorage.getItem("bhava_admin_token");
       const url = `${API_BASE}/api/admin/tiles${activeCategory ? `?category=${encodeURIComponent(activeCategory)}` : ""}`;
       const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       const json = await res.json();
@@ -789,7 +789,7 @@ export default function AdminPage() {
     // Prepare data - handle FormData with image upload
     let body;
     let headers = {};
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     
     if (image) {
       // Use FormData for image upload
@@ -908,7 +908,7 @@ export default function AdminPage() {
   // Quick 1-click toggle between Live (Active) and Draft
   const handleToggleStatus = async (tile, e) => {
     if (e) e.stopPropagation();
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     const isCurrentlyDraft =
       tile.status === "draft" ||
       tile.meta?.status === "draft" ||
@@ -1019,7 +1019,7 @@ export default function AdminPage() {
 
   const handleDelete = async (id) => {
     if (!confirm("Delete this tile?")) return;
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     const res = await fetch(`${API_BASE}/api/admin/tiles/${id}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
     const json = await res.json();
     if (json.success) fetchTiles(); else alert(json.message || "Error");
@@ -1035,7 +1035,7 @@ export default function AdminPage() {
     setImportError("");
     setImportMessage(null);
 
-    const token = localStorage.getItem("bhava_token");
+    const token = localStorage.getItem("bhava_admin_token");
     const fd = new FormData();
     fd.append("file", csvFile);
     fd.append("overwrite", overwriteHandles);
@@ -1067,7 +1067,7 @@ export default function AdminPage() {
     }
   };
 
-  const logout = () => { localStorage.removeItem("bhava_token"); navigate("/admin/login"); };
+  const logout = () => { localStorage.removeItem("bhava_admin_token"); navigate("/admin/login"); };
 
   return (
     <div className="adm-root" style={{ display: "flex", minHeight: "100vh", background: "#f7f4f0" }}>

@@ -12,11 +12,11 @@ import ResponsiveImg from "../components/ResponsiveImg";
 // (1 Hero = HomeMain, 10 Footer = Layout. 9 Reviews is omitted until genuine verified reviews exist.)
 
 const FORMATS = [
-  { id: "sacred-beads", label: "Sacred Beads", note: "Five bracelets", img: "/Products/Sacred Beads Dhan Yog.jpg" },
+  { id: "sacred-beads", label: "Sacred Beads", note: "Sacred Bracelets", img: "/Products/Sacred Beads Dhan Yog.jpg" },
   { id: "incense-sticks", label: "Incense Sticks", note: "Sacred Notes", img: "/Products/Format Incense Sticks.jpg", pos: "68% center" },
   { id: "bamboo-less-incense", label: "Bamboo-less Incense", note: "Pure Ritual", img: "/Products/Format Bamboo-less Incense.jpg", pos: "70% center" },
   { id: "incense-cones", label: "Incense Cones", note: "Sacred Ember", img: "/Products/Format Incense Cones.jpg", pos: "70% center" },
-  { id: "sambrani-camphor", label: "Sambrani & Camphor", note: "Offering cups & ritual camphor", img: "/Products/Format Sambrani.jpg", pos: "78% center" },
+  { id: "sambrani-camphor", label: "Sambrani & Camphor", note: "Offering Cups & Ritual Camphor", img: "/Products/Format Sambrani.jpg", pos: "78% center" },
 ];
 
 function Head({ kicker, title, sub }) {
@@ -73,14 +73,14 @@ export default function HomeShop() {
               <Link key={f.id} to={`/products?category=${f.id}`} className={s.formatTile}>
                 <ResponsiveImg
                   src={f.img}
-                  alt={`${f.label} — ${f.note}`}
+                  alt={f.note ? `${f.label} — ${f.note}` : f.label}
                   loading="lazy"
                   width={480}
                   height={640}
                   sizes="(max-width: 600px) 78vw, 220px"
                   style={f.pos ? { objectPosition: f.pos } : undefined}
                 />
-                <span className={s.formatLabel}>{f.label}<small>{f.note}</small></span>
+                <span className={s.formatLabel}>{f.label}{f.note ? <small>{f.note}</small> : null}</span>
               </Link>
             ))}
           </div>
