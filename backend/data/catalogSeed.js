@@ -12,7 +12,7 @@ export const SEED_CATEGORIES = [
   { id: "bamboo-less-incense", label: "Bamboo-less Incense", blurb: "Pure Ritual — Single, Twin and 27.", sortOrder: 2 },
   { id: "incense-cones", label: "Incense Cones", blurb: "Sacred Ember — a distinctive cone format.", sortOrder: 3 },
   { id: "sambrani-camphor", label: "Sambrani & Camphor", blurb: "Offering cups and ritual camphor.", sortOrder: 4 },
-  { id: "sacred-beads", label: "Sacred Beads", blurb: "Six separate bracelets, each with its own intention.", sortOrder: 5 },
+  { id: "sacred-beads", label: "Sacred Beads", blurb: "Five bracelets, each with its own intention — including a Rose Quartz & Rhodonite mixed-stone piece.", sortOrder: 5 },
 ];
 
 const IMG = {
@@ -111,24 +111,33 @@ export const SEED_PRODUCTS = [
     related: { upsell: "", upsellAlt: "", crossSell: ["sacred-sambrani-offering-cups"], bundle: "the-sacred-smoke-pair" },
     approvalNotes: "Oud camphor not offered until confirmed. Revalidate cost for the 44 g pack.",
   },
-  // ── Six separate bracelets (Section 4.1) ──
+  // ── Bracelets (Section 4.1) — Rose Quartz + Rhodonite = one mixed-stone SKU (SB-RQ-RH)
   ...[
     { slug: "tiger-eye-bracelet", name: "Tiger Eye Bracelet", sku: "SB-TE", tag: "Courage to move.", desc: "Traditionally associated with strength, confidence, focus and grounded action, Tiger Eye serves as a reminder to meet uncertainty with courage, remain focused and turn intention into action.", intention: "I choose courage over hesitation.", cross: ["sacred-notes-discovery", "pure-ritual-single"], bundle: "the-personal-ritual-pair" },
     { slug: "evil-eye-bracelet", name: "Evil Eye Bracelet", sku: "SB-EE", tag: "Keep what matters close.", desc: "Traditionally associated with guarding against envy, ill will and unwanted attention, the Evil Eye symbol serves as a reminder to protect your attention, boundaries and peace.", intention: "I choose what deserves my energy.", cross: ["sacred-sambrani-offering-cups", "camphor-ritual-duo"], bundle: "the-protection-and-peace-collection" },
     { slug: "dhan-yog-bracelet", name: "Dhan Yog Bracelet", sku: "SB-DY", tag: "Prosperity with purpose.", desc: "Dhan means wealth; Yog speaks to union, connection and alignment. Dhan Yog is a reminder to create value, exercise discipline, grow what you have and use prosperity with purpose.", intention: "I choose to create, grow and use wealth wisely.", cross: ["sacred-notes-discovery", "sacred-sambrani-offering-cups"], bundle: "the-intention-and-abundance-collection" },
-    { slug: "freshwater-pearl-bracelet", name: "Freshwater Pearl Bracelet", sku: "SB-FP", tag: "Calm mind. Clearer perspective.", desc: "Traditionally associated with purity, wisdom and emotional balance, freshwater pearl is a reminder to remain centred, respond with clarity and bring grace to everyday relationships.", intention: "I choose love, healing and harmony in all my relationships.", cross: ["sacred-notes-discovery", "camphor-ritual-duo"], bundle: "the-everyday-sacred-set" },
-    // Rose Quartz / Rhodonite: copy is only PROPOSED in the master → withheld until approved
-    { slug: "rose-quartz-bracelet", name: "Rose Quartz Bracelet", sku: "SB-RQ", pending: true, cross: ["sacred-notes-discovery", "pure-ritual-single"], bundle: "the-personal-ritual-pair" },
-    { slug: "rhodonite-bracelet", name: "Rhodonite Bracelet", sku: "SB-RH", pending: true, cross: ["sacred-notes-discovery", "pure-ritual-single"], bundle: "the-sacred-living-pair" },
+    { slug: "freshwater-pearl-bracelet", name: "Freshwater Pearl Bracelet", sku: "SB-FP", tag: "Calm mind. Clearer perspective.", desc: "Traditionally associated with purity, wisdom and emotional balance, freshwater pearl is a reminder to remain centred, respond with clarity and bring grace to everyday relationships.", intention: "I choose calm presence in every relationship.", cross: ["sacred-notes-discovery", "camphor-ritual-duo"], bundle: "the-everyday-sacred-set" },
+    {
+      slug: "rose-quartz-rhodonite-bracelet",
+      name: "Rose Quartz & Rhodonite Bracelet",
+      sku: "SB-RQ-RH",
+      tag: "Love. Heal. Harmonise.",
+      desc: "A beautiful combination of Rose Quartz and Rhodonite. This bracelet brings together unconditional love, emotional healing and inner balance. It is a reminder to be kinder to yourself.",
+      intention: "I choose love, healing and harmony in all my relationships.",
+      cross: ["sacred-notes-discovery", "pure-ritual-single"],
+      bundle: "the-personal-ritual-pair",
+      image: "/Products/Product mala 1.png",
+    },
   ].map((b, i) => ({
     ...base, slug: b.slug, name: b.name, category: "sacred-beads", price: 1101, mode: "none", sortOrder: 10 + i, format: "Bracelet",
     variants: variants("none", { default: b.sku }),
-    tagline: b.pending ? "" : b.tag, description: b.pending ? "" : b.desc, intention: b.pending ? "" : b.intention, copyPending: !!b.pending,
+    tagline: b.tag, description: b.desc, intention: b.intention, copyPending: false,
     pack: "One bracelet; 10 mm beads.", packQuantity: "One bracelet; 10 mm beads",
     contents: [{ label: "Bead size", value: "10 mm" }, { label: "Cord", value: "Flexible elastic / stretch cord" }],
-    fitNote: "Strung on a flexible stretch cord for convenient wear.", image: IMG.bracelet,
+    fitNote: "Strung on a flexible stretch cord for convenient wear.",
+    image: b.image || IMG.bracelet,
     related: { upsell: "", upsellAlt: "", crossSell: b.cross, bundle: b.bundle, upsellBundle: "the-dual-intention" },
-    approvalNotes: b.pending ? "Proposed copy needs approval; six-SKU vs combined-bracelet decision pending." : "",
+    approvalNotes: b.sku === "SB-RQ-RH" ? "Combined mixed-stone bracelet per master (one listing, one SKU SB-RQ-RH). Do not split into standalone RQ/RH pages." : "",
   })),
 ];
 
@@ -147,7 +156,7 @@ const G1 = "Bracelet collection", G2 = "Incense & ritual collection", G3 = "Brac
 const B_ROWS = [
   [1, "the-dual-intention", "The Dual Intention", G1, [B, B], "Any 2 different bracelets. Select 2 different bracelet SKUs.", 6, ""],
   [2, "the-triple-intention", "The Triple Intention", G1, [B, B, B], "Any 3 different bracelets. Select 3 different bracelet SKUs.", 0, ""],
-  [3, "the-complete-bead-collection", "The Complete Bead Collection", G1, ["tiger-eye-bracelet", "evil-eye-bracelet", "dhan-yog-bracelet", "freshwater-pearl-bracelet", "rose-quartz-bracelet", "rhodonite-bracelet"].map((s) => X(s, "default")), "All 6 bracelets. Fixed collection.", 0, ""],
+  [3, "the-complete-bead-collection", "The Complete Bead Collection", G1, ["tiger-eye-bracelet", "evil-eye-bracelet", "dhan-yog-bracelet", "freshwater-pearl-bracelet", "rose-quartz-rhodonite-bracelet"].map((s) => X(s, "default")), "All 5 bracelets. Fixed collection.", 0, ""],
   [4, "the-classic-pair", "The Classic Pair", G2, [F(DISC), F(PRS)], "Sacred Notes Discovery + Pure Ritual Single. Select one fragrance; same fragrance in both formats.", 1, "curated"],
   [5, "the-fragrance-and-flame-pair", "The Fragrance & Flame Pair", G2, [F(DISC), F(EMB)], "Sacred Notes Discovery + Sacred Ember. Select one fragrance; same fragrance in both formats.", 0, ""],
   [6, "the-pure-ritual-pair", "The Pure Ritual Pair", G2, [F(PRS), F(EMB)], "Pure Ritual Single + Sacred Ember. Select one fragrance; same fragrance in both formats.", 0, ""],
@@ -179,7 +188,7 @@ const B_ROWS = [
 
 // Document prices (Section 6.1–6.6) — used ONLY by tests/sync to prove computed price == document price
 export const DOCUMENT_BUNDLE_PRICES = {
-  "the-dual-intention": 2202, "the-triple-intention": 3303, "the-complete-bead-collection": 6606, "the-classic-pair": 602,
+  "the-dual-intention": 2202, "the-triple-intention": 3303, "the-complete-bead-collection": 5505, "the-classic-pair": 602,
   "the-fragrance-and-flame-pair": 652, "the-pure-ritual-pair": 752, "the-three-format-discovery": 1003, "the-sacred-smoke-pair": 852,
   "the-complete-fragrance-ritual": 1504, "the-complete-home-ritual-set": 1855, "the-pure-ritual-fragrance-pair": 752,
   "the-pure-ritual-27-and-ember-pair": 902, "the-extended-three-format-ritual": 1153, "the-personal-ritual-pair": 1352,

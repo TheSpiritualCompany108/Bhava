@@ -4,6 +4,7 @@ import s from "./Shop.module.css";
 import useCatalog from "../hooks/useCatalog";
 import { ProductCard, BundleCard } from "./Cards";
 import { getProduct, shippingCopy, bundleInStock } from "./shopUtils";
+import ResponsiveImg from "../components/ResponsiveImg";
 
 // Homepage commerce modules, in the order set by the master playbook (Section 9.3):
 // 2 Shop by format · 3 Discover the fragrances · 4 Start with a format · 5 Curated collections ·
@@ -11,7 +12,7 @@ import { getProduct, shippingCopy, bundleInStock } from "./shopUtils";
 // (1 Hero = HomeMain, 10 Footer = Layout. 9 Reviews is omitted until genuine verified reviews exist.)
 
 const FORMATS = [
-  { id: "sacred-beads", label: "Sacred Beads", note: "Six bracelets", img: "/Products/Sacred Beads Dhan Yog.jpg" },
+  { id: "sacred-beads", label: "Sacred Beads", note: "Five bracelets", img: "/Products/Sacred Beads Dhan Yog.jpg" },
   { id: "incense-sticks", label: "Incense Sticks", note: "Sacred Notes", img: "/Products/Format Incense Sticks.jpg", pos: "68% center" },
   { id: "bamboo-less-incense", label: "Bamboo-less Incense", note: "Pure Ritual", img: "/Products/Format Bamboo-less Incense.jpg", pos: "70% center" },
   { id: "incense-cones", label: "Incense Cones", note: "Sacred Ember", img: "/Products/Format Incense Cones.jpg", pos: "70% center" },
@@ -46,9 +47,20 @@ export default function HomeShop() {
       if (aOk !== bOk) return aOk - bOk;
       return (a.priority || 99) - (b.priority || 99);
     });
-  const collections = byModule("curated").filter((b) => bundleInStock(catalog, b.slug));
+  // Prefer in-stock for the module; if every module bundle is OOS, fall back to other in-stock bundles
+  // so the section never collapses to height 0.
+  const pickBundles = (moduleKey, limit = 3) => {
+    const moduleList = byModule(moduleKey);
+    const inStockModule = moduleList.filter((b) => bundleInStock(catalog, b.slug));
+    if (inStockModule.length) return inStockModule.slice(0, limit);
+    const fallback = catalog.bundles
+      .filter((b) => b.status !== "archived" && bundleInStock(catalog, b.slug))
+      .sort((a, b) => (a.priority || 99) - (b.priority || 99));
+    return fallback.slice(0, limit);
+  };
+  const collections = pickBundles("curated", 3);
   const bracelets = catalog.products.filter((p) => p.category === "sacred-beads");
-  const complete = byModule("complete").filter((b) => bundleInStock(catalog, b.slug));
+  const complete = pickBundles("complete", 2);
 
   return (
     <>
@@ -59,7 +71,15 @@ export default function HomeShop() {
           <div className={s.formatGrid} id="hs-format">
             {FORMATS.map((f) => (
               <Link key={f.id} to={`/products?category=${f.id}`} className={s.formatTile}>
-                <img src={f.img} alt="" loading="lazy" style={f.pos ? { objectPosition: f.pos } : undefined} />
+                <ResponsiveImg
+                  src={f.img}
+                  alt={`${f.label} — ${f.note}`}
+                  loading="lazy"
+                  width={480}
+                  height={640}
+                  sizes="(max-width: 600px) 78vw, 220px"
+                  style={f.pos ? { objectPosition: f.pos } : undefined}
+                />
                 <span className={s.formatLabel}>{f.label}<small>{f.note}</small></span>
               </Link>
             ))}
@@ -112,7 +132,7 @@ export default function HomeShop() {
       {/* 6 · Sacred Beads */}
       <section className={s.sec} aria-labelledby="hs-beads" hidden={!bracelets.length}>
         <div className={s.wrap}>
-          <Head kicker="Sacred Beads" title="Six Bracelets. Six Intentions." sub="10 mm beads strung on a flexible stretch cord for convenient wear." />
+          <Head kicker="Sacred Beads" title="Five Bracelets. Five Intentions." sub="10 mm beads strung on a flexible stretch cord for convenient wear." />
           <div className={`${s.grid3} ${s.gridCards}`} id="hs-beads">
             {bracelets.map((p) => (
               <ProductCard key={p.slug} product={p} catalog={catalog} dense />
@@ -135,11 +155,33 @@ export default function HomeShop() {
       <section className={`${s.sec} ${s.secWhite}`} aria-labelledby="hs-trust">
         <div className={s.wrap}>
           <Head kicker="Product Information" title="Clear, From The Start" />
-          <div className={s.trustRow} id="hs-trust">
-            <div className={s.trustCell}><h3>Sacred Contents</h3><p>Every offering is named with care — so your ritual begins with clarity, devotion, and nothing left unknown.</p></div>
-            <div className={s.trustCell}><h3>Your Fragrance, Your Choice</h3><p>Guggal, Oud or Sandalwood — one fragrance per pack, or a pair where listed.</p></div>
-            <div className={s.trustCell}><h3>Simple Pricing</h3><p>Prices are inclusive of applicable GST. No coupons or crossed-out prices.</p></div>
-            <div className={s.trustCell}><h3>Shipping</h3><p>{shippingCopy(catalog.shipping)}.</p></div>
+          <div className={s.trustRow} id="hs-trust" aria-label="Product information">
+            <div className={s.trustTrack}>
+              {[
+                { title: "Sacred Contents", text: "Every offering is named with care — so your ritual begins with clarity, devotion, and nothing left unknown." },
+                { title: "Your Fragrance, Your Choice", text: "Guggal, Oud or Sandalwood — one fragrance per pack, or a pair where listed." },
+                { title: "Simple Pricing", text: "Prices are inclusive of applicable GST. No coupons or crossed-out prices." },
+                { title: "Shipping", text: `${shippingCopy(catalog.shipping)}.` },
+              ].map((item) => (
+                <div key={item.title} className={s.trustCell}>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
+              ))}
+              <div className={s.trustDup} aria-hidden="true">
+                {[
+                  { title: "Sacred Contents", text: "Every offering is named with care — so your ritual begins with clarity, devotion, and nothing left unknown." },
+                  { title: "Your Fragrance, Your Choice", text: "Guggal, Oud or Sandalwood — one fragrance per pack, or a pair where listed." },
+                  { title: "Simple Pricing", text: "Prices are inclusive of applicable GST. No coupons or crossed-out prices." },
+                  { title: "Shipping", text: `${shippingCopy(catalog.shipping)}.` },
+                ].map((item) => (
+                  <div key={`dup-${item.title}`} className={s.trustCell}>
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

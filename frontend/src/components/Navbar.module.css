@@ -8,20 +8,18 @@
 }
 
 .betaTag {
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1101;
+  position: static;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  margin-left: 8px;
   background: #4a0b1d;
-  border: 1.5px solid #f8edde;
+  border: 1.5px solid rgba(248, 237, 222, 0.35);
   border-radius: 8px;
   padding: 5px 10px;
   font-family: "Neue Haas Grotesk", Inter, "Work Sans", sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: #f4efe6;
   letter-spacing: 1.5px;
@@ -50,6 +48,8 @@
   gap: 4px;
   flex-shrink: 0;
   cursor: pointer;
+  position: relative;
+  min-width: 0;
 }
 
 .logo {
@@ -487,7 +487,9 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px;
+  padding: 10px;
+  min-width: 44px;
+  min-height: 44px;
   z-index: 1100;
 }
 
@@ -723,11 +725,11 @@
   }
 
   .betaTag {
-    left: 12px;
-    font-size: 10px;
+    font-size: 12px;
     padding: 4px 8px;
     border-radius: 7px;
     letter-spacing: 1.2px;
+    margin-left: 6px;
   }
 
   .heading {
@@ -749,6 +751,13 @@
 
   .navbarContainer {
     padding: 8px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Keep logo fully visible; badge sits beside wordmark on larger phones, hide when cramped */
+  .betaTag {
+    display: none;
   }
 }
 

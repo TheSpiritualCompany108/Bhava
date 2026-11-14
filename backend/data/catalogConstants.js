@@ -67,7 +67,7 @@ export const PENDING = [
   "Sacred Notes Triveni: fragrance split of the 45 sticks (total shown only).",
   "Pure Ritual 27: confirm the pack really contains 27 units.",
   "Camphor: Oud camphor not offered until confirmed; revalidate cost for the 44 g pack.",
-  "Rose Quartz / Rhodonite: proposed tagline, description and intention withheld until approved; combined-artwork vs six-SKU decision.",
+  "Rose Quartz & Rhodonite: final gemstone photography pending (currently using interim packshot); mixed-stone SKU SB-RQ-RH is live as one listing.",
   "Verified net weights for all formats except Discovery (21 g) and Camphor (44 g).",
   "Fragrance descriptions: approve against final samples.",
   "Product-specific usage, safety and storage instructions.",

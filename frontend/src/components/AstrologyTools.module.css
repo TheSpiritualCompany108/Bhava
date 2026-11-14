@@ -139,6 +139,30 @@
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   white-space: nowrap;
+  min-height: 44px;
+  padding: 6px 0;
+}
+
+.mobileTeaser {
+  display: none;
+}
+
+.teaserCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 0 18px;
+  border: 1.5px solid #4A0B1D;
+  border-radius: 999px;
+  background: transparent;
+  color: #4A0B1D;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
 }
 
 .cardLink .material-symbols-outlined {
@@ -245,13 +269,13 @@
   transition: opacity 0.25s ease, transform 0.25s ease;
   font-family: 'Inter', sans-serif;
   flex-shrink: 0;
+  min-height: 44px;
 }
 
 .exploreAllBtn:hover {
   opacity: 0.9;
   transform: translateY(-2px);
 }
-
 .exploreAllBtn .material-symbols-outlined {
   font-size: 16px;
 }
@@ -273,5 +297,20 @@
   .featureBar {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid,
+  .featureBar {
+    display: none;
+  }
+  .mobileTeaser {
+    display: block;
+    max-width: 420px;
+    margin: 0 auto;
+    color: #5c4a4f;
+    font-size: 14.5px;
+    line-height: 1.55;
   }
 }

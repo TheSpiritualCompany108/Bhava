@@ -51,7 +51,10 @@
   font-size: 0.95rem;
   font-weight: 400;
   transition: all 0.3s ease;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 0;
 }
 
 .footerLinks li a:hover {

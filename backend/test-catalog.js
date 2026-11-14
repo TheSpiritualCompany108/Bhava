@@ -19,15 +19,15 @@ const SEL = { fragrance: "guggal", camphor: "guggal", pair: "guggal-oud" };
 const braceletSel = (slug) => ({ ...SEL, bracelets: ctx.bracelets.slice(0, ctx.getBundle(slug).needs.bracelets) });
 
 console.log("Approved catalogue (seed)");
-t("15 products, correct prices, 28 SKUs, all unique", () => {
-  assert.equal(SEED_PRODUCTS.length, 15);
+t("14 products, correct prices, 27 SKUs, all unique", () => {
+  assert.equal(SEED_PRODUCTS.length, 14);
   assert.deepEqual(Object.fromEntries(SEED_PRODUCTS.map((p) => [p.slug, p.price])), {
     "sacred-notes-discovery": 251, "sacred-notes-duo": 501, "sacred-notes-triveni": 501, "pure-ritual-single": 351, "pure-ritual-twin": 701,
     "pure-ritual-27": 501, "sacred-ember": 401, "sacred-sambrani-offering-cups": 501, "camphor-ritual-duo": 351,
-    "tiger-eye-bracelet": 1101, "evil-eye-bracelet": 1101, "dhan-yog-bracelet": 1101, "freshwater-pearl-bracelet": 1101, "rose-quartz-bracelet": 1101, "rhodonite-bracelet": 1101,
+    "tiger-eye-bracelet": 1101, "evil-eye-bracelet": 1101, "dhan-yog-bracelet": 1101, "freshwater-pearl-bracelet": 1101, "rose-quartz-rhodonite-bracelet": 1101,
   });
-  assert.equal(ALL_SKUS.length, 28);
-  assert.equal(new Set(ALL_SKUS).size, 28);
+  assert.equal(ALL_SKUS.length, 27);
+  assert.equal(new Set(ALL_SKUS).size, 27);
 });
 t("variant matrix + SKU register", () => {
   const keys = (s) => ctx.getProduct(s).variants.map((v) => `${v.key}=${v.sku}`).join(",");
@@ -94,12 +94,12 @@ t("fragrance propagates; sambrani Guggal; camphor independent; pairs; fixed comp
   const sku = (slug, sel) => resolveLine(B(slug, sel), ctx).line.components.map((c) => c.sku);
   assert.deepEqual(sku("the-complete-home-ritual-set", { fragrance: "oud", camphor: "sandalwood" }), ["SN-DIS-OUD", "PR-SGL-OUD", "SE-OUD", "SSC-21-GUG", "CRD-44-SAN"]);
   assert.deepEqual(sku("the-sacred-smoke-pair", { camphor: "guggal" }), ["SSC-21-GUG", "CRD-44-GUG"]);
-  assert.deepEqual(sku("the-fragrance-and-intention-set", { pair: "oud-sandalwood", bracelets: ["rhodonite-bracelet"] }), ["SB-RH", "SN-DUO-OS"]);
+  assert.deepEqual(sku("the-fragrance-and-intention-set", { pair: "oud-sandalwood", bracelets: ["rose-quartz-rhodonite-bracelet"] }), ["SB-RQ-RH", "SN-DUO-OS"]);
   assert.deepEqual(sku("the-inner-stillness-set", { pair: "guggal-sandalwood", bracelets: ["tiger-eye-bracelet"] }), ["SB-TE", "PR-TWIN-GS"]);
   assert.deepEqual(sku("the-threefold-intention-set", { bracelets: ["tiger-eye-bracelet"] }), ["SB-TE", "SN-TRI"]);
   assert.deepEqual(sku("the-intention-and-abundance-collection", { camphor: "sandalwood" }), ["SB-DY", "SN-DIS-GUG", "SSC-21-GUG", "CRD-44-SAN"]);
   assert.deepEqual(sku("the-protection-and-peace-collection", { camphor: "guggal" }), ["SB-EE", "PR-SGL-GUG", "SSC-21-GUG", "CRD-44-GUG"]);
-  assert.equal(sku("the-complete-bead-collection", {}).length, 6);
+  assert.equal(sku("the-complete-bead-collection", {}).length, 5);
   assert.deepEqual(sku("the-everyday-sacred-set", { fragrance: "oud", camphor: "guggal", bracelets: ["tiger-eye-bracelet"] }), ["SB-TE", "SN-DIS-OUD", "CRD-44-GUG"]);
 });
 t("selection validation: duplicates, counts, invalid values", () => {
@@ -163,16 +163,16 @@ const stockOf = async (sku) => (await Inventory.findOne({ sku }))?.stock ?? null
 await Inventory.insertMany([{ sku: "SN-DIS-GUG", stock: 2 }, { sku: "SN-DIS-OUD", stock: 5 }, { sku: "PR-SGL-SAN", stock: 1 }]);
 
 let rep = await svc.syncCatalog();
-assert.deepEqual(rep.created, { categories: 5, products: 15, bundles: 30, inventory: 25 });
+assert.deepEqual(rep.created, { categories: 5, products: 14, bundles: 30, inventory: 24 });
 assert.equal(await stockOf("SN-DIS-GUG"), 2); assert.equal(await stockOf("SN-DIS-OUD"), 5); assert.equal(await stockOf("PR-SGL-SAN"), 1);
 assert.equal(await stockOf("SE-GUG"), 0);
-ok("first sync loads 15 products / 30 bundles / 5 categories; existing stock preserved; new SKUs at 0");
+ok("first sync loads 14 products / 30 bundles / 5 categories; existing stock preserved; new SKUs at 0");
 
 await svc.setStock("SN-DIS-OUD", 9, { reason: "count" });
 rep = await svc.syncCatalog();
 assert.deepEqual(rep.created, { categories: 0, products: 0, bundles: 0, inventory: 0 });
 assert.equal(await stockOf("SN-DIS-OUD"), 9);
-assert.equal(await CatalogProduct.countDocuments(), 15); assert.equal(await CatalogBundle.countDocuments(), 30);
+assert.equal(await CatalogProduct.countDocuments(), 14); assert.equal(await CatalogBundle.countDocuments(), 30);
 ok("re-running sync creates no duplicates and never resets stock");
 
 await CatalogProduct.updateOne({ slug: "sacred-ember" }, { $set: { price: 420, tagline: "Edited in admin" } });

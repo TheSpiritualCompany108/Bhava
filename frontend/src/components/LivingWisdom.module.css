@@ -55,6 +55,29 @@
   font-family: "Neue Haas Grotesk", Inter, sans-serif;
   cursor: pointer;
   transition: background 0.2s ease;
+  min-height: 44px;
+}
+
+.mobileTeaser {
+  display: none;
+}
+
+.teaserCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0 18px;
+  border: 1.5px solid #4A0B1D;
+  border-radius: 999px;
+  background: transparent;
+  color: #4A0B1D;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
 }
 
 .beginBtn:hover {
@@ -125,5 +148,19 @@
 @media (max-width: 520px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid,
+  .beginBtn {
+    display: none;
+  }
+  .mobileTeaser {
+    display: block;
+    max-width: 420px;
+    color: #5c4a4f;
+    font-size: 14.5px;
+    line-height: 1.55;
   }
 }

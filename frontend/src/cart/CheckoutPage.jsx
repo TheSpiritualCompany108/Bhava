@@ -783,7 +783,7 @@ export default function CheckoutPage() {
                 return (
                   <li key={i.productId}>
                     <div className={styles.thumb}>
-                      <img src={imgSrc(i.image)} alt="" />
+                      <img src={imgSrc(i.image)} alt={i.name || "Order item"} width={72} height={72} loading="lazy" />
                       <b>{i.quantity}</b>
                     </div>
                     <div className={styles.itemMeta}>

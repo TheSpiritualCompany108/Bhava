@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
 import shop from "../shop/Shop.module.css";
@@ -13,6 +13,7 @@ import { RETURNS_POLICY_LIVE, DISPATCH_SLA } from "../shop/storeFlags";
 import { viewItem, selectItem, addToCartEvent } from "../utils/analytics";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 import ReviewsSection, { Stars } from "./ReviewsSection";
+import ResponsiveImg from "../components/ResponsiveImg";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -33,11 +34,32 @@ function ProductDetailInner({ slug }) {
   const [activeImg, setActiveImg] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const [reviewSummary, setReviewSummary] = useState(null);
+  const [stickyBuy, setStickyBuy] = useState(false);
+  const actionsRef = useRef(null);
   const onReviewSummary = useCallback((s) => setReviewSummary(s), []);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, []);
+
+  // Old standalone RQ / RH pages → one mixed-stone listing (SB-RQ-RH)
+  useEffect(() => {
+    if (loading || product) return;
+    if (slug === "rose-quartz-bracelet" || slug === "rhodonite-bracelet") {
+      navigate("/product/rose-quartz-rhodonite-bracelet", { replace: true });
+    }
+  }, [loading, product, slug, navigate]);
+
+  useEffect(() => {
+    const el = actionsRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return undefined;
+    const io = new IntersectionObserver(
+      ([entry]) => setStickyBuy(!entry.isIntersecting),
+      { root: null, threshold: 0, rootMargin: "-64px 0px 0px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [product?.slug]);
   // Single-variant products are pre-selected; otherwise the shopper must choose explicitly
   const variantKey = product ? (product.variants.length === 1 ? product.variants[0].key : picked) : "";
   useEffect(() => {
@@ -88,6 +110,9 @@ function ProductDetailInner({ slug }) {
     );
   }
   if (!product) {
+    if (slug === "rose-quartz-bracelet" || slug === "rhodonite-bracelet") {
+      return <div className={styles.page}><div className={shop.loadingBox}>Loading…</div></div>;
+    }
     return (
       <div className={styles.page}>
         <div className={shop.loadingBox}>
@@ -175,31 +200,52 @@ function ProductDetailInner({ slug }) {
 
         <div className={styles.productShowcase}>
           <div className={styles.galleryCol}>
-            <div className={styles.mainImageWrapper}>
-              <img
-                src={imgSrc(gallery[Math.min(activeImg, gallery.length - 1)])}
+            <div
+              className={styles.mainImageWrapper}
+              onClick={() => setZoomed((z) => !z)}
+              onTouchStart={(e) => { e.currentTarget.dataset.x = e.touches[0].clientX; }}
+              onTouchEnd={(e) => {
+                const start = Number(e.currentTarget.dataset.x || 0);
+                const dx = e.changedTouches[0].clientX - start;
+                if (dx > 40) setActiveImg((i) => Math.max(0, i - 1));
+                if (dx < -40) setActiveImg((i) => Math.min(gallery.length - 1, i + 1));
+              }}
+              style={zoomed ? { cursor: "zoom-out" } : { cursor: "zoom-in" }}
+              role="img"
+              aria-label={`${product.name} product image`}
+            >
+              <ResponsiveImg
+                src={gallery[Math.min(activeImg, gallery.length - 1)]}
                 alt={`${product.name}${product.pack ? ` – ${product.pack}` : ""}`}
                 className={styles.mainImage}
                 width={720}
                 height={720}
                 loading="eager"
-                onClick={() => setZoomed((z) => !z)}
-                style={zoomed ? { transform: "scale(1.45)", cursor: "zoom-out" } : { cursor: "zoom-in" }}
-                onTouchStart={(e) => { e.currentTarget.dataset.x = e.touches[0].clientX; }}
-                onTouchEnd={(e) => {
-                  const start = Number(e.currentTarget.dataset.x || 0);
-                  const dx = e.changedTouches[0].clientX - start;
-                  if (dx > 40) setActiveImg((i) => Math.max(0, i - 1));
-                  if (dx < -40) setActiveImg((i) => Math.min(gallery.length - 1, i + 1));
-                }}
+                sizes="(max-width: 600px) 55vw, (max-width: 900px) 80vw, 480px"
+                style={zoomed ? { transform: "scale(1.45)" } : undefined}
               />
             </div>
             {gallery.length > 1 && (
               <div className={styles.thumbnailRow}>
                 {gallery.map((g, i) => (
                   <button key={g + i} type="button" className={`${styles.thumbnailBtn} ${i === activeImg ? styles.thumbnailActive : ""}`} onClick={() => setActiveImg(i)} aria-label={`Show image ${i + 1}`}>
-                    <img src={imgSrc(g)} alt="" className={styles.thumbnailImg} />
+                    <img src={imgSrc(g)} alt={`${product.name} view ${i + 1}`} className={styles.thumbnailImg} loading="lazy" width={96} height={96} />
                   </button>
+                ))}
+              </div>
+            )}
+            {gallery.length > 1 && (
+              <div className={styles.galleryDots} role="tablist" aria-label="Product images">
+                {gallery.map((g, i) => (
+                  <button
+                    key={`dot-${g}-${i}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={i === activeImg}
+                    className={`${styles.galleryDot} ${i === activeImg ? styles.galleryDotOn : ""}`}
+                    onClick={() => setActiveImg(i)}
+                    aria-label={`Image ${i + 1} of ${gallery.length}`}
+                  />
                 ))}
               </div>
             )}
@@ -313,7 +359,7 @@ function ProductDetailInner({ slug }) {
               </p>
             )}
 
-            <div className={styles.actionsRow}>
+            <div className={styles.actionsRow} ref={actionsRef}>
               <div className={styles.addWrap}>
                 <button
                   className={`${styles.addToCartBtn} ${inCart ? styles.addedBtn : ""}`}
@@ -339,15 +385,31 @@ function ProductDetailInner({ slug }) {
               {qualifiesFree && <span>✓ Free shipping on this item</span>}
             </div>
 
-            <div className={styles.trustGrid}>
-              <div className={styles.trustItem}><span className={styles.trustIcon}>✦</span> Thoughtfully curated</div>
-              <div className={styles.trustItem}><span className={styles.trustIcon}>◈</span> Secure checkout</div>
-              {RETURNS_POLICY_LIVE ? (
-                <div className={styles.trustItem}><span className={styles.trustIcon}>◎</span> Easy returns guidance</div>
-              ) : (
-                <div className={styles.trustItem}><span className={styles.trustIcon}>◎</span> Inclusive of GST</div>
-              )}
-              <div className={styles.trustItem}><span className={styles.trustIcon}>◉</span> Packed with care</div>
+            <div className={styles.trustGrid} aria-label="Product assurances">
+              <div className={styles.trustTrack}>
+                {[
+                  { icon: "✦", label: "Thoughtfully curated" },
+                  { icon: "◈", label: "Secure checkout" },
+                  { icon: "◎", label: RETURNS_POLICY_LIVE ? "Easy returns guidance" : "Inclusive of GST" },
+                  { icon: "◉", label: "Packed with care" },
+                ].map((t) => (
+                  <div key={t.label} className={styles.trustItem}>
+                    <span className={styles.trustIcon}>{t.icon}</span> {t.label}
+                  </div>
+                ))}
+                <div className={styles.trustDup} aria-hidden="true">
+                  {[
+                    { icon: "✦", label: "Thoughtfully curated" },
+                    { icon: "◈", label: "Secure checkout" },
+                    { icon: "◎", label: RETURNS_POLICY_LIVE ? "Easy returns guidance" : "Inclusive of GST" },
+                    { icon: "◉", label: "Packed with care" },
+                  ].map((t) => (
+                    <div key={`dup-${t.label}`} className={styles.trustItem}>
+                      <span className={styles.trustIcon}>{t.icon}</span> {t.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* ── Upsell ── */}
@@ -532,6 +594,37 @@ function ProductDetailInner({ slug }) {
           </div>
         </section>
       </div>
+
+      {stickyBuy && (
+        <div className={styles.stickyBuyBar} role="region" aria-label="Quick add to cart">
+          <div className={styles.stickyBuyPrice}>
+            <strong>{inr(product.price)}</strong>
+            <span>{FOOTNOTE_PRICE}</span>
+          </div>
+          <button
+            type="button"
+            className={styles.stickyBuyBtn}
+            disabled={!needsChoice && !inStock}
+            onClick={(e) => {
+              if (needsChoice) {
+                document.querySelector(`.${shop.selBlock}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                return;
+              }
+              if (!inStock) return;
+              if (inCart) navigate("/cart");
+              else add(e);
+            }}
+          >
+            {!inStock && variant
+              ? "Out of stock"
+              : needsChoice
+                ? "Select fragrance"
+                : inCart
+                  ? "View Cart →"
+                  : "Add to Cart +"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

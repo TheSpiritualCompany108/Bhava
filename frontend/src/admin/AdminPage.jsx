@@ -95,7 +95,7 @@ const HERO_SLIDES = [
     defaultHighlight: "Every Day",
     defaultDescription: "A Simple Daily Ritual System For Modern Homes.",
     defaultDescription1: "Ritual is not reserved for special occasions. It is the quiet return to yourself, every single day.",
-    defaultPrimaryCta: "Begin With Bhava:",
+    defaultPrimaryCta: "Shop the Ritual",
     defaultSecondaryCta: "Explore the System",
   },
   {

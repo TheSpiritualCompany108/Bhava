@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion"; // eslint-disable-line no-unused-vars
 import styles from "./HomeMain.module.css";
-import ScrollDown from "./ScrollDown";
 import useHomepageSection, { resolveHomepageImageUrl, PLACEHOLDER_IMAGE } from "../hooks/useHomepageSection";
 
 const INTERVAL = 7000;
@@ -177,7 +176,7 @@ function HomeMain() {
               <p className={styles.homeMainHeroDescription1}>{o.description1 || "Ritual is not reserved for special occasions. It is the quiet return to yourself, every single day."}</p>
 
               <div className={styles.homeMainHeroButtons}>
-                <button className={styles.homeMainBtnPrimary} onClick={() => navigate("/about")}>{o.primaryCta || "Begin With Bhava:"}</button>
+                <button className={styles.homeMainBtnPrimary} onClick={() => navigate("/products")}>{o.primaryCta || "Shop the Ritual"}</button>
                 <button className={styles.homeMainBtnSecondary} onClick={() => navigate("/knowledge")}>{o.secondaryCta || "Explore the System"}</button>
               </div>
 
@@ -230,8 +229,6 @@ function HomeMain() {
             </li>
           ))}
         </ul>
-
-        <ScrollDown />
       </div>
     </div>
   );
