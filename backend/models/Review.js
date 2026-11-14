@@ -25,6 +25,15 @@ const reviewSchema = new mongoose.Schema(
       minlength: [10, "Review must be at least 10 characters"],
       maxlength: 2000,
     },
+    // Optional photos attached by the shopper (max enforced in controller)
+    images: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: (arr) => Array.isArray(arr) && arr.length <= 4,
+        message: "A review can include up to 4 images",
+      },
+    },
     // true when the reviewer has an order containing this product
     verified: { type: Boolean, default: false },
     // true for sample reviews inserted by seed-reviews.js (removable with --clear)

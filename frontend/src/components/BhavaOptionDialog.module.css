@@ -70,10 +70,35 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 16px rgba(74, 11, 29, 0.3);
+  animation: iconGlow 2.8s ease-in-out infinite;
 }
 
-.sparkle {
-  font-size: 24px;
+.brandLogo {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  mix-blend-mode: lighten;
+  animation: logoBreathe 2.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes logoBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes iconGlow {
+  0%, 100% { box-shadow: 0 6px 16px rgba(74, 11, 29, 0.3); }
+  50% { box-shadow: 0 8px 22px rgba(224, 123, 57, 0.35); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iconCircle,
+  .brandLogo {
+    animation: none;
+  }
 }
 
 .title {

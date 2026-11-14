@@ -200,7 +200,7 @@ export const DOCUMENT_BUNDLE_PRICES = {
 };
 
 export const SEED_BUNDLES = B_ROWS.map(([no, slug, name, group, components, description, priority, homeModule]) => ({
-  slug, name, group, components, description, tagline: "", sortOrder: no,
+  slug, name, group, components, description, tagline: "", image: "", sortOrder: no,
   status: "active", featured: priority > 0, launchPriority: priority > 0 ? priority : null, homeModule, approvalNotes: "",
 }));
 

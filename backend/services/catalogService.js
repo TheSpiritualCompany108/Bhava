@@ -238,6 +238,7 @@ export async function validateBundleInput(input, { existing } = {}) {
   d.group = str(input.group, 80);
   d.tagline = str(input.tagline, 200);
   d.description = str(input.description, 2000);
+  d.image = str(input.image, 500);
   d.approvalNotes = str(input.approvalNotes, 1000);
   d.sortOrder = Number.isFinite(Number(input.sortOrder)) ? Number(input.sortOrder) : 0;
   d.status = str(input.status || "active", 20);

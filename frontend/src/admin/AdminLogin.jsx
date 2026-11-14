@@ -20,7 +20,7 @@ export default function AdminLogin() {
       });
       const json = await res.json();
       if (json.success && json.token) {
-        localStorage.setItem("bhava_token", json.token);
+        localStorage.setItem("bhava_admin_token", json.token);
         navigate("/admin");
       } else {
         alert(json.message || "Login failed");

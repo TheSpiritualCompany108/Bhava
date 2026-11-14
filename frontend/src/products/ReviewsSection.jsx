@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./ReviewsSection.module.css";
+import { getCustomerToken } from "../utils/customerAuth";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const PAGE_SIZE = 5;
+const MAX_IMAGES = 4;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+const imgUrl = (src) => {
+  if (!src) return "";
+  if (/^https?:\/\//i.test(src) || src.startsWith("blob:") || src.startsWith("data:")) return src;
+  return `${API_BASE}${src.startsWith("/") ? "" : "/"}${src}`;
+};
 
 const timeAgo = (iso) => {
   const diff = Date.now() - new Date(iso).getTime();
@@ -56,10 +65,13 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
   const [hoverRating, setHoverRating] = useState(0);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [photos, setPhotos] = useState([]); // { file, preview }
+  const [lightbox, setLightbox] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formMsg, setFormMsg] = useState({ type: "", text: "" });
+  const fileInputRef = useRef(null);
 
-  const token = localStorage.getItem("bhava_token");
+  const token = getCustomerToken();
   let currentUser = null;
   try {
     currentUser = JSON.parse(localStorage.getItem("bhava_user") || "null");
@@ -93,13 +105,67 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
     setVisible(PAGE_SIZE);
   }, [sort, filterStar]);
 
+  const clearPhotos = useCallback(() => {
+    setPhotos((prev) => {
+      prev.forEach((p) => URL.revokeObjectURL(p.preview));
+      return [];
+    });
+  }, []);
+
   const openForm = () => {
-    if (!token) {
-      navigate("/auth", { state: { from: location.pathname } });
+    const customerToken = getCustomerToken();
+    if (!customerToken) {
+      navigate("/auth", {
+        state: {
+          from: location.pathname,
+          info: "Sign in with your customer account to leave a review.",
+        },
+      });
       return;
     }
     setFormOpen(true);
     setFormMsg({ type: "", text: "" });
+  };
+
+  const closeForm = () => {
+    setFormOpen(false);
+    clearPhotos();
+  };
+
+  const onPickPhotos = (e) => {
+    const picked = Array.from(e.target.files || []);
+    e.target.value = "";
+    if (!picked.length) return;
+    setFormMsg({ type: "", text: "" });
+    setPhotos((prev) => {
+      const room = MAX_IMAGES - prev.length;
+      if (room <= 0) {
+        setFormMsg({ type: "error", text: `You can add up to ${MAX_IMAGES} photos.` });
+        return prev;
+      }
+      const next = [...prev];
+      for (const file of picked.slice(0, room)) {
+        if (!/^image\/(jpeg|jpg|png|webp)$/i.test(file.type)) {
+          setFormMsg({ type: "error", text: "Photos must be JPG, PNG or WebP." });
+          continue;
+        }
+        if (file.size > MAX_IMAGE_BYTES) {
+          setFormMsg({ type: "error", text: "Each photo must be under 5 MB." });
+          continue;
+        }
+        next.push({ file, preview: URL.createObjectURL(file) });
+      }
+      return next;
+    });
+  };
+
+  const removePhoto = (idx) => {
+    setPhotos((prev) => {
+      const copy = [...prev];
+      const [gone] = copy.splice(idx, 1);
+      if (gone?.preview) URL.revokeObjectURL(gone.preview);
+      return copy;
+    });
   };
 
   const submit = async (e) => {
@@ -115,14 +181,42 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
     setSubmitting(true);
     setFormMsg({ type: "", text: "" });
     try {
+      const customerToken = getCustomerToken();
+      if (!customerToken) {
+        setFormMsg({
+          type: "error",
+          text: "Please sign in with your customer account to review.",
+        });
+        navigate("/auth", {
+          state: {
+            from: location.pathname,
+            info: "Sign in with your customer account to leave a review.",
+          },
+        });
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append("rating", String(rating));
+      fd.append("title", title);
+      fd.append("body", body);
+      photos.forEach((p) => fd.append("images", p.file));
+
       const res = await fetch(`${API_BASE}/api/reviews/${encodeURIComponent(productId)}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ rating, title, body }),
+        headers: { Authorization: `Bearer ${customerToken}` },
+        body: fd,
       });
       const json = await res.json();
       if (res.status === 401) {
         navigate("/auth", { state: { from: location.pathname } });
+        return;
+      }
+      if (res.status === 403) {
+        setFormMsg({
+          type: "error",
+          text: json.message || "Please sign in with your customer account to review.",
+        });
         return;
       }
       if (!res.ok || !json.success) {
@@ -132,6 +226,7 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
         setRating(0);
         setTitle("");
         setBody("");
+        clearPhotos();
         setFormOpen(false);
         setSort("recent");
         setFilterStar(0);
@@ -196,7 +291,7 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
           {alreadyReviewed ? (
             <p className={styles.alreadyNote}>You already reviewed this product.</p>
           ) : (
-            <button type="button" className={styles.writeBtn} onClick={formOpen ? () => setFormOpen(false) : openForm}>
+            <button type="button" className={styles.writeBtn} onClick={formOpen ? closeForm : openForm}>
               {formOpen ? "Cancel" : "Write a review"}
             </button>
           )}
@@ -243,6 +338,40 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
               placeholder={`What did you love about ${productTitle || "this product"}?`}
               value={body}
               onChange={(e) => setBody(e.target.value)}
+            />
+          </div>
+          <div className={styles.formRow}>
+            <label className={styles.label}>
+              Photos <span>optional · up to {MAX_IMAGES}</span>
+            </label>
+            <div className={styles.photoRow}>
+              {photos.map((p, i) => (
+                <div key={p.preview} className={styles.photoThumb}>
+                  <img src={p.preview} alt={`Upload preview ${i + 1}`} />
+                  <button type="button" className={styles.photoRemove} onClick={() => removePhoto(i)} aria-label="Remove photo">
+                    ×
+                  </button>
+                </div>
+              ))}
+              {photos.length < MAX_IMAGES && (
+                <button
+                  type="button"
+                  className={styles.photoAdd}
+                  onClick={() => fileInputRef.current?.click()}
+                  aria-label="Add photos"
+                >
+                  <span aria-hidden>+</span>
+                  Add photo
+                </button>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              hidden
+              onChange={onPickPhotos}
             />
           </div>
           {formMsg.text && (
@@ -303,6 +432,21 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
               </div>
               {r.title && <h4 className={styles.cardTitle}>{r.title}</h4>}
               <p className={styles.cardBody}>{r.body}</p>
+              {Array.isArray(r.images) && r.images.length > 0 && (
+                <div className={styles.reviewGallery}>
+                  {r.images.map((src, i) => (
+                    <button
+                      key={`${r.id}-${i}`}
+                      type="button"
+                      className={styles.reviewThumb}
+                      onClick={() => setLightbox(imgUrl(src))}
+                      aria-label={`Open review photo ${i + 1}`}
+                    >
+                      <img src={imgUrl(src)} alt="" loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -313,6 +457,15 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
           <button type="button" className={styles.moreBtn} onClick={() => setVisible((v) => v + PAGE_SIZE)}>
             Show more reviews
           </button>
+        </div>
+      )}
+
+      {lightbox && (
+        <div className={styles.lightbox} role="dialog" aria-modal="true" aria-label="Review photo" onClick={() => setLightbox("")}>
+          <button type="button" className={styles.lightboxClose} aria-label="Close" onClick={() => setLightbox("")}>
+            ×
+          </button>
+          <img src={lightbox} alt="Review photo" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </section>

@@ -26,8 +26,14 @@ function BhavaOptionDialog({ isOpen, onClose, onSelectChat, onSelectCall }) {
         </button>
 
         <div className={styles.header}>
-          <div className={styles.iconCircle}>
-            <span className={styles.sparkle}>✨</span>
+          <div className={styles.iconCircle} aria-hidden="true">
+            <img
+              src={encodeURI("/logo(3).png")}
+              alt=""
+              className={styles.brandLogo}
+              width={36}
+              height={36}
+            />
           </div>
           <h3 className={styles.title}>Connect with Bhava:</h3>
           <p className={styles.subtitle}>Choose how you would like to interact with the AI assistant.</p>
