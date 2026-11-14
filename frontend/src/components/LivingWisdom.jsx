@@ -26,7 +26,14 @@ function LivingWisdom() {
             presence.
           </p>
           <button className={styles.beginBtn} onClick={() => navigate("/knowledge")}>
-            Begin with Bhava:
+            Begin with Bhava
+          </button>
+        </div>
+
+        <div className={styles.mobileTeaser}>
+          <p>Karma, grace, stillness and mindful living — philosophy for everyday practice.</p>
+          <button type="button" className={styles.teaserCta} onClick={() => navigate("/knowledge")}>
+            Explore <span className="material-symbols-outlined">arrow_forward</span>
           </button>
         </div>
 

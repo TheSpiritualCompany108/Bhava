@@ -241,7 +241,7 @@ function BundleDetailInner({ slug }) {
                       <button key={p.slug} type="button" aria-pressed={on} disabled={!stocked || full}
                         className={`${shop.braceletOpt} ${on ? shop.braceletOn : ""}`} onClick={() => toggleBracelet(p.slug)}>
                         {on && <span className={shop.tick}>✓</span>}
-                        <img src={imgSrc(p.image)} alt="" loading="lazy" />
+                        <img src={imgSrc(p.image)} alt={p.name} loading="lazy" width={120} height={120} />
                         {p.name.replace(" Bracelet", "")}
                         <div style={{ fontWeight: 400, fontSize: 11 }}>{inr(p.price)}</div>
                         {!stocked && <div style={{ fontWeight: 400, fontSize: 11 }}>Out of stock</div>}

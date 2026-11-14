@@ -218,26 +218,42 @@
 .slideDots {
   list-style: none;
   display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  margin: 28px 0 0;
   padding: 0;
 }
 
 .dot,
 .dotActive {
-  width: 8px;
-  height: 8px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: rgba(74, 11, 29, 0.25);
+  background: transparent;
   border: none;
   cursor: pointer;
   padding: 0;
   transition: all 0.3s ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.dotActive {
+.dot::after,
+.dotActive::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(74, 11, 29, 0.28);
+  transition: all 0.3s ease;
+}
+
+.dotActive::after {
   background: #e07b39;
-  width: 24px;
+  width: 16px;
   border-radius: 4px;
 }
 
@@ -279,11 +295,36 @@
     justify-content: center;
   }
   .slideTitle { font-size: 32px; }
-  .slideDots { justify-content: center; }
+  .slideDots {
+    justify-content: center;
+    margin-top: 20px;
+    gap: 2px;
+  }
+  .dot,
+  .dotActive {
+    width: 22px;
+    height: 22px;
+  }
+  .dot::after,
+  .dotActive::after {
+    width: 5px;
+    height: 5px;
+  }
+  .dotActive::after {
+    width: 14px;
+  }
 }
 
 @media (max-width: 480px) {
   .homeMainElevateText { font-size: 34px; }
   .homeMainHighlight   { font-size: 30px; }
   .homeMainHeroDescription { font-size: 14px; }
+  .homeMainContainer {
+    padding: 40px 18px 36px;
+  }
+  .slideTitle { font-size: 28px; }
+  .slideDescription { font-size: 14px; }
+  .slideDots {
+    margin-top: 16px;
+  }
 }

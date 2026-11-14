@@ -8,6 +8,7 @@ export const PENDING_RETURNS =
 export const PENDING_STORY = "The story for this bracelet is being finalised.";
 
 export const FOOTNOTE_PRICE = "Inclusive of applicable GST.";
+export const FOOTNOTE_PRICE_SHORT = "incl. of gst";
 
 // Product-specific FAQs (Section 10.1) — answers restate catalogue facts only.
 export function faqsFor(p, catalog) {

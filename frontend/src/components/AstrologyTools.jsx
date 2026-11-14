@@ -96,21 +96,31 @@ function AstrologyTools() {
           "Powerful astrology tools to understand yourself, make better decisions and live with clarity."}
       </p>
 
+      <div className={styles.mobileTeaser}>
+        <p>Kundli, matching, astrology and numerology — tools for clearer decisions.</p>
+        <button type="button" className={styles.teaserCta} onClick={() => navigate("/services")}>
+          Explore <span className="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+
       <div className={styles.grid}>
         {displayTools.map((tool) => {
           const o = items[tool.id] || {};
+          const title = o.title || tool.title;
           return (
             <div key={tool.id} className={`${styles.card} ${styles[tool.theme]}`}>
               <span className={styles.iconBadge}>
                 <span className="material-symbols-outlined">{tool.icon}</span>
               </span>
-              <h3 className={styles.cardTitle}>{o.title || tool.title}</h3>
+              <h3 className={styles.cardTitle}>{title}</h3>
               <p className={styles.cardDescription}>{o.description || tool.description}</p>
               <img
                 src={o.image ? resolveHomepageImageUrl(o.image) : tool.image || PLACEHOLDER_IMAGE}
-                alt=""
+                alt={`${title} tool illustration`}
                 className={styles.cardImage}
-                aria-hidden="true"
+                loading="lazy"
+                width={360}
+                height={240}
               />
               <button className={styles.cardLink} onClick={() => navigate(tool.route || "/services")}>
                 {o.cta || tool.cta} <span className="material-symbols-outlined">arrow_forward</span>

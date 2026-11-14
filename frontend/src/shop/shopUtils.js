@@ -13,6 +13,20 @@ export const imgSrc = (url) => {
   return url.startsWith("/uploads") || url.startsWith("uploads") ? `${API_BASE}${url.startsWith("/") ? "" : "/"}${url}` : url;
 };
 
+/** Sibling .webp for static /Products (and similar) assets only — not /uploads. */
+export const imgWebpSrc = (url) => {
+  const src = imgSrc(url);
+  if (!src || /^https?:\/\//.test(src) || src.startsWith("data:")) return "";
+  if (src.includes("/uploads")) return "";
+  if (/\.svg($|\?)/i.test(src) || /\.webp($|\?)/i.test(src)) return "";
+  if (!/^\/(Products|Daily%20Practices|Explore%20Sacred%20Wisdom|Timeless%20Wisdom)\//i.test(src)
+    && !/^\/[A-Za-z0-9 _%-]+\.(jpe?g|png|gif)($|\?)/i.test(src)) {
+    // allow root public files like /incense.jpeg and /Products/...
+    if (!src.startsWith("/Products/") && !/^\/[^/]+\.(jpe?g|png|gif)($|\?)/i.test(src)) return "";
+  }
+  return src.replace(/\.(jpe?g|png|gif)($|\?)/i, ".webp$2");
+};
+
 // Navigation / category tabs (PDF §9.1): Shop All + the (Admin-managed) categories + Curated Collections
 export const shopTabs = (catalog) => [
   { id: "all", label: "Shop All" },
@@ -78,8 +92,7 @@ export const INTENTION_FILTERS = [
   { id: "protection", label: "Protection symbolism", slugs: ["evil-eye-bracelet"] },
   { id: "prosperity", label: "Prosperity", slugs: ["dhan-yog-bracelet"] },
   { id: "calm", label: "Calm", slugs: ["freshwater-pearl-bracelet"] },
-  { id: "love", label: "Love", slugs: ["rose-quartz-bracelet"] },
-  { id: "compassion", label: "Compassion", slugs: ["rhodonite-bracelet"] },
+  { id: "love", label: "Love & healing", slugs: ["rose-quartz-rhodonite-bracelet"] },
 ];
 
 export const matchesFormat = (p, b, format) => {

@@ -71,16 +71,24 @@ function SacredKnowledge() {
           "Explore ancient scriptures, inspiring stories, and daily reflections to nourish your mind and soul."}
       </p>
 
+      <div className={styles.mobileTeaser}>
+        <p>Scriptures, mythology and a daily reflection — wisdom for modern life.</p>
+        <button type="button" className={styles.teaserCta} onClick={() => navigate("/knowledge")}>
+          Explore <span className="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+
       <div className={styles.grid}>
         {displayCards.map((card) => {
           const o = items[card.id] || {};
+          const title = o.title || card.title;
           return (
             <div key={card.id} className={`${styles.card} ${styles[card.theme]}`}>
               <div className={styles.cardContent}>
                 <span className={styles.iconBadge}>
                   <span className="material-symbols-outlined">{card.icon}</span>
                 </span>
-                <h3 className={styles.cardTitle}>{o.title || card.title}</h3>
+                <h3 className={styles.cardTitle}>{title}</h3>
                 <p className={styles.cardDescription}>{o.description || card.description}</p>
                 <button className={styles.cardLink} onClick={() => navigate(card.route)}>
                   {o.cta || card.cta} <span className="material-symbols-outlined">arrow_forward</span>
@@ -88,9 +96,11 @@ function SacredKnowledge() {
               </div>
               <img
                 src={o.image ? resolveHomepageImageUrl(o.image) : card.image || PLACEHOLDER_IMAGE}
-                alt=""
+                alt={`${title} illustration`}
                 className={styles.cardImage}
-                aria-hidden="true"
+                loading="lazy"
+                width={420}
+                height={320}
               />
             </div>
           );

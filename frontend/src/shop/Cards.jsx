@@ -6,6 +6,7 @@ import { useCart } from "../context/CartContext";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { inr, imgSrc, productInStock, bundleInStock, variantInStock, productLine, bundleContentLines, braceletsSamePrice } from "./shopUtils";
 import { addToCartEvent } from "../utils/analytics";
+import ResponsiveImg from "../components/ResponsiveImg";
 
 const FRAG_ORDER = ["guggal", "oud", "sandalwood"];
 
@@ -34,7 +35,14 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
     <article className={`${styles.card} ${dense ? styles.cardDense : ""} ${inStock ? "" : styles.cardDim}`}>
       <div className={styles.cardImg}>
         <Link to={`/product/${p.slug}`} tabIndex={-1} aria-hidden="true" className={styles.imgLink}>
-          <img src={imgSrc(p.image)} alt={p.name} loading="lazy" />
+          <ResponsiveImg
+            src={p.image}
+            alt={p.name}
+            loading="lazy"
+            width={640}
+            height={640}
+            sizes="(max-width: 480px) 50vw, (max-width: 900px) 33vw, 280px"
+          />
         </Link>
         {!inStock && <span className={`${styles.ribbon} ${styles.ribbonOff}`}>Out of stock</span>}
         <button type="button" className={styles.quickBtn} onClick={() => setQuickOpen(true)} aria-label={`Quick view ${p.name}`}>

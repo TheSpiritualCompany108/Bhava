@@ -228,7 +228,7 @@ export default function CartPage() {
             {/* Section 8.3 — one relevant add-on, never forced */}
             {addOnProduct && (
               <div className={x.addon}>
-                <img src={imgSrc(addOnProduct.image)} alt="" />
+                <img src={imgSrc(addOnProduct.image)} alt={addOnProduct.name || "Suggested add-on"} loading="lazy" width={96} height={96} />
                 <div className={x.addonText}>
                   <span className={x.addonK}>Completes your ritual</span>
                   <strong>{addOnProduct.name}{addOn.variant ? ` — ${catalog.fragrances[addOn.variant]?.label}` : ""} · {inr(addOnProduct.price)}</strong>
@@ -319,7 +319,7 @@ export default function CartPage() {
                 return (
                   <article key={p.slug} className={`${x.likeCard} ${inStock ? "" : x.likeCardDim}`}>
                     <Link to={`/product/${p.slug}`} className={x.likeImg} tabIndex={-1} aria-hidden="true">
-                      <img src={imgSrc(p.image)} alt="" loading="lazy" />
+                      <img src={imgSrc(p.image)} alt={p.name} loading="lazy" width={160} height={160} />
                       {!inStock && <span className={x.likeOos}>Out of stock</span>}
                     </Link>
                     <div className={x.likeBody}>

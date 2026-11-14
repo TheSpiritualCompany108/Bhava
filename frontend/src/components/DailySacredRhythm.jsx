@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./DailySacredRhythm.module.css";
 
 const pillars = [
@@ -28,12 +29,20 @@ const pillars = [
 ];
 
 function DailySacredRhythm() {
+  const navigate = useNavigate();
   return (
     <section className={styles.section} aria-labelledby="daily-sacred-rhythm-title">
       <div className={styles.inner}>
         <h2 id="daily-sacred-rhythm-title" className={styles.title}>
           Your Daily Sacred Rhythm
         </h2>
+
+        <div className={styles.mobileTeaser}>
+          <p>Morning puja, dhyana, mantra and evening reflection — a short daily rhythm.</p>
+          <button type="button" className={styles.teaserCta} onClick={() => navigate("/knowledge")}>
+            Explore <span className="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
 
         <div className={styles.grid}>
           {pillars.map((pillar, i) => (
