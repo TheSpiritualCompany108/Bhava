@@ -8,7 +8,7 @@
 //         <div className={styles.textCol}>
 //           <h2 id="sacred-mission-title" className={styles.title}>Our Sacred Mission</h2>
 //           <p className={styles.body}>
-//             Bhava is redefining the spiritual economy by honoring ancient wisdom through premium,
+//             Bhava: is redefining the spiritual economy by honoring ancient wisdom through premium,
 //             authentic products. We believe that spirituality deserves the same craftsmanship and
 //             excellence as any luxury category.
 //           </p>
@@ -54,7 +54,7 @@ export default function SacredMissionSection() {
           </h2>
           <p className={styles.body}>
             Devotion has become occasional. Structure returns it gently to
-            daily life. At Bhava, we do not create products; we design quiet
+            daily life. At Bhava:, we do not create products; we design quiet
             systems for presence.
           </p>
           <ul className={styles.list}>

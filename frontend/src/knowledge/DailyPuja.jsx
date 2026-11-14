@@ -80,7 +80,7 @@ function DailyPuja() {
       instructions: [
         "Chant with an open heart for all beings.",
         "Feel compassion expanding outward.",
-        "End with Loka Samasta Sukhino Bhavantu.",
+        "End with Loka Samasta Sukhino Bhava:ntu.",
       ],
       sanskrit:
         "सर्वे भवन्तु सुखिनः\nसर्वे सन्तु निरामयाः।\nसर्वे भद्राणि पश्यन्तु\nमा कश्चिद् दुःखभाग्भवेत्॥\n\nलोकाः समस्ताः सुखिनो भवन्तु।",

@@ -144,8 +144,8 @@ function DailyHoroscope() {
 
   const handleShare = async () => {
     const shareData = {
-      title: `${activeSign.name} Daily Horoscope — BHAVA`,
-      text: data?.horoscope || "Check today's horoscope on BHAVA.",
+      title: `${activeSign.name} Daily Horoscope — BHAVA:`,
+      text: data?.horoscope || "Check today's horoscope on BHAVA:.",
       url: window.location.href,
     };
     if (navigator.share) {

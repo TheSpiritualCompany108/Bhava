@@ -78,13 +78,13 @@ const discussions = [
 
 const testimonials = [
   {
-    text: "Bhava's community gave me a spiritual home outside India. The weekly satsangs kept me grounded during the hardest year of my life.",
+    text: "Bhava:'s community gave me a spiritual home outside India. The weekly satsangs kept me grounded during the hardest year of my life.",
     author: "Priya Sharma",
     location: "Mumbai → London",
     stars: 5,
   },
   {
-    text: "I found my meditation teacher through a Bhava forum thread. That single connection changed my practice completely.",
+    text: "I found my meditation teacher through a Bhava: forum thread. That single connection changed my practice completely.",
     author: "Rajesh Iyer",
     location: "Bengaluru",
     stars: 5,
@@ -96,7 +96,7 @@ const testimonials = [
     stars: 5,
   },
   {
-    text: "As a Hindu living in Canada, Bhava Community makes me feel connected to my roots every single day.",
+    text: "As a Hindu living in Canada, Bhava: Community makes me feel connected to my roots every single day.",
     author: "Arjun Mehta",
     location: "Vancouver",
     stars: 5,
@@ -157,7 +157,7 @@ function CommunityPage() {
       {/* ── Hero ── */}
       <div className={styles.hero}>
         <div className={styles.heroBg} />
-        <p className={styles.eyebrow}>BHAVA COMMUNITY</p>
+        <p className={styles.eyebrow}>BHAVA: COMMUNITY</p>
         <h1 className={styles.heroTitle}>
           Where Seekers <span className={styles.accent}>Come Together</span>
         </h1>

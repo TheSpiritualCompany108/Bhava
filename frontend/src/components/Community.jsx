@@ -131,7 +131,7 @@ function Community() {
         <header className={styles.header}>
           <p className={styles.kicker}>Lived rituals · Verified voices</p>
           <h2 id="home-reviews" className={styles.title}>
-            From Those Who Keep Bhava Close
+            From Those Who Keep Bhava: Close
           </h2>
           <p className={styles.sub}>
             Quiet mornings. Soft smoke. A house that feels a little more sacred — in their own words.
@@ -151,7 +151,7 @@ function Community() {
             <span className={styles.trustDivider} aria-hidden="true" />
             <div className={styles.trustItem}>
               <span className={styles.trustSeal}>✦</span>
-              <span className={styles.trustLabel}>from real Bhava orders</span>
+              <span className={styles.trustLabel}>from real Bhava: orders</span>
             </div>
           </div>
         </header>

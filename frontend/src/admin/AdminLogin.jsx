@@ -36,14 +36,14 @@ export default function AdminLogin() {
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "70vh" }}>
       <div style={{ width: 520, background: "#fff", padding: 36, borderRadius: 8, boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}>
         <h2 style={{ textAlign: "center", fontFamily: "Canela, serif" }}>Admin Login</h2>
-        <p style={{ textAlign: "center", color: "#666" }}>Sign in to access the dynamic content database.</p>
+        <p style={{ textAlign: "center", color: "#6f6064" }}>Sign in to access the dynamic content database.</p>
         <form onSubmit={submit} style={{ marginTop: 18 }}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: "block", marginBottom: 8, color: "#333", fontWeight: 600 }}>Email Address</label>
+            <label style={{ display: "block", marginBottom: 8, color: "#4A0B1D", fontWeight: 600 }}>Email Address</label>
             <input required value={email} onChange={(e)=>setEmail(e.target.value)} type="email" style={{ width: "100%", padding: 12, borderRadius: 6, border: "1px solid #e6e6e6" }} />
           </div>
           <div style={{ marginBottom: 18 }}>
-            <label style={{ display: "block", marginBottom: 8, color: "#333", fontWeight: 600 }}>Administrator Password</label>
+            <label style={{ display: "block", marginBottom: 8, color: "#4A0B1D", fontWeight: 600 }}>Administrator Password</label>
             <input required value={password} onChange={(e)=>setPassword(e.target.value)} type="password" style={{ width: "100%", padding: 12, borderRadius: 6, border: "1px solid #e6e6e6" }} />
           </div>
           <button type="submit" style={{ width: "100%", padding: 14, background: "#ea7f3b", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700 }}>{loading ? "Authenticating..." : "Sign In"}</button>

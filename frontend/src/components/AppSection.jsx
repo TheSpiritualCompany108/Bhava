@@ -49,7 +49,7 @@ function AppSection() {
         <div className={styles.visual}>
           <img
             src="/App mockups.png"
-            alt="Bhava App Mockup"
+            alt="Bhava: App Mockup"
             className={styles.mockupImg}
           />
         </div>

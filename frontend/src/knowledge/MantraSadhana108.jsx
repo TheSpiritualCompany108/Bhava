@@ -402,7 +402,7 @@ function MantraSadhana108() {
 
   const handleShare = async () => {
     const shareData = {
-      title: "108-Day Mantra Sādhana — BHAVA",
+      title: "108-Day Mantra Sādhana — BHAVA:",
       text: "Chant sacred mantras for 108 consecutive days and experience profound inner transformation through sound and devotion.",
       url: window.location.href,
     };

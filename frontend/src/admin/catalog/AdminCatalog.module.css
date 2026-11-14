@@ -1,5 +1,5 @@
 /* Admin → Catalogue / Collections / Inventory. Matches the existing Admin palette (maroon #4A0B1D · saffron #E07B39). */
-.wrap { flex: 1; min-width: 0; padding: 0 0 40px; font-family: 'Neue Haas Grotesk', Inter, system-ui, sans-serif; color: #2b1d21; }
+.wrap { flex: 1; min-width: 0; padding: 0 0 40px; font-family: 'Neue Haas Grotesk', Inter, system-ui, sans-serif; color: #4A0B1D; }
 .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
 .h1 { margin: 0; font-size: 22px; color: #4A0B1D; }
 .sub { margin: 4px 0 0; font-size: 13px; color: #6f6064; max-width: 640px; line-height: 1.5; }
@@ -31,7 +31,7 @@
 .table td { padding: 10px 12px; border-bottom: 1px solid #f3ebdd; vertical-align: middle; }
 .table tr:last-child td { border-bottom: 0; }
 .thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: #f5f0e6; display: block; }
-.name { font-weight: 700; color: #2b1d21; } .muted { color: #8a7a7e; font-size: 12px; }
+.name { font-weight: 700; color: #4A0B1D; } .muted { color: #8a7a7e; font-size: 12px; }
 .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; }
 .rowActions { display: flex; gap: 6px; flex-wrap: wrap; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }

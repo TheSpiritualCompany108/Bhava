@@ -4,42 +4,42 @@ import styles from "./CommunityVoicesAndAncientVerses.module.css";
 /* ─── Community Voices ─── */
 const voices = [
   {
-    quote: "Bhava helps me stay rooted in my dharma, reminds me of the eternal truths that shape my inner world even while navigating modern life.",
+    quote: "Bhava: helps me stay rooted in my dharma, reminds me of the eternal truths that shape my inner world even while navigating modern life.",
     name: "Priya",
     date: "February 3, 2026",
     gradient: "linear-gradient(135deg, rgba(60,20,80,0.75) 0%, rgba(120,40,60,0.65) 100%)",
     quoteColor: "#9a6ae0",
   },
   {
-    quote: "Through Bhava's teachings, I've discovered the profound connection between ancient wisdom and my everyday challenges. It's transformative.",
+    quote: "Through Bhava:'s teachings, I've discovered the profound connection between ancient wisdom and my everyday challenges. It's transformative.",
     name: "Arjun",
     date: "January 28, 2026",
     gradient: "linear-gradient(135deg, rgba(20,40,80,0.75) 0%, rgba(20,80,100,0.65) 100%)",
     quoteColor: "#6a9ae0",
   },
   {
-    quote: "The depth of knowledge presented here is unmatched. Bhava makes the complex teachings of our tradition accessible and meaningful.",
+    quote: "The depth of knowledge presented here is unmatched. Bhava: makes the complex teachings of our tradition accessible and meaningful.",
     name: "Lakshmi",
     date: "February 1, 2026",
     gradient: "linear-gradient(135deg, rgba(80,40,10,0.75) 0%, rgba(120,80,10,0.65) 100%)",
     quoteColor: "#e0a030",
   },
   {
-    quote: "Every morning I begin with Bhava. The mantras and teachings have created a stillness in me that I carry throughout the entire day.",
+    quote: "Every morning I begin with Bhava:. The mantras and teachings have created a stillness in me that I carry throughout the entire day.",
     name: "Rohan",
     date: "January 20, 2026",
     gradient: "linear-gradient(135deg, rgba(10,60,40,0.75) 0%, rgba(20,80,60,0.65) 100%)",
     quoteColor: "#40c080",
   },
   {
-    quote: "I grew up disconnected from my Hindu roots. Bhava brought me back — gently, beautifully, and with so much wisdom and love.",
+    quote: "I grew up disconnected from my Hindu roots. Bhava: brought me back — gently, beautifully, and with so much wisdom and love.",
     name: "Meera",
     date: "February 8, 2026",
     gradient: "linear-gradient(135deg, rgba(60,10,60,0.75) 0%, rgba(100,20,80,0.65) 100%)",
     quoteColor: "#c060c0",
   },
   {
-    quote: "As a seeker new to Vedanta, I was overwhelmed. Bhava broke everything down in a way that felt profound yet completely practical.",
+    quote: "As a seeker new to Vedanta, I was overwhelmed. Bhava: broke everything down in a way that felt profound yet completely practical.",
     name: "Dev",
     date: "January 15, 2026",
     gradient: "linear-gradient(135deg, rgba(20,20,60,0.75) 0%, rgba(40,40,100,0.65) 100%)",

@@ -24,7 +24,7 @@ const corePillars = [
     route: "/knowledge",
   },
   {
-    title: "Bhava Companion",
+    title: "Bhava: Companion",
     description:
       "A quiet digital companion for daily rhythm with practices, audio reminders, and journaling support.",
     cta: "Discover the App",
@@ -63,7 +63,7 @@ const craftingCards = [
   {
     title: "Guided Beyond the Object",
     description:
-      "Every ritual is accompanied by guidance, reflections, and structured practices through Bhava.",
+      "Every ritual is accompanied by guidance, reflections, and structured practices through Bhava:.",
     cta: "Begin Practice",
     route: "/knowledge",
   },
@@ -84,7 +84,7 @@ function AboutUs() {
       {/* Belief + Our Story */}
       <section className={styles.heroSection} aria-labelledby="about-hero-title">
         <div className={styles.inner}>
-          <p className={styles.kicker}>About Bhava</p>
+          <p className={styles.kicker}>About Bhava:</p>
           <h1 id="about-hero-title" className={styles.heroTitle}>
             Quiet Rituals. Meaningful Lives.
           </h1>
@@ -93,7 +93,7 @@ function AboutUs() {
             <div className={styles.beliefCol}>
               <h3 className={styles.colHeading}>The Belief</h3>
               <p className={styles.body}>
-                Bhava was created from a simple belief: that the sacred
+                Bhava: was created from a simple belief: that the sacred
                 belongs in everyday life.
               </p>
               <p className={styles.body}>
@@ -114,7 +114,7 @@ function AboutUs() {
                 connection.
               </p>
               <p className={styles.body}>
-                Bhava exists to help make that return possible by inviting
+                Bhava: exists to help make that return possible by inviting
                 stillness into ordinary moments through thoughtfully crafted
                 objects and guided practices.
               </p>
@@ -155,7 +155,7 @@ function AboutUs() {
       <section className={styles.pillarsSection} aria-labelledby="pillars-title">
         <div className={styles.inner}>
           <p className={styles.kicker}>An Intentional Ecosystem</p>
-          <h2 id="pillars-title" className={styles.sectionTitle}>The Six Core Pillars of Bhava</h2>
+          <h2 id="pillars-title" className={styles.sectionTitle}>The Six Core Pillars of Bhava:</h2>
 
           <div className={styles.pillarsGrid}>
             {corePillars.map((pillar, i) => (
@@ -192,10 +192,10 @@ function AboutUs() {
         </div>
       </section>
 
-      {/* The Bhava Experience */}
+      {/* The Bhava: Experience */}
       <section className={styles.experienceSection} aria-labelledby="experience-title">
         <div className={styles.inner}>
-          <p className={styles.kickerCentered}>The Bhava Experience</p>
+          <p className={styles.kickerCentered}>The Bhava: Experience</p>
           <h2 id="experience-title" className={styles.experienceTitle}>
             An Ecosystem for Intentional Living
           </h2>

@@ -14,7 +14,7 @@ export default function AskBhavaFab() {
       type="button"
       className={styles.fab}
       onClick={open}
-      aria-label="Ask Bhava"
+      aria-label="Ask Bhava:"
     >
       <span className={styles.ring} aria-hidden="true" />
       <span className={styles.logoWrap} aria-hidden="true">

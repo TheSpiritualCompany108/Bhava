@@ -220,7 +220,7 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
 
           <div className={s.sect}>SEO</div>
           <div className={s.grid2}>
-            <Field label={`SEO title (${form.seoTitle.length}/70)`} full htmlFor="pf-st"><input id="pf-st" className={s.input} maxLength={70} value={form.seoTitle} onChange={(e) => set("seoTitle", e.target.value)} placeholder="Defaults to “Product name | Bhava”" /></Field>
+            <Field label={`SEO title (${form.seoTitle.length}/70)`} full htmlFor="pf-st"><input id="pf-st" className={s.input} maxLength={70} value={form.seoTitle} onChange={(e) => set("seoTitle", e.target.value)} placeholder="Defaults to “Product name | Bhava:”" /></Field>
             <Field label={`SEO description (${form.seoDescription.length}/170)`} full htmlFor="pf-sd"><textarea id="pf-sd" className={s.textarea} rows={2} maxLength={170} value={form.seoDescription} onChange={(e) => set("seoDescription", e.target.value)} placeholder="Defaults to the short description" /></Field>
           </div>
 

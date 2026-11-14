@@ -105,7 +105,7 @@ async function buildInvoiceHtml(order) {
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Bhava Invoice #${code}</title>
+  <title>Bhava: Invoice #${code}</title>
   <style>
     *{box-sizing:border-box}
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
@@ -139,7 +139,7 @@ async function buildInvoiceHtml(order) {
     <div class="top">
       <div>
         <div class="brandRow">
-          <img class="brandLogo" src="${logoUrl}" alt="Bhava"/>
+          <img class="brandLogo" src="${logoUrl}" alt="Bhava:"/>
           <h1 class="brand">Bhava:</h1>
         </div>
         <p class="tag">Tax Invoice / Bill of Supply</p>
@@ -177,7 +177,7 @@ async function buildInvoiceHtml(order) {
       <div class="row"><span>Shipping</span><span>₹${shipping.toLocaleString("en-IN")}</span></div>
       <div class="row grand"><span>Total</span><span>₹${total.toLocaleString("en-IN")}</span></div>
     </div>
-    <p class="foot">This is a computer-generated invoice for your Bhava order. Keep it for your records.</p>
+    <p class="foot">This is a computer-generated invoice for your Bhava: order. Keep it for your records.</p>
   </div>
 </body>
 </html>`;
@@ -192,7 +192,7 @@ async function downloadInvoice(order) {
   // Reliable file download (no popup blocker)
   const a = document.createElement("a");
   a.href = url;
-  a.download = `Bhava-Invoice-${code}.html`;
+  a.download = `Bhava:-Invoice-${code}.html`;
   document.body.appendChild(a);
   a.click();
   a.remove();

@@ -117,14 +117,13 @@ async function buildShareImage(quoteText, refText) {
   ctx.letterSpacing = "2px";
   ctx.fillText(refText.toUpperCase(), W / 2, refY);
 
-  // BHAVA logo area
+  // BHAVA: logo area (word + orange colon)
   const logoY = refY + refH;
   const logoImg = await loadImage("/logo(3).png");
   const logoSize = 36;
   // measure text widths to center the whole row
   ctx.font = `800 22px "Arial Black", "Arial", sans-serif`;
   const bhavaW = ctx.measureText("BHAVA").width;
-  ctx.font = `800 22px "Arial Black", "Arial", sans-serif`;
   const colonW = ctx.measureText(":").width;
   const gap = 10; // space between logo and "BHAVA"
   const colonGap = 4;
@@ -244,7 +243,7 @@ function GitaSlider() {
   };
 
   const handleEmail = () => {
-    const subject = "Daily Wisdom — BHAVA";
+    const subject = "Daily Wisdom — BHAVA:";
     const body = `${shareText}\n\n${shareUrl}`;
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };

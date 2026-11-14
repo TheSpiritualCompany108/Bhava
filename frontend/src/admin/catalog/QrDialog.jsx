@@ -8,6 +8,7 @@ const SITE = (import.meta.env.VITE_SITE_URL || "https://www.bhavaglobal.com").re
 const CARD = {
   width: 720,
   height: 960,
+  scale: 3,
   bg: "#FFF8F0",
   border: "#E07B39",
   brand: "#D57F45",
@@ -30,7 +31,7 @@ export function productQrDisplayPath(slug) {
 async function waitForFonts() {
   if (!document.fonts?.ready) return;
   try {
-    await document.fonts.load('700 72px "Canela"');
+    await document.fonts.load('500 72px "Canela"');
     await document.fonts.load('500 28px "Neue Haas Grotesk"');
     await document.fonts.ready;
   } catch {
@@ -38,29 +39,58 @@ async function waitForFonts() {
   }
 }
 
-/** Compose branded Bhava QR card (matches store print template). */
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+/** Knock out near-black pixels so gold mark sits clean on cream badge. */
+function logoOnClear(img) {
+  const c = document.createElement("canvas");
+  c.width = img.naturalWidth || img.width;
+  c.height = img.naturalHeight || img.height;
+  const x = c.getContext("2d");
+  x.drawImage(img, 0, 0);
+  const frame = x.getImageData(0, 0, c.width, c.height);
+  const d = frame.data;
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i] < 42 && d[i + 1] < 42 && d[i + 2] < 42) d[i + 3] = 0;
+  }
+  x.putImageData(frame, 0, 0);
+  return c;
+}
+
+/** Compose branded Bhava: QR card (matches store print template). */
 async function buildBrandedQrCard(targetUrl, displayPath) {
   await waitForFonts();
 
   const qrSize = 420;
+  // H = high redundancy so a center logo still scans
   const qrDataUrl = await QRCode.toDataURL(targetUrl, {
-    width: qrSize,
+    width: qrSize * CARD.scale,
     margin: 1,
-    errorCorrectionLevel: "M",
+    errorCorrectionLevel: "H",
     color: { dark: CARD.ink, light: CARD.bg },
   });
 
-  const qrImg = await new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = qrDataUrl;
-  });
+  const [qrImg, logoImg] = await Promise.all([
+    loadImage(qrDataUrl),
+    loadImage("/bhava-icon.png"),
+  ]);
 
   const canvas = document.createElement("canvas");
-  canvas.width = CARD.width;
-  canvas.height = CARD.height;
+  canvas.width = CARD.width * CARD.scale;
+  canvas.height = CARD.height * CARD.scale;
   const ctx = canvas.getContext("2d");
+  // Draw in logical card units while exporting a sharp 2160 × 2880 PNG.
+  ctx.scale(CARD.scale, CARD.scale);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 
   // Card background
   ctx.fillStyle = CARD.bg;
@@ -80,12 +110,12 @@ async function buildBrandedQrCard(targetUrl, displayPath) {
   );
   ctx.stroke();
 
-  // BHAVA
+  // BHAVA:
   ctx.fillStyle = CARD.brand;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = '700 72px "Canela", "Cormorant Garamond", Georgia, serif';
-  ctx.fillText("BHAVA", CARD.width / 2, 130);
+  ctx.font = '500 72px "Canela", "Cormorant Garamond", Georgia, serif';
+  ctx.fillText("BHAVA:", CARD.width / 2, 130);
 
   // Sacred Collections
   ctx.fillStyle = CARD.ink;
@@ -96,6 +126,46 @@ async function buildBrandedQrCard(targetUrl, displayPath) {
   const qrX = (CARD.width - qrSize) / 2;
   const qrY = 250;
   ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+  // Bhava logo in QR center — cream badge (#FFF8F0) + clear black PNG bg
+  // bhava-icon.png is 400×573 (taller than wide) — never force a square draw box
+  const badgeR = 56;
+  const maxLogo = badgeR * 1.55;
+  const clearLogo = logoOnClear(logoImg);
+  const natW = clearLogo.width;
+  const natH = clearLogo.height;
+  const scale = Math.min(maxLogo / natW, maxLogo / natH);
+  const logoW = natW * scale;
+  const logoH = natH * scale;
+  const cx = qrX + qrSize / 2;
+  const cy = qrY + qrSize / 2;
+
+  ctx.save();
+  // Soft cream halo so QR modules don't crash into the badge
+  ctx.beginPath();
+  ctx.arc(cx, cy, badgeR + 8, 0, Math.PI * 2);
+  ctx.fillStyle = CARD.bg; // #FFF8F0
+  ctx.fill();
+
+  // Cream disc (requested logo bg)
+  ctx.beginPath();
+  ctx.arc(cx, cy, badgeR, 0, Math.PI * 2);
+  ctx.fillStyle = "#FFF8F0";
+  ctx.fill();
+
+  // Clip logo to the disc
+  ctx.beginPath();
+  ctx.arc(cx, cy, badgeR - 2, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.drawImage(clearLogo, cx - logoW / 2, cy - logoH / 2, logoW, logoH);
+  ctx.restore();
+
+  // Thin orange ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, badgeR + 1.5, 0, Math.PI * 2);
+  ctx.strokeStyle = CARD.border;
+  ctx.lineWidth = 3;
+  ctx.stroke();
 
   // Footer copy
   ctx.fillStyle = CARD.ink;
