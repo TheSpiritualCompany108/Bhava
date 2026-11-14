@@ -61,7 +61,7 @@
 
 .heading {
   color: #d57f45;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 24px;
   margin: 0;
   display: flex;
@@ -75,15 +75,16 @@
 .dotsBhava {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   justify-content: center;
   align-items: center;
-  margin-bottom: 2px;
+  margin-left: -2px;
+  transform: translateY(1px);
 }
 
 .dotName {
-  width: 6px;
-  height: 6px;
+  width: 3.5px;
+  height: 3.5px;
   background-color: #d57f45;
   border-radius: 50%;
   display: block;
@@ -747,12 +748,12 @@
   }
 
   .dotName {
-    width: 5px;
-    height: 5px;
+    width: 3px;
+    height: 3px;
   }
 
   .dotsBhava {
-    gap: 3px;
+    gap: 4px;
   }
 
   .navbarContainer {

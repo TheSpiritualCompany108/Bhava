@@ -28,7 +28,7 @@ function BhavaOptionDialog({ isOpen, onClose, onSelectChat, onSelectCall }) {
         <div className={styles.header}>
           <div className={styles.iconCircle} aria-hidden="true">
             <img
-              src={encodeURI("/logo(3).png")}
+              src="/bhava-icon.png"
               alt=""
               className={styles.brandLogo}
               width={36}

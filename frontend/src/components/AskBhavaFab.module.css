@@ -77,18 +77,21 @@
 }
 
 .logo {
-  width: 96%;
-  height: 96%;
+  width: auto;
+  height: 78%;
+  max-width: 78%;
   object-fit: contain;
-  object-position: center;
+  object-position: center center;
   display: block;
   mix-blend-mode: lighten;
+  transform-origin: center center;
+  transform: translateY(-2px);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .fab:hover .logo,
 .fab:focus-visible .logo {
-  transform: scale(1.06);
+  transform: translateY(-2px) scale(1.06);
 }
 
 .label {
@@ -143,7 +146,7 @@
     transform: translateX(-10px);
   }
   .fab:hover .logo {
-    transform: none;
+    transform: translateY(-2px);
   }
   .fab:hover .ring {
     opacity: 1;
