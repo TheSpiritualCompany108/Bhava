@@ -12,7 +12,7 @@ const slides = [
     image: "./Slide 01.png",
     title: ["A Daily Ritual.", "A Different Life."],
     description:
-      "Eleven intentional minutes each day can create remarkable clarity over time. Bhava helps you build a practice that quietly becomes part of who you are.",
+      "Eleven intentional minutes each day can create remarkable clarity over time. Bhava: helps you build a practice that quietly becomes part of who you are.",
     cta: "Begin Your Ritual",
     ctaPath: "/about",
   },
@@ -20,7 +20,7 @@ const slides = [
     image: "./Slide 02.png",
     title: ["Objects Made", "For Practice."],
     description:
-      "Every Bhava object has one purpose: to support your daily rhythm with simplicity, beauty, and intention.",
+      "Every Bhava: object has one purpose: to support your daily rhythm with simplicity, beauty, and intention.",
     cta: "Explore Ritual Systems",
     ctaPath: "/products",
   },
@@ -165,7 +165,7 @@ function HomeMain() {
               exit="exit"
             >
               <h1 className={styles.homeMainHeroTitle}>
-                <span className={styles.homeMainElevateText}> {o.headline || "Awaken Bhava : Live Divine"}</span>
+                <span className={styles.homeMainElevateText}> {o.headline || "Awaken Bhava: : Live Divine"}</span>
                 <span className={styles.homeMainHighlight}>{o.highlight || "Every Day"}</span>
               </h1>
 

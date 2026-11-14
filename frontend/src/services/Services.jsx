@@ -100,7 +100,7 @@ function Services() {
 
       {/* ── Hero ── */}
       <div className={styles.hero}>
-        <p className={styles.eyebrow}>BHAVA SACRED SERVICES</p>
+        <p className={styles.eyebrow}>BHAVA: SACRED SERVICES</p>
         <h1 className={styles.heroTitle}>
           Spiritual <span className={styles.accent}>Services</span>
         </h1>
@@ -177,7 +177,7 @@ function Services() {
         <div className={styles.ctaInner}>
           <h2 className={styles.ctaTitle}>Begin Your Sacred Journey Today</h2>
           <p className={styles.ctaSub}>
-            Over 50,000 devotees have deepened their practice with Bhava services.
+            Over 50,000 devotees have deepened their practice with Bhava: services.
             Your first puja consultation is free.
           </p>
           <div className={styles.ctaBtns}>

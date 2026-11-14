@@ -159,7 +159,7 @@ function ProductDetailInner({ slug }) {
 
   const origin = siteOrigin();
   const seoDesc = clipDesc(product.seoDescription || product.description, product.tagline || product.pack);
-  const seoTitle = product.seoTitle || `${product.name}${product.pack ? ` – ${product.pack}` : ""} | Bhava`;
+  const seoTitle = product.seoTitle || `${product.name}${product.pack ? ` – ${product.pack}` : ""} | Bhava:`;
 
   return (
     <div className={styles.page}>

@@ -11,7 +11,7 @@ function KnowledgeHero() {
           <span style={{ color: "#E07B39" }}>A simple ritual creates stillness.</span>
         </h1>
         <div className={styles.heroBtns}>
-          <button className={styles.btnPrimary}>Begin with Bhava</button>
+          <button className={styles.btnPrimary}>Begin with Bhava:</button>
         </div>
       </div>
       <div className={styles.heroesRight}>

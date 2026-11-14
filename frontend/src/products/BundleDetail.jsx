@@ -129,7 +129,7 @@ function BundleDetailInner({ slug }) {
   return (
     <div className={styles.page}>
       <Seo
-        title={`${bundle.name} – Curated collection | Bhava`}
+        title={`${bundle.name} – Curated collection | Bhava:`}
         description={clipDesc(bundle.description, bundle.tagline)}
         canonical={`${origin}/collection/${bundle.slug}`}
         image={origin + imgSrc(hero).replace(origin, "")}

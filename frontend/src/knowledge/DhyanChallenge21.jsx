@@ -186,7 +186,7 @@ function DhyanChallenge21() {
 
   const handleShare = async () => {
     const shareData = {
-      title: "21-Day Dhyān Challenge — BHAVA",
+      title: "21-Day Dhyān Challenge — BHAVA:",
       text: "Twenty-one days of guided meditation to transform your consciousness and cultivate lasting stillness.",
       url: window.location.href,
     };

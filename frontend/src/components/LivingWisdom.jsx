@@ -26,7 +26,7 @@ function LivingWisdom() {
             presence.
           </p>
           <button className={styles.beginBtn} onClick={() => navigate("/knowledge")}>
-            Begin with Bhava
+            Begin with Bhava:
           </button>
         </div>
 

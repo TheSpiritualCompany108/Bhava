@@ -9,7 +9,7 @@ const categories = [
     count: 10,
     faqs: [
       { q: "Are your products temple-blessed and authentic?", a: "Yes. Every product in our collection is sourced directly from verified temple artisans and traditional manufacturers across India. We partner with over 500 temples and certified suppliers to ensure every item carries genuine spiritual intent and purity." },
-      { q: "Is Bhava: certified by regulatory bodies?", a: "Yes. Bhava is registered under FSSAI for all applicable consumable products and complies with BIS standards for incense and dhoop. All certifications are available for review upon request." },
+      { q: "Is Bhava: certified by regulatory bodies?", a: "Yes. Bhava: is registered under FSSAI for all applicable consumable products and complies with BIS standards for incense and dhoop. All certifications are available for review upon request." },
     ],
   },
   {
@@ -34,10 +34,10 @@ const categories = [
   {
     icon: "📱",
     title: "Wellness App",
-    desc: "Learn about the Bhava app features, launch dates and subscriptions",
+    desc: "Learn about the Bhava: app features, launch dates and subscriptions",
     count: 5,
     faqs: [
-      { q: "When is the Wellness App launching?", a: "The Bhava Wellness App is currently in final beta and is set to launch in Q2 2025 on both iOS and Android. Join our waitlist for 3 months of premium access free at launch." },
+      { q: "When is the Wellness App launching?", a: "The Bhava: Wellness App is currently in final beta and is set to launch in Q2 2025 on both iOS and Android. Join our waitlist for 3 months of premium access free at launch." },
     ],
   },
   {

@@ -262,10 +262,10 @@ function KundliGenerator() {
   const handleShare = async () => {
     const src = result;
     const shareData = {
-      title: "My Kundli — BHAVA",
+      title: "My Kundli — BHAVA:",
       text: src
         ? `My Kundli: Ascendant ${src.ascendant} (${src.rashi}), Moon Sign ${src.moonSign}, Nakshatra ${src.nakshatra}.`
-        : "Generate your Kundli on BHAVA.",
+        : "Generate your Kundli on BHAVA:.",
       url: window.location.href,
     };
     if (navigator.share) {

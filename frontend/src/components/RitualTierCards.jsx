@@ -26,7 +26,7 @@ export const homeRitualTiers = [
     items: [
       "11 Ready Ghee Diyas",
       "11 Premium Agarbatti",
-      "Mini Bhava Pyramid (80mm)",
+      "Mini Bhava: Pyramid (80mm)",
       "Kumkum & Pooja Oil",
       "Guided Ritual Card",
     ],
@@ -41,7 +41,7 @@ export const homeRitualTiers = [
     description: "Designed to make beautiful consistency effortless.",
     items: [
       "21 Ghee Diyas & Agarbatti",
-      "Bhava Pyramid (110mm)",
+      "Bhava: Pyramid (110mm)",
       "Brass Bell & Small Shankh",
       "Chandan, Kumkum & Camphor",
       "Guided 3-Step Ritual Card",
@@ -73,7 +73,7 @@ export const premiumRitualTiers = [
     name: "Signature Ritual",
     price: "₹5,100",
     tag: "Flagship · Coming Soon",
-    tagline: "The complete, ultimate Bhava experience.",
+    tagline: "The complete, ultimate Bhava: experience.",
     description: "Beautiful homes and meaningful gifting includes:",
     items: [
       "51 Ready Diyas & 51 Premium Agarbatti",

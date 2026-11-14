@@ -94,7 +94,7 @@ export default function Products() {
     [bannerSlides],
   );
   const kicker = bannerData?.kicker || "The Spiritual Company";
-  const title = bannerData?.title || "Shop Bhava";
+  const title = bannerData?.title || "Shop Bhava:";
   const subtitle =
     bannerData?.subtitle ||
     "Sacred Beads, incense, Sambrani and camphor — chosen with care for a more considered daily ritual.";
@@ -212,8 +212,8 @@ export default function Products() {
   return (
     <div className={styles.page}>
       <Seo
-        title="Shop incense, Sambrani, camphor and sacred beads | Bhava"
-        description={clipDesc("Sacred Notes incense, Pure Ritual, Sacred Ember, Sambrani, camphor and six intention bracelets from Bhava by The Spiritual Company.")}
+        title="Shop incense, Sambrani, camphor and sacred beads | Bhava:"
+        description={clipDesc("Sacred Notes incense, Pure Ritual, Sacred Ember, Sambrani, camphor and six intention bracelets from Bhava: by The Spiritual Company.")}
         canonical={`${siteOrigin()}/products`}
       />
       {toast && (
@@ -231,7 +231,7 @@ export default function Products() {
             <img
               key={bannerSlides[i]?.id || src}
               src={src}
-              alt={i === bannerIndex ? "Bhava — shop sacred beads, incense, Sambrani and camphor" : ""}
+              alt={i === bannerIndex ? "Bhava: — shop sacred beads, incense, Sambrani and camphor" : ""}
               className={`${styles.bannerImg} ${i === bannerIndex ? styles.bannerImgActive : ""}`}
               fetchPriority={i === 0 ? "high" : "low"}
               aria-hidden={i !== bannerIndex}

@@ -91,7 +91,7 @@ const HERO_SLIDES = [
     id: "slide-0",
     label: "Slide 1 (main hero)",
     type: "hero",
-    defaultHeadline: "Awaken Bhava : Live Divine",
+    defaultHeadline: "Awaken Bhava: : Live Divine",
     defaultHighlight: "Every Day",
     defaultDescription: "A Simple Daily Ritual System For Modern Homes.",
     defaultDescription1: "Ritual is not reserved for special occasions. It is the quiet return to yourself, every single day.",
@@ -104,7 +104,7 @@ const HERO_SLIDES = [
     type: "slide",
     defaultTitle0: "A Daily Ritual.",
     defaultTitle1: "A Different Life.",
-    defaultDescription: "Eleven intentional minutes each day can create remarkable clarity over time. Bhava helps you build a practice that quietly becomes part of who you are.",
+    defaultDescription: "Eleven intentional minutes each day can create remarkable clarity over time. Bhava: helps you build a practice that quietly becomes part of who you are.",
     defaultCta: "Begin Your Ritual",
   },
   {
@@ -113,7 +113,7 @@ const HERO_SLIDES = [
     type: "slide",
     defaultTitle0: "Objects Made",
     defaultTitle1: "For Practice.",
-    defaultDescription: "Every Bhava object has one purpose: to support your daily rhythm with simplicity, beauty, and intention.",
+    defaultDescription: "Every Bhava: object has one purpose: to support your daily rhythm with simplicity, beauty, and intention.",
     defaultCta: "Explore Ritual Systems",
   },
   {
@@ -179,9 +179,9 @@ const HOMEPAGE_TABS = [
   {
     key: "community",
     label: "Community",
-    hint: "Near the bottom of the homepage: the \"Living with Bhava\" testimonials row.",
+    hint: "Near the bottom of the homepage: the \"Living with Bhava:\" testimonials row.",
     defaultKicker: "Community Stories",
-    defaultTitle: "Living with Bhava :",
+    defaultTitle: "Living with Bhava: :",
   },
 ];
 
@@ -201,13 +201,13 @@ function HomepageField({ label, value, defaultValue, onChange, placeholder, text
       borderRadius: 4,
       border: "1px solid #ddd",
       fontSize: 13,
-      color: hasValue ? "#000" : "#888",
+      color: hasValue ? "#4A0B1D" : "#8a7a7e",
       ...(textarea ? { minHeight: 50, resize: "vertical" } : {}),
     },
   };
   return (
     <div>
-      <label style={{ display: "block", marginBottom: 4, fontSize: 11, fontWeight: 600, color: hasValue ? "#4A0B1D" : "#999" }}>
+      <label style={{ display: "block", marginBottom: 4, fontSize: 11, fontWeight: 600, color: hasValue ? "#4A0B1D" : "#8a7a7e" }}>
         {label} {!hasValue && "(showing default — edit to override)"}
       </label>
       {textarea ? <textarea {...shared} /> : <input {...shared} />}
@@ -1070,9 +1070,22 @@ export default function AdminPage() {
   const logout = () => { localStorage.removeItem("bhava_admin_token"); navigate("/admin/login"); };
 
   return (
-    <div className="adm-root" style={{ display: "flex", minHeight: "100vh", background: "#f7f4f0" }}>
+    <div className="adm-root" style={{ display: "flex", minHeight: "100vh", background: "#f7f4f0", color: "#4A0B1D" }}>
       {/* Responsive admin shell: on phones the sidebar becomes a scrollable tab row (no horizontal page overflow) */}
       <style>{`
+        .adm-root {
+          color: #4A0B1D;
+          font-family: "Neue Haas Grotesk", Inter, system-ui, sans-serif;
+        }
+        .adm-root input:not([type="checkbox"]):not([type="radio"]),
+        .adm-root select,
+        .adm-root textarea {
+          color: #4A0B1D;
+        }
+        .adm-root ::placeholder {
+          color: #8a7a7e;
+          opacity: 1;
+        }
         @media (max-width: 800px) {
           .adm-root { flex-direction: column !important; }
           .adm-top { padding: 10px 12px !important; }
@@ -1095,24 +1108,24 @@ export default function AdminPage() {
         <h3 style={{ marginTop: 0, color: "#4A0B1D", fontSize: 14 }}>Categories</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
           {categories.filter((c) => c !== "Products").map(c => (
-            <li key={c} onClick={() => { setSection("tiles"); setActiveCategory(c); setSelectedTile(null); setEditingId(null); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "tiles" && c === activeCategory ? "#E07B39" : 'transparent', color: section === "tiles" && c === activeCategory ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>{c}</li>
+            <li key={c} onClick={() => { setSection("tiles"); setActiveCategory(c); setSelectedTile(null); setEditingId(null); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "tiles" && c === activeCategory ? "#E07B39" : 'transparent', color: section === "tiles" && c === activeCategory ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>{c}</li>
           ))}
         </ul>
 
         <h3 style={{ marginTop: 20, color: "#4A0B1D", fontSize: 14, borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>Shop</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
           {[["catalogProducts", "🛍️ Catalogue"], ["catalogBundles", "🎁 Collections"], ["inventory", "📦 Inventory"]].map(([key, label]) => (
-            <li key={key} onClick={() => setSection(key)} style={{ cursor: "pointer", padding: "10px 12px", background: section === key ? "#E07B39" : "transparent", color: section === key ? "#fff" : "#000", borderRadius: 8, marginBottom: 6, fontSize: 13 }}>{label}</li>
+            <li key={key} onClick={() => setSection(key)} style={{ cursor: "pointer", padding: "10px 12px", background: section === key ? "#E07B39" : "transparent", color: section === key ? "#fff" : "#4A0B1D", borderRadius: 8, marginBottom: 6, fontSize: 13 }}>{label}</li>
           ))}
         </ul>
 
         <h3 style={{ marginTop: 20, color: "#4A0B1D", fontSize: 14, borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>Content</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
-          <li onClick={() => { setSection("homepage"); if (homepageTab === "productsBanner") setHomepageTab("hero"); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "homepage" && homepageTab !== "productsBanner" ? "#E07B39" : 'transparent', color: section === "homepage" && homepageTab !== "productsBanner" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🏠 Homepage</li>
-          <li onClick={() => { setSection("homepage"); setHomepageTab("productsBanner"); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "homepage" && homepageTab === "productsBanner" ? "#E07B39" : 'transparent', color: section === "homepage" && homepageTab === "productsBanner" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🛍️ Products Banner</li>
-          <li onClick={() => setSection("quotes")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "quotes" ? "#E07B39" : 'transparent', color: section === "quotes" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>📜 Quotes</li>
-          <li onClick={() => setSection("mantraAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "mantraAudio" ? "#E07B39" : 'transparent', color: section === "mantraAudio" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🎵 108-Day Mantra</li>
-          <li onClick={() => setSection("dhyanAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "dhyanAudio" ? "#E07B39" : 'transparent', color: section === "dhyanAudio" ? '#fff' : '#000', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🧘 21-Day Dhyān</li>
+          <li onClick={() => { setSection("homepage"); if (homepageTab === "productsBanner") setHomepageTab("hero"); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "homepage" && homepageTab !== "productsBanner" ? "#E07B39" : 'transparent', color: section === "homepage" && homepageTab !== "productsBanner" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🏠 Homepage</li>
+          <li onClick={() => { setSection("homepage"); setHomepageTab("productsBanner"); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "homepage" && homepageTab === "productsBanner" ? "#E07B39" : 'transparent', color: section === "homepage" && homepageTab === "productsBanner" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🛍️ Products Banner</li>
+          <li onClick={() => setSection("quotes")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "quotes" ? "#E07B39" : 'transparent', color: section === "quotes" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>📜 Quotes</li>
+          <li onClick={() => setSection("mantraAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "mantraAudio" ? "#E07B39" : 'transparent', color: section === "mantraAudio" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🎵 108-Day Mantra</li>
+          <li onClick={() => setSection("dhyanAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "dhyanAudio" ? "#E07B39" : 'transparent', color: section === "dhyanAudio" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🧘 21-Day Dhyān</li>
 
         </ul>
       </aside>
@@ -1159,7 +1172,7 @@ export default function AdminPage() {
 
               <div style={{ display: "flex", gap: 10 }}>
                 <button type="submit" style={{ flex: 1, padding: 12, background: "#4CAF50", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>{editingQuoteId ? "✓ Save Quote" : "✓ Create Quote"}</button>
-                <button type="button" onClick={() => { resetQuoteForm(); setShowQuoteForm(false); }} style={{ flex: 1, padding: 12, background: "#f0f0f0", color: "#333", border: "1px solid #ddd", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>Cancel</button>
+                <button type="button" onClick={() => { resetQuoteForm(); setShowQuoteForm(false); }} style={{ flex: 1, padding: 12, background: "#f0f0f0", color: "#4A0B1D", border: "1px solid #ddd", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>Cancel</button>
               </div>
             </form>
           )}
@@ -1169,9 +1182,9 @@ export default function AdminPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {quotes.map(q => (
             <div key={q._id} style={{ background: "#fff", padding: 16, borderRadius: 8, border: q.isActive ? "2px solid #4CAF50" : "1px solid #ddd" }}>
-              <p style={{ margin: "0 0 4px 0", fontSize: 10, color: "#999", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>TODAY'S REFLECTION</p>
-              {q.reflection && <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#666" }}>{q.reflection}</p>}
-              <p style={{ margin: "0 0 8px 0", fontSize: 14, color: "#333", fontStyle: "italic" }}>&ldquo;{q.text}&rdquo;</p>
+              <p style={{ margin: "0 0 4px 0", fontSize: 10, color: "#8a7a7e", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>TODAY'S REFLECTION</p>
+              {q.reflection && <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#6f6064" }}>{q.reflection}</p>}
+              <p style={{ margin: "0 0 8px 0", fontSize: 14, color: "#4A0B1D", fontStyle: "italic" }}>&ldquo;{q.text}&rdquo;</p>
               <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#9B3A2A", fontWeight: 700, textTransform: "uppercase" }}>{q.reference || q.ref || "—"}</p>
               {q.isActive && <span style={{ fontSize: 11, color: "#4CAF50", fontWeight: 600 }}>● Live on homepage</span>}
               <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
@@ -1180,7 +1193,7 @@ export default function AdminPage() {
               </div>
             </div>
           ))}
-          {!quotesLoading && quotes.length === 0 && <p style={{ color: "#999", fontSize: 13 }}>No quotes yet. Add one above.</p>}
+          {!quotesLoading && quotes.length === 0 && <p style={{ color: "#8a7a7e", fontSize: 13 }}>No quotes yet. Add one above.</p>}
         </div>
       </main>
       ) : section === "mantraAudio" ? (
@@ -1190,7 +1203,7 @@ export default function AdminPage() {
         {mantraAudioError && <div style={{ padding: 12, background: '#ffe6e6', color: '#900', borderRadius: 6, marginBottom: 12 }}>{mantraAudioError}</div>}
 
         <h3 style={{ marginTop: 0, color: "#4A0B1D" }}>108-Day Mantra Sādhana — Audio</h3>
-        <p style={{ color: "#666", fontSize: 13, marginTop: -8, marginBottom: 16 }}>Upload one audio file per day. Uploading a new file for a day replaces the existing one.</p>
+        <p style={{ color: "#6f6064", fontSize: 13, marginTop: -8, marginBottom: 16 }}>Upload one audio file per day. Uploading a new file for a day replaces the existing one.</p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {Array.from({ length: 108 }, (_, i) => i + 1).map((day) => {
@@ -1214,7 +1227,7 @@ export default function AdminPage() {
                     </>
                   ) : (
                     <>
-                      <span style={{ flex: "1 1 260px", color: "#999", fontSize: 12 }}>No audio uploaded</span>
+                      <span style={{ flex: "1 1 260px", color: "#8a7a7e", fontSize: 12 }}>No audio uploaded</span>
                       <label style={{ padding: "6px 12px", background: "#E07B39", color: "#fff", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
                         {isUploading ? "Uploading…" : "Upload"}
                         <input type="file" accept="audio/*" style={{ display: "none" }} disabled={isUploading} onChange={(e) => handleMantraAudioUpload(day, e.target.files[0])} />
@@ -1264,7 +1277,7 @@ export default function AdminPage() {
         {dhyanAudioError && <div style={{ padding: 12, background: '#ffe6e6', color: '#900', borderRadius: 6, marginBottom: 12 }}>{dhyanAudioError}</div>}
 
         <h3 style={{ marginTop: 0, color: "#4A0B1D" }}>21-Day Dhyān Challenge — Audio</h3>
-        <p style={{ color: "#666", fontSize: 13, marginTop: -8, marginBottom: 16 }}>Upload one audio file per day. Uploading a new file for a day replaces the existing one.</p>
+        <p style={{ color: "#6f6064", fontSize: 13, marginTop: -8, marginBottom: 16 }}>Upload one audio file per day. Uploading a new file for a day replaces the existing one.</p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {Array.from({ length: 21 }, (_, i) => i + 1).map((day) => {
@@ -1288,7 +1301,7 @@ export default function AdminPage() {
                     </>
                   ) : (
                     <>
-                      <span style={{ flex: "1 1 260px", color: "#999", fontSize: 12 }}>No audio uploaded</span>
+                      <span style={{ flex: "1 1 260px", color: "#8a7a7e", fontSize: 12 }}>No audio uploaded</span>
                       <label style={{ padding: "6px 12px", background: "#E07B39", color: "#fff", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
                         {isUploading ? "Uploading…" : "Upload"}
                         <input type="file" accept="audio/*" style={{ display: "none" }} disabled={isUploading} onChange={(e) => handleDhyanAudioUpload(day, e.target.files[0])} />
@@ -1327,7 +1340,7 @@ export default function AdminPage() {
       /* CENTER - HOMEPAGE CONTENT EDITOR */
       <main style={{ flex: 1, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
         <h3 style={{ marginTop: 0, color: "#4A0B1D" }}>Homepage Content</h3>
-        <p style={{ color: "#666", fontSize: 13, marginTop: -8, marginBottom: 16 }}>
+        <p style={{ color: "#6f6064", fontSize: 13, marginTop: -8, marginBottom: 16 }}>
           Edit the text and images shown on the homepage. Leave a field blank to keep the site's default.
         </p>
 
@@ -1426,12 +1439,12 @@ export default function AdminPage() {
               <div style={{ marginBottom: 20 }}>
                 <div style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #f0f0f0" }}>
                   <h4 style={{ margin: "0 0 8px 0", color: "#4A0B1D", fontSize: 15 }}>Products Banner Slider</h4>
-                  <p style={{ margin: "0 0 14px 0", fontSize: 13, color: "#666" }}>
+                  <p style={{ margin: "0 0 14px 0", fontSize: 13, color: "#6f6064" }}>
                     Add multiple images — they rotate as a slider on the Products page (/products). First slide is the default fallback banner.
                   </p>
 
                   {slides.length === 0 && (
-                    <div style={{ marginBottom: 14, border: "2px dashed #E0D0C0", borderRadius: 8, padding: 18, textAlign: "center", background: "#FAF7F2", color: "#888", fontSize: 13 }}>
+                    <div style={{ marginBottom: 14, border: "2px dashed #E0D0C0", borderRadius: 8, padding: 18, textAlign: "center", background: "#FAF7F2", color: "#8a7a7e", fontSize: 13 }}>
                       No slides yet. Default site banner will show until you add one.
                     </div>
                   )}
@@ -1456,7 +1469,7 @@ export default function AdminPage() {
                             {displayImg ? (
                               <img src={displayImg} alt={`Slide ${idx + 1}`} style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 6, display: "block" }} />
                             ) : (
-                              <p style={{ margin: "28px 0", fontSize: 13, color: "#999" }}>No image yet — upload one</p>
+                              <p style={{ margin: "28px 0", fontSize: 13, color: "#8a7a7e" }}>No image yet — upload one</p>
                             )}
                             {preview && (
                               <p style={{ margin: "8px 0 0", fontSize: 12, color: "#E07B39", fontWeight: 600 }}>
@@ -1511,7 +1524,7 @@ export default function AdminPage() {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <h4 style={{ margin: "0 0 4px 0", color: "#4A0B1D", fontSize: 15 }}>Headings (Categories ke upar)</h4>
-                  <p style={{ margin: "0 0 8px 0", fontSize: 13, color: "#666" }}>
+                  <p style={{ margin: "0 0 8px 0", fontSize: 13, color: "#6f6064" }}>
                     Yeh headings jo categories filter ke upar box se bahar display hoti hain:
                   </p>
 
@@ -1592,7 +1605,7 @@ export default function AdminPage() {
                       <div key={item.id} style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f0f0f0" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                           <h4 style={{ margin: 0, color: "#4A0B1D", fontSize: 14 }}>
-                            {item.label} <span style={{ color: "#999", fontWeight: 400, fontSize: 12 }}>(card {idx + 1} of {allCards.length}, left to right)</span>
+                            {item.label} <span style={{ color: "#8a7a7e", fontWeight: 400, fontSize: 12 }}>(card {idx + 1} of {allCards.length}, left to right)</span>
                           </h4>
                           <button
                             onClick={() => removeHomepageCard(item.id, item.isExtra)}
@@ -1641,7 +1654,7 @@ export default function AdminPage() {
 
                   {hiddenBase.length > 0 && (
                     <div style={{ marginTop: 8 }}>
-                      <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#999" }}>Hidden cards:</p>
+                      <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#8a7a7e" }}>Hidden cards:</p>
                       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                         {hiddenBase.map((item) => (
                           <button
@@ -1693,13 +1706,13 @@ export default function AdminPage() {
                 </div>
               ))}
               {(!homepageData.testimonials || homepageData.testimonials.length === 0) && (
-                <p style={{ color: "#999", fontSize: 13 }}>No overrides yet — the site is showing its default testimonials. Add one to replace them.</p>
+                <p style={{ color: "#8a7a7e", fontSize: 13 }}>No overrides yet — the site is showing its default testimonials. Add one to replace them.</p>
               )}
             </div>
           )}
 
           {homepageTab === "hero" && (
-            <p style={{ margin: "0 0 16px 0", fontSize: 12, color: "#999" }}>
+            <p style={{ margin: "0 0 16px 0", fontSize: 12, color: "#8a7a7e" }}>
               These slides rotate automatically on the homepage banner (one at a time, every few seconds) — they don't show side by side. Use the dots at the bottom of the banner on the live site to jump to a specific slide and check your changes.
             </p>
           )}
@@ -1768,7 +1781,7 @@ export default function AdminPage() {
 
                   {hiddenBase.length > 0 && (
                     <div style={{ marginTop: 8 }}>
-                      <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#999" }}>Hidden slides:</p>
+                      <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#8a7a7e" }}>Hidden slides:</p>
                       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                         {hiddenBase.map((s) => (
                           <button
@@ -1838,7 +1851,7 @@ export default function AdminPage() {
                   <h3 style={{ margin: 0, color: "#4A0B1D", fontSize: 16 }}>
                     {isProducts ? "➕ Add New Product" : "➕ Add New Content"}
                   </h3>
-                  <p style={{ margin: "2px 0 0 0", fontSize: 12, color: "#777" }}>
+                  <p style={{ margin: "2px 0 0 0", fontSize: 12, color: "#6f6064" }}>
                     {isProducts ? "Create a spiritual product with pricing, subcategory & imagery" : "Create new course, session or lesson content"}
                   </p>
                 </div>
@@ -1973,11 +1986,11 @@ export default function AdminPage() {
                     <div style={{ background: "#f5f5f5", border: "2px dashed #ddd", borderRadius: 8, padding: 12, marginBottom: 12, textAlign: "center" }}>
                       {imagePreview ? (
                         <>
-                          <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#666" }}>New Image Preview:</p>
+                          <p style={{ margin: "0 0 8px 0", fontSize: 12, color: "#6f6064" }}>New Image Preview:</p>
                           <img src={imagePreview} alt="preview" style={{ maxWidth: "100%", maxHeight: 120, borderRadius: 6 }} />
                         </>
                       ) : (
-                        <p style={{ margin: 0, fontSize: 12, color: "#999" }}>No image selected</p>
+                        <p style={{ margin: 0, fontSize: 12, color: "#8a7a7e" }}>No image selected</p>
                       )}
                     </div>
                     <label style={{ 
@@ -2008,7 +2021,7 @@ export default function AdminPage() {
                       setForm({ title: "", subtitle: "", badgeText: "", duration: "", summary: "", fullDescription: "", productType: "", lessons: [], category: activeCategory });
                       setImage(null);
                       setImagePreview(null);
-                    }} style={{ flex: 1, padding: 12, background: "#f0f0f0", color: "#333", border: "1px solid #ddd", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>Cancel</button>
+                    }} style={{ flex: 1, padding: 12, background: "#f0f0f0", color: "#4A0B1D", border: "1px solid #ddd", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>Cancel</button>
                   </div>
 
                   {/* Sessions Section - ONLY for Non-Products */}
@@ -2020,7 +2033,7 @@ export default function AdminPage() {
                       </h4>
                       <div style={{ maxHeight: 250, overflowY: "auto", border: "1px solid #e0e0e0", borderRadius: 4, padding: 8, background: "#fafafa" }}>
                         {form.lessons?.length === 0 ? (
-                          <p style={{ margin: 0, fontSize: 12, color: "#999", textAlign: "center", padding: 12 }}>No sessions yet</p>
+                          <p style={{ margin: 0, fontSize: 12, color: "#8a7a7e", textAlign: "center", padding: 12 }}>No sessions yet</p>
                         ) : (
                           form.lessons.map((lesson, idx) => (
                             <div key={idx} style={{ background: "#fff", padding: 10, marginBottom: 8, borderRadius: 4, border: "1px solid #e0e0e0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -2028,7 +2041,7 @@ export default function AdminPage() {
                                 <p style={{ margin: "0 0 4px 0", fontSize: 12, fontWeight: 600, color: "#4A0B1D" }}>
                                   {lesson.num}. {lesson.title}
                                 </p>
-                                <p style={{ margin: 0, fontSize: 11, color: "#666" }}>⏱️ {lesson.duration}</p>
+                                <p style={{ margin: 0, fontSize: 11, color: "#6f6064" }}>⏱️ {lesson.duration}</p>
                               </div>
                               <div style={{ display: "flex", gap: 6 }}>
                                 <button type="button" onClick={() => openSessionModal(idx)} style={{ padding: "4px 8px", background: "#2196F3", color: "#fff", border: "none", borderRadius: 3, cursor: "pointer", fontSize: 10, fontWeight: 600 }}>Edit</button>
@@ -2049,7 +2062,7 @@ export default function AdminPage() {
               <div style={{ background: "#fff", padding: "16px 20px", borderRadius: 8, marginBottom: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eaeaea" }}>
                 {/* Search Bar */}
                 <div style={{ marginBottom: 14, position: "relative" }}>
-                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#999", fontSize: 14 }}>🔍</span>
+                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#8a7a7e", fontSize: 14 }}>🔍</span>
                   <input
                     type="text"
                     value={productSearch}
@@ -2072,7 +2085,7 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() => setProductSearch("")}
-                      style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#999", cursor: "pointer", fontSize: 14 }}
+                      style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#8a7a7e", cursor: "pointer", fontSize: 14 }}
                     >✕</button>
                   )}
                 </div>
@@ -2190,14 +2203,14 @@ export default function AdminPage() {
                 )}
               </h3>
               {isProducts && displayedTiles.length > 0 && (
-                <span style={{ fontSize: 12, color: "#888" }}>Click product card to edit details & image</span>
+                <span style={{ fontSize: 12, color: "#8a7a7e" }}>Click product card to edit details & image</span>
               )}
             </div>
 
             {/* PRODUCT / TILE GRID */}
             {displayedTiles.length === 0 ? (
               <div style={{ background: "#fff", padding: 40, textAlign: "center", borderRadius: 8, border: "1px dashed #ddd" }}>
-                <p style={{ margin: "0 0 8px 0", color: "#666", fontSize: 14, fontWeight: 500 }}>
+                <p style={{ margin: "0 0 8px 0", color: "#6f6064", fontSize: 14, fontWeight: 500 }}>
                   {isProducts ? "No products found in this filter." : "No content tiles found."}
                 </p>
                 {(productSearch || productSubcategory !== "ALL" || productStatusFilter !== "ALL") && (
@@ -2323,7 +2336,7 @@ export default function AdminPage() {
                 <h3 style={{ margin: 0, fontSize: 16, color: "#4A0B1D", fontWeight: 700 }}>
                   {isProducts ? "Edit Product" : "Edit Content"}
                 </h3>
-                <p style={{ margin: "2px 0 0 0", fontSize: 11, color: "#888" }}>
+                <p style={{ margin: "2px 0 0 0", fontSize: 11, color: "#8a7a7e" }}>
                   {isProducts ? "Update product details, pricing, subcategory & photo" : "Edit content tile details and sessions"}
                 </p>
               </div>
@@ -2337,7 +2350,7 @@ export default function AdminPage() {
                   setImage(null); 
                   setImagePreview(null); 
                 }} 
-                style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#999" }}
+                style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#8a7a7e" }}
               >✕</button>
             </div>
 
@@ -2561,7 +2574,7 @@ export default function AdminPage() {
                     <h4 style={{ margin: "8px 0 12px 0", fontSize: 13, color: "#4A0B1D" }}>Sessions ({form.lessons?.length || 0})</h4>
                     <div style={{ maxHeight: 250, overflowY: "auto", border: "1px solid #e0e0e0", borderRadius: 4, padding: 8, marginBottom: 12, background: "#fafafa" }}>
                       {form.lessons?.length === 0 ? (
-                        <p style={{ margin: 0, fontSize: 12, color: "#999", textAlign: "center", padding: 16 }}>No sessions yet. Click add below.</p>
+                        <p style={{ margin: 0, fontSize: 12, color: "#8a7a7e", textAlign: "center", padding: 16 }}>No sessions yet. Click add below.</p>
                       ) : (
                         form.lessons.map((lesson, idx) => (
                           <div key={idx} style={{ background: "#fff", padding: 10, marginBottom: 10, borderRadius: 4, border: "1px solid #e0e0e0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -2569,7 +2582,7 @@ export default function AdminPage() {
                               <p style={{ margin: "0 0 4px 0", fontSize: 13, fontWeight: 600, color: "#4A0B1D" }}>
                                 {lesson.num}. {lesson.title}
                               </p>
-                              <p style={{ margin: 0, fontSize: 11, color: "#666" }}>⏱️ {lesson.duration}</p>
+                              <p style={{ margin: 0, fontSize: 11, color: "#6f6064" }}>⏱️ {lesson.duration}</p>
                             </div>
                             <div style={{ display: "flex", gap: 6 }}>
                               <button type="button" onClick={() => openSessionModal(idx)} style={{ padding: "6px 12px", background: "#2196F3", color: "#fff", border: "none", borderRadius: 3, cursor: "pointer", fontSize: 11, fontWeight: 600 }}>Edit</button>
@@ -2648,7 +2661,7 @@ export default function AdminPage() {
               <h2 style={{ margin: 0, fontSize: 18, color: "#4A0B1D" }}>
                 {editingSessionIndex !== null ? `Edit Session ${currentSessionData.num}` : `Add New Session`}
               </h2>
-              <button onClick={() => setShowSessionModal(false)} style={{ background: "none", border: "none", fontSize: 28, cursor: "pointer", color: "#999" }}>✕</button>
+              <button onClick={() => setShowSessionModal(false)} style={{ background: "none", border: "none", fontSize: 28, cursor: "pointer", color: "#8a7a7e" }}>✕</button>
             </div>
 
             <form style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -2689,7 +2702,7 @@ export default function AdminPage() {
                 <button 
                   type="button"
                   onClick={() => setShowSessionModal(false)}
-                  style={{ flex: 1, padding: 12, background: "#f0f0f0", color: "#333", border: "1px solid #ddd", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}
+                  style={{ flex: 1, padding: 12, background: "#f0f0f0", color: "#4A0B1D", border: "1px solid #ddd", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: 14 }}
                 >
                   Cancel
                 </button>

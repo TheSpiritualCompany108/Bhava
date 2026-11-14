@@ -69,7 +69,7 @@ function VedicHymns() {
         ],
         optional: [
           "Om Gan Ganapataye Namah — for removing obstacles",
-          "Lokah Samastah Sukhino Bhavantu — for universal peace",
+          "Lokah Samastah Sukhino Bhava:ntu — for universal peace",
         ],
       },
       innerExperience: [

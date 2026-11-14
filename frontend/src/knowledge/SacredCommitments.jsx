@@ -32,7 +32,7 @@ const commitments = [
   {
     title: "21-Day Dhyān Challenge",
     highlights: ["The mind rarely stays still.", "A guided practice creates steadiness.", "Sit with it daily."],
-    buttonText: "Begin the 21-Day Practice with Bhava",
+    buttonText: "Begin the 21-Day Practice with Bhava:",
     color: "#351751",
     image: "/Sacred%20Commitments%20for%20the%20Disciplined%20Soul/21%20Dhyan%20Challenge.png",
     route: "/knowledge/21-day-dhyan",

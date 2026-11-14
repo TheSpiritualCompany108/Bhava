@@ -20,7 +20,7 @@ export default function PolicyPage() {
   return (
     <div className={styles.page}>
       <Seo
-        title={`${page.title} | Bhava`}
+        title={`${page.title} | Bhava:`}
         description={clipDesc(page.body[0])}
         canonical={`${siteOrigin()}/${slug}`}
       />

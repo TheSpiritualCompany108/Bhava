@@ -118,7 +118,7 @@ function AuthPage() {
         clearSharedAddressCache();
         localStorage.setItem("bhava_token", data.token);
         localStorage.setItem("bhava_user", JSON.stringify(data.user));
-        setSuccess(`Welcome to Bhava, ${data.user.name}!`);
+        setSuccess(`Welcome to Bhava:, ${data.user.name}!`);
         setTimeout(() => navigate(redirectTo, { replace: true }), 1000);
       }
     } catch {
@@ -154,20 +154,9 @@ function AuthPage() {
       </button>
 
       <div className={styles.card}>
-        {/* Bhava Logo */}
-        <img src="/bhava-icon.png" alt="Bhava" className={styles.logoMark} />
-        {/* <div className={styles.logoText}>BHAVA  <span className={styles.dotsBhava}>
-                          <span className={styles.dotName}></span>
-                          <span className={styles.dotName}></span>
-                        </span></div> */}
-
-                          <h2 className={styles.heading}>
-                                         BHAVA
-                                         <span className={styles.dotsBhava}>
-                                           <span className={styles.dotName}></span>
-                                           <span className={styles.dotName}></span>
-                                         </span>
-                                       </h2>
+        {/* Bhava: Logo */}
+        <img src="/bhava-icon.png" alt="Bhava:" className={styles.logoMark} />
+        <h2 className={styles.heading}>BHAVA:</h2>
 
         <h1 className={styles.title}>
           {mode === "login" ? "Swagatam" : "Create Account"}

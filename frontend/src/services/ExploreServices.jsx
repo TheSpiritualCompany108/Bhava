@@ -48,7 +48,7 @@ const serviceCards = [
     title: "Creators",
     color: "#C0671E",
     description:
-      "Discover creators who share knowledge, practices, stories and experiences inspired by the Bhava way.",
+      "Discover creators who share knowledge, practices, stories and experiences inspired by the Bhava: way.",
     route: "/community",
   },
 ];
