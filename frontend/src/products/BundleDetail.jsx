@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext";
 import useCatalog from "../hooks/useCatalog";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { FOOTNOTE_PRICE, PENDING_RETURNS } from "../shop/content";
-import { inr, imgSrc, shippingCopy, getProduct, getBundle, bundleLine, liveBundlePrice, braceletsSamePrice, bundleThumbImage, formatPackFacts, includeMetaLine } from "../shop/shopUtils";
+import { inr, imgSrc, shippingCopy, getProduct, getBundle, bundleLine, liveBundlePrice, bundleThumbImage, formatPackFacts, includeMetaLine } from "../shop/shopUtils";
 import { RETURNS_POLICY_LIVE } from "../shop/storeFlags";
 import { addToCartEvent, bundleView } from "../utils/analytics";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
@@ -87,8 +87,6 @@ function BundleDetailInner({ slug }) {
   const livePrice = liveBundlePrice(catalog, bundle, selection);
   const line = ready ? bundleLine(bundle, selection, 1, livePrice) : null;
   const inCart = line && cartItems.find((i) => i.productId === line.productId);
-  const braceletSlots = bundle.needs.bracelets || 0;
-  const showFrom = braceletSlots > 0 && bracelets.length < braceletSlots && !braceletsSamePrice(catalog);
   const qualifiesFree = livePrice >= catalog.shipping.freeAbove;
 
   let bi = 0;
@@ -210,7 +208,7 @@ function BundleDetailInner({ slug }) {
             </div>
 
             <div className={styles.priceSection}>
-              <span className={styles.currentPrice}>{showFrom ? `From ${inr(livePrice)}` : inr(livePrice)}</span>
+              <span className={styles.currentPrice}>{inr(livePrice)}</span>
               <span className={styles.taxNote}>{FOOTNOTE_PRICE}</span>
             </div>
 

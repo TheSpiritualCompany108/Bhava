@@ -271,8 +271,13 @@ export async function validateBundleInput(input, { existing } = {}) {
     if (via === "pair" && p.mode !== "pair") { err("components", `${at}: "${p.name}" is not a fragrance-pair product.`); continue; }
     const comp = { product: p.slug, via };
     if (via === "fixed") {
-      const v = p.variants.find((x) => x.key === str(c.variant, 40));
-      if (!v) { err("components", `${at}: "${c.variant}" is not a variant of "${p.name}".`); continue; }
+      const asked = str(c.variant, 40);
+      const active = (p.variants || []).filter((x) => x && x.active !== false);
+      // Bracelets / single-SKU products often omit variant in the admin form — default to the only key.
+      let v = asked ? p.variants.find((x) => x.key === asked) : null;
+      if (!v && active.length === 1) v = active[0];
+      if (!v) v = p.variants.find((x) => x.key === "default") || active[0] || p.variants[0];
+      if (!v) { err("components", `${at}: "${asked || "undefined"}" is not a variant of "${p.name}".`); continue; }
       comp.variant = v.key;
       const k = `${p.slug}:${v.key}`;
       if (seenFixed.has(k) && p.mode === "none") { err("components", `${at}: bracelet "${p.name}" appears twice.`); continue; }
