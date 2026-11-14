@@ -7,16 +7,41 @@ const VIA_FOR_MODE = { single: ["fragrance", "fixed"], pair: ["pair", "fixed"], 
 const VIA_LABEL = { fragrance: "Customer's fragrance (shared)", camphor: "Customer's camphor fragrance", pair: "Customer's fragrance pair", fixed: "Fixed variant" };
 const EMPTY = { slug: "", name: "", group: "", tagline: "", description: "", image: "", status: "active", featured: false, launchPriority: "", homeModule: "", sortOrder: 0, approvalNotes: "", components: [{ bracelet: true }] };
 
+function defaultVariantKey(product) {
+  if (!product?.variants?.length) return undefined;
+  return product.variants.find((v) => v.key === "default")?.key || product.variants[0]?.key;
+}
+
+function normalizeComponents(components, productsBySlug) {
+  return (components || []).map((c) => {
+    if (c.bracelet) return { bracelet: true };
+    const p = productsBySlug[c.product];
+    const via = c.via || (VIA_FOR_MODE[p?.mode] || ["fixed"])[0];
+    if (via !== "fixed") return { product: c.product, via };
+    const variant = c.variant || defaultVariantKey(p);
+    return { product: c.product, via, variant };
+  });
+}
+
 function BundleForm({ slug, bundle, products, onClose, onSaved }) {
   const editing = !!slug;
-  const [form, setForm] = useState(bundle ? { ...EMPTY, ...bundle, image: bundle.image || "", launchPriority: bundle.launchPriority ?? "" } : EMPTY);
+  const pmap = useMemo(() => Object.fromEntries(products.map((p) => [p.slug, p])), [products]);
+  const [form, setForm] = useState(() => {
+    if (!bundle) return EMPTY;
+    return {
+      ...EMPTY,
+      ...bundle,
+      image: bundle.image || "",
+      launchPriority: bundle.launchPriority ?? "",
+      components: normalizeComponents(bundle.components, Object.fromEntries(products.map((p) => [p.slug, p]))),
+    };
+  });
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [lightbox, setLightbox] = useState(false);
   const [error, setError] = useState(null);
   const fileRef = useRef(null);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  const pmap = useMemo(() => Object.fromEntries(products.map((p) => [p.slug, p])), [products]);
   const fieldErr = (n) => error?.errors?.find((e) => e.field === n)?.message;
 
   const uploadImage = async (file) => {
@@ -36,6 +61,19 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
   };
 
   const setComp = (i, patch) => set("components", form.components.map((c, j) => (j === i ? patch : c)));
+  const pickProduct = (i, productSlug) => {
+    if (productSlug === "__bracelet") {
+      setComp(i, { bracelet: true });
+      return;
+    }
+    const p = pmap[productSlug];
+    const via = (VIA_FOR_MODE[p?.mode] || ["fixed"])[0];
+    setComp(i, {
+      product: productSlug,
+      via,
+      ...(via === "fixed" ? { variant: defaultVariantKey(p) } : {}),
+    });
+  };
   const bracelets = products.filter((p) => p.mode === "none");
 
   // Live price + what the customer must choose (derived exactly like the server does)
@@ -53,7 +91,11 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
     setBusy(true);
     setError(null);
     try {
-      const body = { ...form, launchPriority: form.featured ? Number(form.launchPriority) || null : null };
+      const body = {
+        ...form,
+        launchPriority: form.featured ? Number(form.launchPriority) || null : null,
+        components: normalizeComponents(form.components, pmap),
+      };
       const j = editing ? await api(`/bundles/${slug}`, { method: "PUT", body }) : await api("/bundles", { method: "POST", body });
       onSaved(j.message);
     } catch (e) { setError(e); setBusy(false); }
@@ -146,19 +188,24 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
         return (
           <div key={i} className={s.variantRow} style={{ gridTemplateColumns: "minmax(0,1.3fr) minmax(0,1.3fr) minmax(0,1fr) auto" }}>
             <select className={s.select} value={c.bracelet ? "__bracelet" : c.product || ""} aria-label={`Component ${i + 1} product`}
-              onChange={(e) => (e.target.value === "__bracelet" ? setComp(i, { bracelet: true }) : setComp(i, { product: e.target.value, via: (VIA_FOR_MODE[pmap[e.target.value]?.mode] || ["fixed"])[0], variant: undefined }))}>
+              onChange={(e) => pickProduct(i, e.target.value)}>
               <option value="">Select product…</option>
               <option value="__bracelet">Any bracelet (customer chooses)</option>
               {products.map((x) => <option key={x.slug} value={x.slug}>{x.name} — {money(x.price)}</option>)}
             </select>
             {c.bracelet ? <span className={s.muted}>Customer picks one bracelet (no duplicates)</span> : (
               <select className={s.select} value={c.via || ""} aria-label={`Component ${i + 1} selection`}
-                onChange={(e) => setComp(i, { product: c.product, via: e.target.value, variant: e.target.value === "fixed" ? p?.variants[0]?.key : undefined })}>
+                onChange={(e) => setComp(i, { product: c.product, via: e.target.value, ...(e.target.value === "fixed" ? { variant: defaultVariantKey(p) } : {}) })}>
                 {(VIA_FOR_MODE[p?.mode] || ["fixed"]).map((v) => <option key={v} value={v}>{VIA_LABEL[v]}</option>)}
               </select>
             )}
             {!c.bracelet && c.via === "fixed" ? (
-              <select className={s.select} value={c.variant || ""} onChange={(e) => setComp(i, { ...c, variant: e.target.value })} aria-label="Fixed variant">
+              <select
+                className={s.select}
+                value={c.variant || defaultVariantKey(p) || ""}
+                onChange={(e) => setComp(i, { ...c, variant: e.target.value })}
+                aria-label="Fixed variant"
+              >
                 {(p?.variants || []).map((v) => <option key={v.key} value={v.key}>{v.label}</option>)}
               </select>
             ) : <span />}
