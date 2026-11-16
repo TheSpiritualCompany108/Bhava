@@ -11,8 +11,9 @@ export const SEED_CATEGORIES = [
   { id: "incense-sticks", label: "Incense Sticks", blurb: "Sacred Notes — Discovery, Duo and Triveni.", sortOrder: 1 },
   { id: "bamboo-less-incense", label: "Bamboo-less Incense", blurb: "Pure Ritual — Single, Twin and 27.", sortOrder: 2 },
   { id: "incense-cones", label: "Incense Cones", blurb: "Sacred Ember — a distinctive cone format.", sortOrder: 3 },
-  { id: "sambrani-camphor", label: "Sambrani & Camphor", blurb: "Offering cups and ritual camphor.", sortOrder: 4 },
-  { id: "sacred-beads", label: "Sacred Beads", blurb: "Five bracelets, each with its own intention — including a Rose Quartz & Rhodonite mixed-stone piece.", sortOrder: 5 },
+  { id: "sambrani", label: "Sambrani", blurb: "Sacred Sambrani Offering Cups — Guggal only.", sortOrder: 4 },
+  { id: "camphor", label: "Camphor", blurb: "Camphor Ritual Duo — Guggal or Sandalwood.", sortOrder: 5 },
+  { id: "sacred-beads", label: "Sacred Beads", blurb: "Five bracelets, each with its own intention — including a Rose Quartz & Rhodonite mixed-stone piece.", sortOrder: 6 },
 ];
 
 const IMG = {
@@ -95,7 +96,7 @@ export const SEED_PRODUCTS = [
     related: { upsell: "", upsellAlt: "", crossSell: ["sacred-notes-discovery", "pure-ritual-single"], bundle: "the-fragrance-and-flame-pair" },
   },
   {
-    ...base, slug: "sacred-sambrani-offering-cups", name: "Sacred Sambrani Offering Cups", category: "sambrani-camphor", price: 501, mode: "fixed", sortOrder: 8,
+    ...base, slug: "sacred-sambrani-offering-cups", name: "Sacred Sambrani Offering Cups", category: "sambrani", price: 501, mode: "fixed", sortOrder: 8,
     format: "Cups", variants: variants("fixed", { guggal: "SSC-21-GUG" }), tagline: "A traditional Guggal offering.",
     description: "Guggal Sambrani cups for a traditional offering and a considered ritual at home. A dedicated Guggal product designed to complement your regular puja and offering routine.",
     pack: "21 cups; Guggal only.", packQuantity: "21 cups",
@@ -103,7 +104,7 @@ export const SEED_PRODUCTS = [
     related: { upsell: "", upsellAlt: "", crossSell: ["camphor-ritual-duo"], bundle: "the-sacred-smoke-pair" },
   },
   {
-    ...base, slug: "camphor-ritual-duo", name: "Camphor Ritual Duo", category: "sambrani-camphor", price: 351, mode: "camphor", sortOrder: 9,
+    ...base, slug: "camphor-ritual-duo", name: "Camphor Ritual Duo", category: "camphor", price: 351, mode: "camphor", sortOrder: 9,
     format: "Tablets", variants: variants("camphor", { guggal: "CRD-44-GUG", sandalwood: "CRD-44-SAN" }), tagline: "Two tablets. One fragrance.",
     description: "Two 22 g camphor tablets in one selected fragrance. Both tablets in the pack are of the same fragrance, keeping the pack composition consistent.",
     pack: "2 × 22 g; 44 g total; Guggal or Sandalwood.", packQuantity: "2 tablets × 22 g", netWeight: "44 g total",

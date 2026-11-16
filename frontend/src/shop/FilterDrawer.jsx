@@ -1,10 +1,9 @@
 import React from "react";
 import styles from "../products/Products.module.css";
 import {
-  FORMAT_FILTERS, PRICE_FILTERS, INTENTION_FILTERS,
+  FORMAT_FILTERS, PRICE_FILTERS, INTENTION_FILTERS, COLLECTION_FILTERS,
+  fragranceFilterIds,
 } from "./shopUtils";
-
-const FRAGRANCE_FILTERS = ["guggal", "oud", "sandalwood"];
 
 function Section({ title, children }) {
   return (
@@ -44,7 +43,8 @@ export default function FilterDrawer({
   activeCount,
 }) {
   const f = shopFilters || {};
-  const { tab, fragrance, format, priceRange, intention, availability } = values;
+  const { tab, fragrance, format, priceRange, intention, availability, collection } = values;
+  const fragranceIds = fragranceFilterIds({ category: tab, format });
 
   const pick = (key, value) => {
     onSet(key, value);
@@ -82,10 +82,21 @@ export default function FilterDrawer({
             </Section>
           )}
 
+          {f.collection !== false && (
+            <Section title="Collection">
+              <Opt active={!collection} onClick={() => pick("collection", "")}>All collections</Opt>
+              {COLLECTION_FILTERS.map((x) => (
+                <Opt key={x.id} active={collection === x.id} onClick={() => pick("collection", collection === x.id ? "" : x.id)}>
+                  {x.label}
+                </Opt>
+              ))}
+            </Section>
+          )}
+
           {f.fragrance !== false && (
             <Section title="Fragrance">
               <Opt active={!fragrance} onClick={() => pick("fragrance", "")}>All fragrances</Opt>
-              {FRAGRANCE_FILTERS.map((id) => (
+              {fragranceIds.map((id) => (
                 <Opt key={id} active={fragrance === id} onClick={() => pick("fragrance", fragrance === id ? "" : id)}>
                   {catalog?.fragrances?.[id]?.label || id}
                 </Opt>

@@ -6,6 +6,7 @@ import { useCart } from "../context/CartContext";
 import useCatalog from "../hooks/useCatalog";
 import { useHomepageSectionState, resolveHomepageImageUrl } from "../hooks/useHomepageSection";
 import { ProductCard, BundleCard } from "../shop/Cards";
+import SortDropdown from "./SortDropdown";
 import FilterDrawer, { FilterIconButton } from "../shop/FilterDrawer";
 import {
   shopTabs,
@@ -16,18 +17,22 @@ import {
   FORMAT_FILTERS,
   PRICE_FILTERS,
   INTENTION_FILTERS,
+  COLLECTION_FILTERS,
+  fragranceFilterIds,
+  productMatchesCategoryTab,
+  isSmokePairTab,
   matchesFormat,
   matchesPrice,
   matchesIntention,
+  matchesCollection,
   matchesSearchWords,
   productSearchText,
   bundleSearchText,
 } from "../shop/shopUtils";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 
-const FRAGRANCE_FILTERS = ["guggal", "oud", "sandalwood"];
 const DEFAULT_FILTERS = {
-  category: true, fragrance: true, format: true, price: true, intention: true, availability: true,
+  category: true, collection: true, fragrance: true, format: true, price: true, intention: true, availability: true,
 };
 
 export default function Products() {
@@ -37,12 +42,17 @@ export default function Products() {
   const { catalog, loading, error, reload } = useCatalog();
 
   const tabs = shopTabs(catalog);
-  const tab = tabs.some((t) => t.id === params.get("category")) ? params.get("category") : "all";
+  const rawCategory = params.get("category") || "";
+  const tab = tabs.some((t) => t.id === rawCategory) || rawCategory === "sambrani-camphor"
+    ? (rawCategory || "all")
+    : "all";
   const [showMore, setShowMore] = useState(false);
-  const fragrance = FRAGRANCE_FILTERS.includes(params.get("fragrance")) ? params.get("fragrance") : "";
   const format = FORMAT_FILTERS.some((f) => f.id === params.get("format")) ? params.get("format") : "";
+  const allowedFragrances = fragranceFilterIds({ category: tab, format });
+  const fragrance = allowedFragrances.includes(params.get("fragrance")) ? params.get("fragrance") : "";
   const priceRange = PRICE_FILTERS.some((f) => f.id === params.get("price")) ? params.get("price") : "";
   const intention = INTENTION_FILTERS.some((f) => f.id === params.get("intention")) ? params.get("intention") : "";
+  const collection = COLLECTION_FILTERS.some((f) => f.id === params.get("collection")) ? params.get("collection") : "";
   const availability = params.get("availability") === "in-stock" ? "in-stock" : "";
   const [searchQuery, setSearchQuery] = useState(() => params.get("q") || "");
   const [sortBy, setSortBy] = useState("featured");
@@ -115,12 +125,23 @@ export default function Products() {
 
   const activeFilterCount = [
     tab !== "all" && shopFilters.category,
+    collection && shopFilters.collection,
     fragrance && shopFilters.fragrance,
     format && shopFilters.format,
     priceRange && shopFilters.price,
     intention && shopFilters.intention,
     availability && shopFilters.availability,
   ].filter(Boolean).length;
+
+  // Drop fragrance from the URL when context rules no longer allow it (e.g. Oud on Camphor)
+  useEffect(() => {
+    const raw = params.get("fragrance");
+    if (!raw) return;
+    if (fragranceFilterIds({ category: tab, format }).includes(raw)) return;
+    const next = new URLSearchParams(params);
+    next.delete("fragrance");
+    setParams(next, { replace: true });
+  }, [tab, format, params, setParams]);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -161,13 +182,18 @@ export default function Products() {
     let products = catalog.products.map((p, i) => ({ p, i }));
     let bundles = catalog.bundles.map((b, i) => ({ b, i }));
 
-    if (tab === "curated-collections") products = [];
-    else if (tab !== "all") products = products.filter(({ p }) => p.category === tab);
-    // PDF §9.2: Sambrani & Camphor page = Sambrani Cups → Camphor Ritual Duo → Sacred Smoke Pair
-    if (tab === "sambrani-camphor") bundles = bundles.filter(({ b }) => b.slug === "the-sacred-smoke-pair");
-    else if (tab !== "all" && tab !== "curated-collections") bundles = [];
-    if ((tab === "curated-collections" || tab === "all") && !showMore && !q0) bundles = bundles.filter(({ b }) => b.featured);
+    if (tab === "curated-collections" || collection) products = [];
+    else if (tab !== "all") products = products.filter(({ p }) => productMatchesCategoryTab(p, tab));
+    // PDF §9.2: Sambrani / Camphor pages also surface Sacred Smoke Pair
+    if (isSmokePairTab(tab)) bundles = bundles.filter(({ b }) => b.slug === "the-sacred-smoke-pair");
+    else if (tab !== "all" && tab !== "curated-collections" && !collection) bundles = [];
+    if ((tab === "curated-collections" || tab === "all") && !showMore && !q0 && !collection) {
+      bundles = bundles.filter(({ b }) => b.featured);
+    }
 
+    if (collection) {
+      bundles = bundles.filter(({ b }) => matchesCollection(b, collection));
+    }
     if (fragrance) {
       products = products.filter(({ p }) => productHasFragrance(catalog, p, fragrance));
       bundles = bundles.filter(({ b }) => bundleHasFragrance(catalog, b, fragrance));
@@ -203,7 +229,7 @@ export default function Products() {
     if (cmp) {
       sortedP.sort(cmp);
       sortedB.sort(cmp);
-    } else if (tab === "curated-collections") {
+    } else if (tab === "curated-collections" || collection) {
       // PDF §9.2: Three-Format Discovery → Complete Fragrance Ritual → Complete Home Ritual Set → bracelet-led sets → rest
       const lead = ["the-three-format-discovery", "the-complete-fragrance-ritual", "the-complete-home-ritual-set"];
       const rank = (b) => (lead.includes(b.slug) ? lead.indexOf(b.slug) : b.components.some((c) => c.bracelet) ? 10 : 20);
@@ -212,7 +238,7 @@ export default function Products() {
       sortedB.sort((a, b) => (a.featured === b.featured ? (a.featured ? a.priority - b.priority : a.sortOrder - b.sortOrder) : a.featured ? -1 : 1));
     }
     return { products: sortedP, bundles: sortedB };
-  }, [catalog, tab, fragrance, format, priceRange, intention, availability, q, q0, sortBy, showMore]);
+  }, [catalog, tab, collection, fragrance, format, priceRange, intention, availability, q, q0, sortBy, showMore]);
 
   const total = items.products.length + items.bundles.length;
 
@@ -301,13 +327,8 @@ export default function Products() {
             </span>
           )}
           <div className={styles.sortContainer}>
-            <label htmlFor="sortSelect" className={styles.sortLabel}>Sort By</label>
-            <select id="sortSelect" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className={styles.sortSelect}>
-              <option value="featured">Featured</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="name">Name: A to Z</option>
-            </select>
+            <span className={styles.sortLabel} id="sortLabel">Sort By</span>
+            <SortDropdown value={sortBy} onChange={setSortBy} />
           </div>
         </div>
       </section>
@@ -318,7 +339,7 @@ export default function Products() {
         catalog={catalog}
         shopFilters={shopFilters}
         tabs={tabs}
-        values={{ tab, fragrance, format, priceRange, intention, availability }}
+        values={{ tab, fragrance, format, priceRange, intention, availability, collection }}
         onSet={setParam}
         onClear={clearFilters}
         activeCount={activeFilterCount}

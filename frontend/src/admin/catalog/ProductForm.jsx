@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import s from "./AdminCatalog.module.css";
-import { api, imgUrl, slugify } from "./adminApi";
+import { api, imgUrl, slugify, optimizeImage } from "./adminApi";
 import { Modal, ErrorList, ImageLightbox } from "./common";
 
 const EMPTY = {
@@ -57,7 +57,7 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
     setError(null);
     try {
       const fd = new FormData();
-      fd.append("image", file);
+      fd.append("image", await optimizeImage(file));
       const { url } = await api("/upload", { method: "POST", form: fd });
       if (target === "main") set("image", url);
       else set("gallery", [...form.gallery, url].slice(0, 10));

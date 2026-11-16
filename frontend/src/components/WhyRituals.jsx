@@ -46,7 +46,7 @@ function WhyRituals() {
         <div className={styles.imageShell}>
           <img
             className={styles.image}
-            src="/whyrituals.png"
+            src="/whyrituals.webp" width={1400} height={788} loading="lazy" decoding="async"
             alt="A person seated in a calm ritual practice with incense and candles"
           />
         </div>

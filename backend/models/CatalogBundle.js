@@ -21,6 +21,8 @@ const catalogBundleSchema = new mongoose.Schema(
     description: { type: String, default: "" },
     /** Collection hero image (admin-uploaded). Shown on storefront cards / PDP promos — not a product packshot. */
     image: { type: String, default: "" },
+    /** Extra collection images (cover is `image`). */
+    gallery: { type: [String], default: [] },
     components: { type: [componentSchema], default: [] },
     status: { type: String, enum: BUNDLE_STATUSES, default: "active", index: true },
     featured: { type: Boolean, default: false }, // the 8 priority launch bundles

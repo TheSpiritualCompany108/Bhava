@@ -18,7 +18,9 @@ export default function ResponsiveImg({
 }) {
   const resolved = imgSrc(src);
   const webp = imgWebpSrc(src);
-  const srcSet = resolved ? `${resolved} 1x` : undefined;
+  // srcset splits on whitespace, so file names with spaces must be percent-encoded or the candidate is ignored
+  const enc = (u) => (u ? u.replace(/ /g, "%20") : u);
+  const srcSet = resolved ? `${enc(resolved)} 1x` : undefined;
 
   const img = (
     <img
@@ -39,7 +41,7 @@ export default function ResponsiveImg({
 
   return (
     <picture>
-      <source srcSet={webp} type="image/webp" sizes={sizes} />
+      <source srcSet={enc(webp)} type="image/webp" sizes={sizes} />
       {img}
     </picture>
   );

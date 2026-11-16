@@ -3,6 +3,7 @@ import { LOW_STOCK_DEFAULT } from "../data/catalogConstants.js";
 
 export const DEFAULT_SHOP_FILTERS = {
   category: true,
+  collection: true,
   fragrance: true,
   format: true,
   price: true,
@@ -18,6 +19,7 @@ const settingsSchema = new mongoose.Schema(
     // Which filter groups appear in the storefront left filter panel (Admin-controllable)
     shopFilters: {
       category: { type: Boolean, default: true },
+      collection: { type: Boolean, default: true },
       fragrance: { type: Boolean, default: true },
       format: { type: Boolean, default: true },
       price: { type: Boolean, default: true },

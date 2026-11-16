@@ -53,6 +53,12 @@ const BY_CATEGORY = {
     { name: "Deepak Nanda", rating: 4, title: "Strong presence", body: "Cones give a fuller cloud — great for longer puja. Use a proper holder; ash collects neatly.", verified: true, daysAgo: 19 },
     { name: "Amrita Sen", rating: 5, title: "Festive and calm", body: "Used these through Diwali mornings. Fragrance held the house without feeling heavy.", verified: true, daysAgo: 48 },
   ],
+  sambrani: [
+    { name: "Geeta Iyer", rating: 5, title: "Like the temple", body: "Sambrani takes me straight back to temple corridors. Warm, familiar, and deeply comforting.", verified: true, daysAgo: 8 },
+  ],
+  camphor: [
+    { name: "Imran Sheikh", rating: 4, title: "Ritual essential", body: "Camphor catches well and clears the space. Keep it away from drafts and it burns evenly.", verified: true, daysAgo: 26 },
+  ],
   "sambrani-camphor": [
     { name: "Geeta Iyer", rating: 5, title: "Like the temple", body: "Sambrani takes me straight back to temple corridors. Warm, familiar, and deeply comforting.", verified: true, daysAgo: 8 },
     { name: "Imran Sheikh", rating: 4, title: "Ritual essential", body: "Camphor catches well and clears the space. Keep it away from drafts and it burns evenly.", verified: true, daysAgo: 26 },

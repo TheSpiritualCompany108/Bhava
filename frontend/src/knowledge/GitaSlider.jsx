@@ -3,7 +3,7 @@ import styles from "./GitaSlider.module.css";
 import { getTodaysQuote } from "./gitaQuotes";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const krishnaImage = "/krishna02.png";
+const krishnaImage = "/krishna02.webp";
 
 /** Wrap text to fit within maxWidth on a canvas context */
 function wrapText(ctx, text, maxWidth) {
@@ -279,7 +279,7 @@ function GitaSlider() {
             </div>
 
             <div className={styles.quoteRight}>
-              <img className={styles.quoteImage} src={krishnaImage} alt="Lord Krishna" />
+              <img className={styles.quoteImage} src={krishnaImage} alt="Lord Krishna" loading="lazy" decoding="async" />
             </div>
           </div>
         </div>

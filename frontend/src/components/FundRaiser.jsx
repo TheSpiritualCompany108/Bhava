@@ -6,7 +6,7 @@ function FundRaiser() {
       <div className={styles.card}>
         <div className={styles.imageWrapper}>
           <img
-            src="/Diya.png"
+            src="/Diya.webp" width={1254} height={706} loading="lazy" decoding="async"
             alt="A quiet offering for our Bharat"
             className={styles.image}
           />

@@ -50,7 +50,7 @@ function monthLabel(key) {
 
 function Stars({ rating }) {
   return (
-    <span className={styles.stars} aria-label={`${rating} out of 5`}>
+    <span className={styles.stars} role="img" aria-label={`${rating} out of 5`}>
       {Array.from({ length: 5 }, (_, i) => (
         <span
           key={i}

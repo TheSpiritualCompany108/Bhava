@@ -220,7 +220,7 @@ export default function InventoryDashboard() {
   const [dialog, setDialog] = useState(null); // {type:'stock'|'history'|'bulk', row?}
   const [threshold, setThreshold] = useState("");
   const [shopFilters, setShopFilters] = useState({
-    category: true, fragrance: true, format: true, price: true, intention: true, availability: true,
+    category: true, collection: true, fragrance: true, format: true, price: true, intention: true, availability: true,
   });
   const [selected, setSelected] = useState(() => new Set());
   const q = useDebounced(search, 300);
@@ -371,6 +371,7 @@ export default function InventoryDashboard() {
         <span className={s.label} style={{ marginRight: 8 }}>Shop filter panel (left drawer)</span>
         {[
           ["category", "Category"],
+          ["collection", "Collection"],
           ["fragrance", "Fragrance"],
           ["format", "Format"],
           ["price", "Price"],

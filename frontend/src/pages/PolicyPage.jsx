@@ -22,14 +22,20 @@ export default function PolicyPage() {
     <div className={styles.page}>
       <Seo
         title={`${page.title} | Bhava:`}
-        description={clipDesc(page.body[0])}
+        description={clipDesc(page.sections[0].p[0])}
         canonical={`${siteOrigin()}/${slug}`}
       />
       <InlineBack fallback="/" />
       <p className={styles.kicker}>{page.kicker}</p>
       <h1>{page.title}</h1>
-      {page.body.map((p) => <p key={p}>{p}</p>)}
-      <p className={styles.note}>This copy is a placeholder for the client. No legal terms are in force until this page is replaced.</p>
+      {page.updated && <p className={styles.note}>Last updated: {page.updated}</p>}
+      {page.sections.map((sec, i) => (
+        <section key={i} className={styles.sec}>
+          {sec.h && <h2>{sec.h}</h2>}
+          {sec.p?.map((x) => <p key={x}>{x}</p>)}
+          {sec.list && <ul>{sec.list.map((x) => <li key={x}>{x}</li>)}</ul>}
+        </section>
+      ))}
       <Link to="/contact">Contact</Link>
       {" · "}
       <Link to="/faq">FAQ</Link>

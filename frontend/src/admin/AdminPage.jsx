@@ -3,6 +3,7 @@ import BundlesPanel from "./catalog/BundlesPanel";
 import InventoryDashboard from "./catalog/InventoryDashboard";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { invalidateHomepageSection } from "../hooks/useHomepageSection";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -458,6 +459,8 @@ export default function AdminPage() {
         setHomepageImages({});
         setHomepageImagePreviews({});
         setHomepageSaved(true);
+        // Drop storefront cache so /products picks up the new banner without a hard refresh
+        invalidateHomepageSection(homepageTab);
       } else {
         setHomepageError(json.message || `Error ${res.status}`);
       }
@@ -1416,10 +1419,14 @@ export default function AdminPage() {
               setHomepageData((prev) => {
                 const nextSlides = (Array.isArray(prev.slides) && prev.slides.length ? prev.slides : slides).filter((s) => s.id !== id);
                 const next = { ...prev, slides: nextSlides };
-                if (id === "banner") {
-                  next.bannerImage = "";
-                  next.image = "";
+                if (next.items && typeof next.items === "object") {
+                  next.items = { ...next.items };
+                  delete next.items[id];
                 }
+                // legacy single-banner fields must follow the new first slide (or be empty)
+                const first = nextSlides[0]?.image || "";
+                next.bannerImage = first;
+                next.image = first;
                 return next;
               });
             };

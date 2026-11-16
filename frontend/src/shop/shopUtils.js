@@ -27,12 +27,41 @@ export const imgWebpSrc = (url) => {
   return src.replace(/\.(jpe?g|png|gif)($|\?)/i, ".webp$2");
 };
 
-// Navigation / category tabs (PDF §9.1): Shop All + the (Admin-managed) categories + Curated Collections
-export const shopTabs = (catalog) => [
-  { id: "all", label: "Shop All" },
-  ...(catalog?.categories || []).map((c) => ({ id: c.id, label: c.label })),
-  { id: "curated-collections", label: "Curated Collections" },
-];
+export const SAMBRANI_SLUG = "sacred-sambrani-offering-cups";
+export const CAMPHOR_SLUG = "camphor-ritual-duo";
+
+/** Soft-split legacy `sambrani-camphor` into two shop tabs (PDF §12). */
+export const shopTabs = (catalog) => {
+  const cats = [];
+  for (const c of catalog?.categories || []) {
+    if (c.id === "sambrani-camphor") {
+      cats.push({ id: "sambrani", label: "Sambrani" });
+      cats.push({ id: "camphor", label: "Camphor" });
+    } else {
+      cats.push({ id: c.id, label: c.label });
+    }
+  }
+  return [
+    { id: "all", label: "Shop All" },
+    ...cats,
+    { id: "curated-collections", label: "Curated Collections" },
+  ];
+};
+
+/** Match a product to a shop category tab (incl. Sambrani / Camphor soft-split + legacy URL). */
+export const productMatchesCategoryTab = (p, tab) => {
+  if (!p || !tab || tab === "all") return true;
+  if (tab === "sambrani") return p.slug === SAMBRANI_SLUG || p.category === "sambrani";
+  if (tab === "camphor") return p.slug === CAMPHOR_SLUG || p.category === "camphor";
+  if (tab === "sambrani-camphor") {
+    return p.category === "sambrani-camphor" || p.slug === SAMBRANI_SLUG || p.slug === CAMPHOR_SLUG;
+  }
+  return p.category === tab;
+};
+
+/** Sacred Smoke Pair shows on Sambrani / Camphor tabs. */
+export const isSmokePairTab = (tab) =>
+  tab === "sambrani" || tab === "camphor" || tab === "sambrani-camphor";
 
 export const getProduct = (catalog, slug) => catalog?.products.find((p) => p.slug === slug);
 export const getBundle = (catalog, slug) => catalog?.bundles.find((b) => b.slug === slug);
@@ -74,8 +103,8 @@ export const FORMAT_FILTERS = [
   { id: "sticks", label: "Sticks", category: "incense-sticks" },
   { id: "bamboo-less", label: "Bamboo-less", category: "bamboo-less-incense" },
   { id: "cones", label: "Cones", category: "incense-cones" },
-  { id: "cups", label: "Cups", slugs: ["sacred-sambrani-offering-cups"] },
-  { id: "tablets", label: "Tablets", slugs: ["camphor-ritual-duo"] },
+  { id: "cups", label: "Cups", slugs: [SAMBRANI_SLUG] },
+  { id: "tablets", label: "Tablets", slugs: [CAMPHOR_SLUG] },
   { id: "bracelets", label: "Bracelets", category: "sacred-beads" },
   { id: "collections", label: "Collections", bundles: true },
 ];
@@ -92,8 +121,66 @@ export const INTENTION_FILTERS = [
   { id: "protection", label: "Protection symbolism", slugs: ["evil-eye-bracelet"] },
   { id: "prosperity", label: "Prosperity", slugs: ["dhan-yog-bracelet"] },
   { id: "calm", label: "Calm", slugs: ["freshwater-pearl-bracelet"] },
-  { id: "love", label: "Love & healing", slugs: ["rose-quartz-rhodonite-bracelet"] },
+  { id: "love", label: "Love & compassion", slugs: ["rose-quartz-rhodonite-bracelet"] },
+  { id: "compassion", label: "Compassion", slugs: ["rose-quartz-rhodonite-bracelet"] },
 ];
+
+/** PDF §12 Collection filter — Discovery / everyday / multi-format / home / bracelet. */
+export const COLLECTION_FILTERS = [
+  {
+    id: "discovery",
+    label: "Discovery",
+    match: (b) =>
+      /discovery/i.test(b?.slug || "") ||
+      ["the-classic-pair", "the-fragrance-and-flame-pair", "the-pure-ritual-fragrance-pair"].includes(b?.slug),
+  },
+  {
+    id: "everyday-ritual",
+    label: "Everyday ritual",
+    match: (b) =>
+      /everyday/i.test(b?.slug || "") ||
+      ["the-pure-ritual-pair", "the-personal-ritual-pair", "the-sacred-living-pair", "the-intention-and-flame-set"].includes(b?.slug),
+  },
+  {
+    id: "multi-format",
+    label: "Multi-format",
+    match: (b) =>
+      /multi-format/i.test(b?.group || "") ||
+      /three-format|extended-three/i.test(b?.slug || "") ||
+      ["the-complete-fragrance-ritual", "the-pure-ritual-27-and-ember-pair", "the-complete-ember-collection"].includes(b?.slug),
+  },
+  {
+    id: "home-ritual",
+    label: "Home ritual",
+    match: (b) =>
+      b?.homeModule === "complete" ||
+      /home-ritual|sacred-home|sacred-smoke|sacred-offering|auspicious|complete-ritual|complete-fragrance|complete-home|sacred-space|abundance|protection-and-peace/i.test(b?.slug || ""),
+  },
+  {
+    id: "bracelet-collections",
+    label: "Bracelet collections",
+    match: (b) => b?.group === "Bracelet collection",
+  },
+];
+
+export const ALL_FRAGRANCE_IDS = ["guggal", "oud", "sandalwood"];
+
+/**
+ * PDF §12 fragrance filter options by context:
+ * Sambrani / cups → Guggal only; Camphor / tablets → Guggal + Sandalwood (never Oud).
+ */
+export const fragranceFilterIds = ({ category, format } = {}) => {
+  if (format === "cups" || category === "sambrani") return ["guggal"];
+  if (format === "tablets" || category === "camphor") return ["guggal", "sandalwood"];
+  if (category === "sambrani-camphor") return ["guggal", "sandalwood"];
+  return ALL_FRAGRANCE_IDS;
+};
+
+export const matchesCollection = (b, collectionId) => {
+  const r = COLLECTION_FILTERS.find((x) => x.id === collectionId);
+  if (!r) return true;
+  return !!b && r.match(b);
+};
 
 export const matchesFormat = (p, b, format) => {
   const f = FORMAT_FILTERS.find((x) => x.id === format);
@@ -353,7 +440,7 @@ export function bundleThumbImage(_catalog, b) {
     if (cat === "incense-sticks") hasSticks = true;
     else if (cat === "bamboo-less-incense") hasBamboo = true;
     else if (cat === "incense-cones") hasCones = true;
-    else if (cat === "sambrani-camphor") hasSmoke = true;
+    else if (cat === "sambrani-camphor" || cat === "sambrani" || cat === "camphor") hasSmoke = true;
     else if (cat === "sacred-beads") hasBracelet = true;
   }
 

@@ -819,7 +819,7 @@ export default function CheckoutPage() {
             )}
 
             <p className={x.terms}>
-              By placing the order, you agree to Bhava: <Link to="/terms" className={x.termsLink}>Terms of Use</Link> and{" "}
+              By placing the order, you agree to Bhava: <Link to="/terms" className={x.termsLink}>Terms and Conditions</Link> and{" "}
               <Link to="/privacy-policy" className={x.termsLink}>Privacy Policy</Link>
             </p>
 

@@ -302,3 +302,6 @@
     font-size: 0.8rem;
   }
 }
+/* address list follows the email/phone list — same row spacing, no extra gap */
+.contactList + .contactList { margin-top: 12px; }
+.addressRow a { word-break: normal; }

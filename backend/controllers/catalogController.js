@@ -48,6 +48,7 @@ export const getCatalog = wrap(async (req, res) => {
     .filter(({ price }) => price !== null)
     .map(({ b, price }) => ({
       slug: b.slug, name: b.name, price, group: b.group, tagline: b.tagline, description: b.description, needs: b.needs,
+      image: b.image || "", gallery: b.gallery || [],
       featured: !!b.featured, priority: b.launchPriority || null, homeModule: b.homeModule || "", sortOrder: b.sortOrder,
       components: b.components.map((c) => ({ product: c.product || null, bracelet: !!c.bracelet, via: c.via || null, variant: c.variant || null })),
     }));
@@ -230,7 +231,7 @@ export const adminPutSettings = wrap(async (req, res) => {
     patch.lowStockThreshold = n;
   }
   if (req.body?.shopFilters && typeof req.body.shopFilters === "object") {
-    const keys = ["category", "fragrance", "format", "price", "intention", "availability"];
+    const keys = ["category", "collection", "fragrance", "format", "price", "intention", "availability"];
     const next = {};
     for (const k of keys) {
       if (typeof req.body.shopFilters[k] === "boolean") next[`shopFilters.${k}`] = req.body.shopFilters[k];
