@@ -166,6 +166,10 @@ const PinterestIcon = () => (
   <i className="fa-brands fa-pinterest" aria-hidden="true" />
 );
 
+// Support contact shown in the footer. Phone is intentionally blank until the client provides it (row hidden while empty).
+const SUPPORT_EMAIL = "Thespiritualcompany108@gmail.com";
+const SUPPORT_PHONE = "";
+
 function Footer() {
 
 
@@ -307,9 +311,29 @@ function Footer() {
               );
             })}
           </div>
-          <p className={styles.footerAddress}>
-            Address : #258, Pocket-5, Sector-2, Rohini, New Delhi - 110085
-          </p>
+          <ul className={styles.contactList}>
+            <li>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
+              <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+            </li>
+            {SUPPORT_PHONE && (
+              <li>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>
+                <a href={`tel:${SUPPORT_PHONE.replace(/\s/g, "")}`}>{SUPPORT_PHONE}</a>
+              </li>
+            )}
+          </ul>
+          {/* address row styled like the email row: pin icon + wrapped text */}
+          <ul className={styles.contactList}>
+            <li className={styles.addressRow}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11Z" /><circle cx="12" cy="10" r="2.5" /></svg>
+              <address>
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("#258, Pocket-5, Sector-2, Rohini, New Delhi - 110085")}`} target="_blank" rel="noopener noreferrer" title="Open in Google Maps">
+                  #258, Pocket-5, Sector-2, Rohini, New Delhi - 110085
+                </a>
+              </address>
+            </li>
+          </ul>
         </div>
       </div>
 

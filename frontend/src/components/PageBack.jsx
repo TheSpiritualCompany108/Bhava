@@ -54,6 +54,12 @@ export default function PageBack() {
     "/community",
     "/explore-services",
     "/cart",
+    "/contact", // the contact page has its own Back link
+    "/shipping-policy", // policy pages show Back inside the page
+    "/returns-refund-policy",
+    "/privacy-policy",
+    "/terms",
+    "/faq", // FAQ shows Back inside the page
   ]);
   const hidden =
     primaryLandings.has(path)

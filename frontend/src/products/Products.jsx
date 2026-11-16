@@ -163,7 +163,9 @@ export default function Products() {
 
     if (tab === "curated-collections") products = [];
     else if (tab !== "all") products = products.filter(({ p }) => p.category === tab);
-    if (tab !== "all" && tab !== "curated-collections") bundles = [];
+    // PDF §9.2: Sambrani & Camphor page = Sambrani Cups → Camphor Ritual Duo → Sacred Smoke Pair
+    if (tab === "sambrani-camphor") bundles = bundles.filter(({ b }) => b.slug === "the-sacred-smoke-pair");
+    else if (tab !== "all" && tab !== "curated-collections") bundles = [];
     if ((tab === "curated-collections" || tab === "all") && !showMore && !q0) bundles = bundles.filter(({ b }) => b.featured);
 
     if (fragrance) {
@@ -201,6 +203,11 @@ export default function Products() {
     if (cmp) {
       sortedP.sort(cmp);
       sortedB.sort(cmp);
+    } else if (tab === "curated-collections") {
+      // PDF §9.2: Three-Format Discovery → Complete Fragrance Ritual → Complete Home Ritual Set → bracelet-led sets → rest
+      const lead = ["the-three-format-discovery", "the-complete-fragrance-ritual", "the-complete-home-ritual-set"];
+      const rank = (b) => (lead.includes(b.slug) ? lead.indexOf(b.slug) : b.components.some((c) => c.bracelet) ? 10 : 20);
+      sortedB.sort((a, b) => rank(a) - rank(b) || (a.priority || 99) - (b.priority || 99) || a.sortOrder - b.sortOrder);
     } else {
       sortedB.sort((a, b) => (a.featured === b.featured ? (a.featured ? a.priority - b.priority : a.sortOrder - b.sortOrder) : a.featured ? -1 : 1));
     }

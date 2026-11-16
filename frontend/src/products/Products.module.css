@@ -1027,6 +1027,40 @@
   .qtyWrapper {
     justify-content: center;
   }
+
+  /* Filters / count / sort — stop the wrap crash on narrow screens */
+  .toolbarRow {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 10px 12px;
+    flex-wrap: nowrap;
+  }
+  .toolbarRow .resultCount {
+    grid-column: 1 / -1;
+    order: 3;
+    flex: none;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .toolbarRow .sortContainer {
+    margin-left: 0;
+    justify-self: end;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  .sortLabel {
+    font-size: 12px;
+  }
+  .sortSelect {
+    max-width: 150px;
+    padding: 8px 10px;
+  }
+  .filterIconBtn {
+    padding: 9px 14px;
+    font-size: 13px;
+  }
 }
 
 .modalAddBtnDone,

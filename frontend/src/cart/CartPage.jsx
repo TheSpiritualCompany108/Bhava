@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import useCartValidation from "../hooks/useCartValidation";
 import useCatalog from "../hooks/useCatalog";
 import {
-  MAX_LINE_QTY, imgSrc, inr, suggestAddOn, getProduct, productLine, shippingCopy,
+  MAX_LINE_QTY, imgSrc, inr, suggestAddOn, suggestBraceletAddOns, getProduct, productLine, shippingCopy,
   productInStock,
 } from "../shop/shopUtils";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
@@ -137,8 +137,35 @@ export default function CartPage() {
   const remaining = shipRule.freeAbove - subtotal;
   // Count only items that are actually included in the total (unavailable lines are excluded)
   const payableCount = data ? data.lines.reduce((n, l) => n + (l.ok ? l.quantity : 0), 0) : itemCount;
-  const addOn = catalog ? suggestAddOn(catalog, cartItems) : null;
+  const braceletAddOns = catalog ? suggestBraceletAddOns(catalog, cartItems) : [];
+  const addOn = catalog && !braceletAddOns.length ? suggestAddOn(catalog, cartItems) : null;
   const addOnProduct = addOn && getProduct(catalog, addOn.slug);
+  const fragLabel = (key) => (key && catalog?.fragrances?.[key]?.label) || "";
+  const renderAddOn = (rec) => {
+    const p = getProduct(catalog, rec.slug);
+    if (!p) return null;
+    const label = fragLabel(rec.variant);
+    return (
+      <div key={rec.slug} className={x.addon}>
+        <img src={imgSrc(p.image)} alt={p.name || "Suggested add-on"} loading="lazy" width={96} height={96} />
+        <div className={x.addonText}>
+          <span className={x.addonK}>Completes your ritual</span>
+          <strong>
+            {p.name}
+            {label ? ` — ${label}` : ""}
+            {" · "}
+            {inr(p.price)}
+          </strong>
+          <span className={x.muted}>{rec.reason}</span>
+        </div>
+        {rec.variant ? (
+          <button type="button" className={x.addBtn} onClick={() => addToCart(productLine(p, rec.variant, 1))}>ADD</button>
+        ) : (
+          <Link to={`/product/${p.slug}`} className={x.addBtn}>CHOOSE</Link>
+        )}
+      </div>
+    );
+  };
   const likeShown = likeCat === "all" ? alsoLike : alsoLike.filter((p) => p.category === likeCat);
 
   const quickAddLike = (e, p) => {
@@ -253,21 +280,13 @@ export default function CartPage() {
               );
             })}
 
-            {/* Section 8.3 — one relevant add-on, never forced */}
-            {addOnProduct && (
-              <div className={x.addon}>
-                <img src={imgSrc(addOnProduct.image)} alt={addOnProduct.name || "Suggested add-on"} loading="lazy" width={96} height={96} />
-                <div className={x.addonText}>
-                  <span className={x.addonK}>Completes your ritual</span>
-                  <strong>{addOnProduct.name}{addOn.variant ? ` — ${catalog.fragrances[addOn.variant]?.label}` : ""} · {inr(addOnProduct.price)}</strong>
-                  <span className={x.muted}>{addOn.reason}</span>
-                </div>
-                {addOn.variant ? (
-                  <button className={x.addBtn} onClick={() => addToCart(productLine(addOnProduct, addOn.variant, 1))}>ADD</button>
-                ) : (
-                  <Link to={`/product/${addOnProduct.slug}`} className={x.addBtn}>CHOOSE</Link>
-                )}
+            {/* Section 8.3 — bracelet cart: trade-up + cross-category + ritual; else one add-on */}
+            {braceletAddOns.length > 0 ? (
+              <div className={x.addonStack} aria-label="Basket-building recommendations">
+                {braceletAddOns.map(renderAddOn)}
               </div>
+            ) : (
+              addOnProduct && renderAddOn(addOn)
             )}
 
             <Link to="/products" className={x.continue}>← Continue Shopping</Link>
