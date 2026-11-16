@@ -10,7 +10,8 @@ const SHOP_NAV = [
   { label: "Incense Sticks", to: "/products?category=incense-sticks" },
   { label: "Bamboo-less Incense", to: "/products?category=bamboo-less-incense" },
   { label: "Incense Cones", to: "/products?category=incense-cones" },
-  { label: "Sambrani & Camphor", to: "/products?category=sambrani-camphor" },
+  { label: "Sambrani", to: "/products?category=sambrani" },
+  { label: "Camphor", to: "/products?category=camphor" },
   { label: "Sacred Beads", to: "/products?category=sacred-beads" },
   { label: "Curated Collections", to: "/products?category=curated-collections" },
 ];
@@ -108,7 +109,7 @@ function Navbar() {
               if (e.key === "Enter" || e.key === " ") navigate("/");
             }}
           >
-            <img src="/bhava-icon.png" alt="Bhava: Logo" className={styles.logo} />
+            <img src="/bhava-icon.webp" alt="Bhava: Logo" className={styles.logo} width={49} height={70} />
             <h2 className={styles.heading}>
               BHAVA
               <span className={styles.dotsBhava} aria-hidden="true">

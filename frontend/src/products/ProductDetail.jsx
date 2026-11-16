@@ -95,9 +95,14 @@ function ProductDetailInner({ slug }) {
       seen.add(p.slug);
       out.push(p);
     };
+    // Cross-sell / upsell matrix picks first (PDF §12) …
     (product.related?.crossSell || []).forEach((s) => push(getProduct(catalog, s)));
-    catalog.products.filter((p) => p.category === product.category).forEach(push);
-    catalog.products.forEach(push);
+    if (product.related?.upsell) push(getProduct(catalog, product.related.upsell));
+    if (product.related?.upsellAlt) push(getProduct(catalog, product.related.upsellAlt));
+    // … then top up to a full row of 4 with other in-stock products
+    catalog.products
+      .filter((p) => p.status !== "archived" && productInStock(catalog, p))
+      .forEach(push);
     return out;
   }, [catalog, product]);
 
@@ -200,6 +205,7 @@ function ProductDetailInner({ slug }) {
           <Link to={`/products?category=${product.category}`}>{category?.label}</Link><span>/</span>
           <span className={styles.breadcrumbCurrent}>{product.name}</span>
         </nav>
+        <div className={styles.backRow}><InlineBack fallback="/products" /></div>
 
         <div className={styles.productShowcase}>
           <div className={styles.galleryCol}>
@@ -255,7 +261,6 @@ function ProductDetailInner({ slug }) {
           </div>
 
           <div className={styles.detailsCol}>
-            <InlineBack fallback="/products" />
             <span className={styles.categoryTag}>{category?.label}</span>
             <h1 className={styles.title}>{product.name}</h1>
             {product.tagline && <p className={styles.tagline}>{product.tagline}</p>}

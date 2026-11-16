@@ -32,6 +32,8 @@ const LIKE_CAT_ORDER = [
   "incense-cones",
   "bamboo-less-incense",
   "sambrani-camphor",
+  "sambrani",
+  "camphor",
   "sacred-beads",
 ];
 const catRank = (id) => {
@@ -63,14 +65,18 @@ export default function CartPage() {
       if (!p || inBag.has(p.slug) || ranked.some((r) => r.slug === p.slug)) return;
       ranked.push(p);
     };
+    // PDF §12: SKU-level cross-sell / upsell matrix only — no generic catalog fill
     cartItems.forEach((item) => {
       const p = item.kind === "product" ? getProduct(catalog, item.slug) : null;
       (p?.related?.crossSell || []).forEach((slug) => push(getProduct(catalog, slug)));
       if (p?.related?.upsell) push(getProduct(catalog, p.related.upsell));
       if (p?.related?.upsellAlt) push(getProduct(catalog, p.related.upsellAlt));
     });
-    catalog.products.forEach(push);
+    const related = new Set(ranked.map((r) => r.slug));
+    // Cross-sell matrix picks come first; then the rest of the catalogue so the row is never sparse.
+    catalog.products.filter((p) => p.status !== "archived").forEach(push);
     ranked.sort((a, b) => {
+      if (related.has(a.slug) !== related.has(b.slug)) return related.has(a.slug) ? -1 : 1;
       const byCat = catRank(a.category) - catRank(b.category);
       if (byCat) return byCat;
       return Number(productInStock(catalog, b)) - Number(productInStock(catalog, a));
@@ -324,7 +330,7 @@ export default function CartPage() {
             {data && !allOk && <p role="alert" className={x.alert}>Some items are unavailable. Reduce the quantity or remove them to continue — they are not included in the total above.</p>}
 
             <p className={x.terms}>
-              By placing the order, you agree to Bhava: <Link to="/terms" className={x.termsLink}>Terms of Use</Link> and{" "}
+              By placing the order, you agree to Bhava: <Link to="/terms" className={x.termsLink}>Terms and Conditions</Link> and{" "}
               <Link to="/privacy-policy" className={x.termsLink}>Privacy Policy</Link>
             </p>
             <button className={x.cta} onClick={handleCheckout} disabled={!allOk || loading}>

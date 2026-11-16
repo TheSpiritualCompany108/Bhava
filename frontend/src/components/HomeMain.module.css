@@ -328,3 +328,33 @@
     margin-top: 16px;
   }
 }
+
+/* Slide arrows */
+.sliderControls { display: contents; }
+.navArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(74, 11, 29, 0.25);
+  background: rgba(248, 245, 240, 0.9);
+  color: #4A0B1D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(74, 11, 29, 0.15);
+  transition: background 0.2s, color 0.2s;
+}
+.navArrow:hover { background: #4A0B1D; color: #fff; }
+.navPrev { left: 16px; }
+.navNext { right: 16px; }
+/* Mobile: arrows sit in one row with the dots */
+@media (max-width: 768px) {
+  .sliderControls { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; }
+  .sliderControls .slideDots { margin: 0; }
+  .navArrow { position: static; transform: none; width: 32px; height: 32px; flex: 0 0 auto; }
+}

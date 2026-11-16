@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import s from "./AdminCatalog.module.css";
-import { api, money, imgUrl, useDebounced, useNotice, slugify } from "./adminApi";
+import { api, money, imgUrl, useDebounced, useNotice, slugify, optimizeImage } from "./adminApi";
 import { Notice, Confirm, ErrorList, StatusBadge, Modal, ImageLightbox } from "./common";
 
 const VIA_FOR_MODE = { single: ["fragrance", "fixed"], pair: ["pair", "fixed"], camphor: ["camphor", "fixed"], all: ["fixed"], fixed: ["fixed"], none: ["fixed"] };
@@ -39,20 +39,26 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [lightbox, setLightbox] = useState(false);
+  const [imgs, setImgs] = useState(() => [bundle?.image, ...(bundle?.gallery || [])].filter(Boolean));
   const [error, setError] = useState(null);
   const fileRef = useRef(null);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const fieldErr = (n) => error?.errors?.find((e) => e.field === n)?.message;
 
-  const uploadImage = async (file) => {
-    if (!file) return;
+  const uploadImages = async (files) => {
+    const list = Array.from(files || []).slice(0, 10 - imgs.length);
+    if (!list.length) return;
     setUploading(true);
     setError(null);
     try {
-      const fd = new FormData();
-      fd.append("image", file);
-      const { url } = await api("/upload", { method: "POST", form: fd });
-      set("image", url);
+      const urls = [];
+      for (const file of list) {
+        const fd = new FormData();
+        fd.append("image", await optimizeImage(file));
+        const { url } = await api("/upload", { method: "POST", form: fd });
+        urls.push(url);
+      }
+      setImgs((cur) => [...cur, ...urls]);
     } catch (e) {
       setError(e);
     } finally {
@@ -93,6 +99,8 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
     try {
       const body = {
         ...form,
+        image: imgs[0] || "",
+        gallery: imgs.slice(1),
         launchPriority: form.featured ? Number(form.launchPriority) || null : null,
         components: normalizeComponents(form.components, pmap),
       };
@@ -108,34 +116,36 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
         <button className={s.btn} onClick={save} disabled={busy || uploading}>{busy ? "Saving…" : editing ? "Save changes" : "Create collection"}</button>
       </>}>
       <ErrorList error={error} />
-      <div className={s.sect}>Collection image</div>
+      <div className={s.sect}>Collection images</div>
       <div className={s.field}>
-        <label className={s.label}>Hero image (shown on shop cards &amp; product page)</label>
+        <label className={s.label}>Images (first = cover on shop cards; all shown on the collection page)</label>
         <div className={s.imgs}>
-          {form.image && (
-            <div className={s.imgBox}>
-              <img src={imgUrl(form.image)} alt="Collection" title="Click to preview" onClick={() => setLightbox(true)} />
-              <button type="button" className={s.imgX} onClick={() => set("image", "")} aria-label="Remove collection image">✕</button>
+          {imgs.map((u, i) => (
+            <div className={s.imgBox} key={u + i}>
+              <img src={imgUrl(u)} alt={`Collection ${i + 1}`} title="Click to preview" onClick={() => setLightbox(i + 1)} />
+              {i === 0 ? <span className={s.hint}>Cover</span> : <button type="button" className={s.hint} onClick={() => setImgs([u, ...imgs.filter((_, j) => j !== i)])}>Make cover</button>}
+              <button type="button" className={s.imgX} onClick={() => setImgs(imgs.filter((_, j) => j !== i))} aria-label="Remove image">✕</button>
             </div>
-          )}
+          ))}
           <input
             ref={fileRef}
             type="file"
+            multiple
             accept="image/jpeg,image/jpg,image/png,image/webp"
             hidden
-            onChange={(e) => { uploadImage(e.target.files?.[0]); e.target.value = ""; }}
+            onChange={(e) => { uploadImages(e.target.files); e.target.value = ""; }}
           />
-          <button type="button" className={`${s.btn} ${s.btnGhost}`} onClick={() => fileRef.current?.click()} disabled={uploading}>
-            {uploading ? "Uploading…" : form.image ? "Replace image" : "Upload collection image"}
+          <button type="button" className={`${s.btn} ${s.btnGhost}`} onClick={() => fileRef.current?.click()} disabled={uploading || imgs.length >= 10}>
+            {uploading ? "Uploading…" : imgs.length ? "Add more images" : "Upload collection images"}
           </button>
         </div>
-        <span className={s.hint}>JPG, PNG or WebP · use a set / lifestyle shot — not a single product packshot.</span>
+        <span className={s.hint}>JPG, PNG or WebP · select multiple at once (max 10) · use set / lifestyle shots.</span>
         {fieldErr("image") && <span className={s.errText}>{fieldErr("image")}</span>}
       </div>
-      {lightbox && form.image && (
+      {lightbox && imgs.length > 0 && (
         <ImageLightbox
-          images={[{ url: form.image, name: form.slug || "collection" }]}
-          start={0}
+          images={imgs.map((u, i) => ({ url: u, name: `${form.slug || "collection"}-${i + 1}` }))}
+          start={Math.max(0, lightbox - 1)}
           onClose={() => setLightbox(false)}
         />
       )}

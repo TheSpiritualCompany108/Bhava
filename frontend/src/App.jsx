@@ -1,39 +1,40 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import Layout from "./components/Layout";
 import ScrollManager from "./components/ScrollManager";
 import Home from "./pages/Home";
-import Knowledge from "./knowledge/Knowledge";
-import KnowledgeRoutes from "./knowledge/KnowledgeRoutes";
-import Products from "./products/Products";
-import Services from "./services/Services";
-import ExploreServices from "./services/ExploreServices";
-import KundliGenerator from "./services/KundliGenerator";
-import DailyHoroscope from "./services/DailyHoroscope";
-import AppPage from "./app/AppPage";
-import CommunityPage from "./community/CommunityPage";
-import ContactUs from "./pages/ContactUs";
-import FAQPage from "./pages/FAQPage";
-import AuthPage from "./auth/AuthPage";
-import CartPage from "./cart/CartPage";
-import CheckoutPage from "./cart/CheckoutPage";
-import ProfilePage from "./account/ProfilePage";
-import OrdersPage from "./account/OrdersPage";
-import AddressesPage from "./account/AddressesPage";
-import CareerPage from "./pages/carrerpage";
-import AboutUs from "./pages/AboutUs";
-import AdminLogin from "./admin/AdminLogin";
-import AdminPage from "./admin/AdminPage";
-import ProductDetail from "./products/ProductDetail";
-import BundleDetail from "./products/BundleDetail";
-import PolicyPage from "./pages/PolicyPage";
+const Knowledge = lazy(() => import("./knowledge/Knowledge"));
+const KnowledgeRoutes = lazy(() => import("./knowledge/KnowledgeRoutes"));
+const Products = lazy(() => import("./products/Products"));
+const Services = lazy(() => import("./services/Services"));
+const ExploreServices = lazy(() => import("./services/ExploreServices"));
+const KundliGenerator = lazy(() => import("./services/KundliGenerator"));
+const DailyHoroscope = lazy(() => import("./services/DailyHoroscope"));
+const AppPage = lazy(() => import("./app/AppPage"));
+const CommunityPage = lazy(() => import("./community/CommunityPage"));
+const ContactUs = lazy(() => import("./pages/ContactUs"));
+const FAQPage = lazy(() => import("./pages/FAQPage"));
+const AuthPage = lazy(() => import("./auth/AuthPage"));
+const CartPage = lazy(() => import("./cart/CartPage"));
+const CheckoutPage = lazy(() => import("./cart/CheckoutPage"));
+const ProfilePage = lazy(() => import("./account/ProfilePage"));
+const OrdersPage = lazy(() => import("./account/OrdersPage"));
+const AddressesPage = lazy(() => import("./account/AddressesPage"));
+const CareerPage = lazy(() => import("./pages/carrerpage"));
+const AboutUs = lazy(() => import("./pages/AboutUs"));
+const AdminLogin = lazy(() => import("./admin/AdminLogin"));
+const AdminPage = lazy(() => import("./admin/AdminPage"));
+const ProductDetail = lazy(() => import("./products/ProductDetail"));
+const BundleDetail = lazy(() => import("./products/BundleDetail"));
+const PolicyPage = lazy(() => import("./pages/PolicyPage"));
 
 function App() {
   return (
     <BrowserRouter>
       <CartProvider>
         <ScrollManager />
+        <Suspense fallback={null}>
         <Routes>
           {/* Auth page — outside Layout (no navbar/footer) */}
           <Route path="/auth" element={<AuthPage />} />
@@ -72,6 +73,7 @@ function App() {
             <Route path="/admin/login" element={<AdminLogin />} />
           </Route>
         </Routes>
+        </Suspense>
       </CartProvider>
     </BrowserRouter>
   );

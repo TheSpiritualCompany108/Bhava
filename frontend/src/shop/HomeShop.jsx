@@ -16,7 +16,7 @@ const FORMATS = [
   { id: "incense-sticks", label: "Incense Sticks", note: "Sacred Notes", img: "/Products/Format Incense Sticks.jpg", pos: "68% center" },
   { id: "bamboo-less-incense", label: "Bamboo-less Incense", note: "Pure Ritual", img: "/Products/Format Bamboo-less Incense.jpg", pos: "70% center" },
   { id: "incense-cones", label: "Incense Cones", note: "Sacred Ember", img: "/Products/Format Incense Cones.jpg", pos: "70% center" },
-  { id: "sambrani-camphor", label: "Sambrani & Camphor", note: "Offering Cups & Ritual Camphor", img: "/Products/Format Sambrani.jpg", pos: "78% center" },
+  { id: "sambrani", label: "Sambrani", note: "Offering Cups", img: "/Products/Format Sambrani.jpg", pos: "78% center" },
 ];
 
 function Head({ kicker, title, sub }) {

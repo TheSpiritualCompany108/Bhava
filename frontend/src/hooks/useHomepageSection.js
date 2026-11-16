@@ -39,19 +39,32 @@ const readStored = (key) => {
   }
 };
 
+/** Call after admin Save so /products (and other pages) don't keep a stale banner. */
+export function invalidateHomepageSection(key) {
+  if (key) delete cache[key];
+  else Object.keys(cache).forEach((k) => delete cache[k]);
+  try {
+    if (key) localStorage.removeItem(LS_PREFIX + key);
+    else {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith(LS_PREFIX))
+        .forEach((k) => localStorage.removeItem(k));
+    }
+  } catch { /* storage blocked */ }
+}
+
 export function useHomepageSectionState(key) {
   const initial = cache[key] || readStored(key);
   const [data, setData] = useState(initial || {});
   const [loaded, setLoaded] = useState(!!initial);
 
   useEffect(() => {
-    // Already fetched during this page session — nothing more to do.
+    let alive = true;
+    // Stale-while-revalidate: show cache/localStorage instantly, always refresh from API
     if (cache[key]) {
       setData(cache[key]);
       setLoaded(true);
-      return;
     }
-    let alive = true;
     fetch(`${API_BASE}/api/homepage/${key}`)
       .then((res) => res.json())
       .then((json) => {

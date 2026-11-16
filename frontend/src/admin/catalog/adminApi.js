@@ -65,3 +65,24 @@ export async function downloadImage(url, baseName = "image") {
     return false;
   }
 }
+
+/**
+ * Shrinks a photo in the browser before upload (max 1600px wide, WebP). Storefront cards are shown at
+ * ≤ 640px, so multi-MB originals only slow the site down. Falls back to the original file on any problem.
+ */
+export async function optimizeImage(file, maxW = 1600, quality = 0.82) {
+  try {
+    if (!file || !/^image\/(png|jpe?g|webp)$/.test(file.type) || typeof createImageBitmap !== "function") return file;
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, maxW / bmp.width);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((res) => canvas.toBlob(res, "image/webp", quality));
+    if (!blob || blob.type !== "image/webp" || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.\w+$/, "") + ".webp", { type: "image/webp" });
+  } catch {
+    return file;
+  }
+}

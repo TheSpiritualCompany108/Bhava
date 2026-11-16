@@ -34,6 +34,7 @@ function BundleDetailInner({ slug }) {
   const [bracelets, setBracelets] = useState([]);
   const [toast, setToast] = useState(false);
   const [zoomed, setZoomed] = useState(false);
+  const [activeImg, setActiveImg] = useState(0);
   const [tab, setTab] = useState("about");
 
   useEffect(() => {
@@ -70,7 +71,9 @@ function BundleDetailInner({ slug }) {
   const avail = catalog.availability.bundles[bundle.slug];
   const needN = bundle.needs.bracelets || 0;
   const braceletProducts = catalog.products.filter((p) => p.category === "sacred-beads");
-  const hero = bundleThumbImage(catalog, bundle);
+  const cover = bundleThumbImage(catalog, bundle);
+  const gallery = [cover, ...(bundle.gallery || [])].filter(Boolean);
+  const hero = gallery[Math.min(activeImg, gallery.length - 1)];
   const origin = siteOrigin();
 
   const missing = [];
@@ -162,6 +165,7 @@ function BundleDetailInner({ slug }) {
           <Link to="/products?category=curated-collections">Curated Collections</Link><span>/</span>
           <span className={styles.breadcrumbCurrent}>{bundle.name}</span>
         </nav>
+        <div className={styles.backRow}><InlineBack fallback="/products?category=curated-collections" /></div>
 
         <div className={styles.productShowcase}>
           {/* ── Left: gallery (same as PDP) ── */}
@@ -185,11 +189,19 @@ function BundleDetailInner({ slug }) {
               />
               <span className={styles.badgeOverlay}>Collection</span>
             </div>
+            {gallery.length > 1 && (
+              <div className={styles.thumbnailRow}>
+                {gallery.map((g, i) => (
+                  <button key={g + i} type="button" className={`${styles.thumbnailBtn} ${i === activeImg ? styles.thumbnailActive : ""}`} onClick={() => setActiveImg(i)} aria-label={`Show image ${i + 1}`}>
+                    <img src={imgSrc(g)} alt={`${bundle.name} view ${i + 1}`} className={styles.thumbnailImg} loading="lazy" width={96} height={96} />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* ── Right: buy box (same as PDP) ── */}
           <div className={styles.detailsCol}>
-            <InlineBack fallback="/products?category=curated-collections" />
             <span className={styles.categoryTag}>{bundle.group || "Curated collection"}</span>
             <h1 className={styles.title}>{bundle.name}</h1>
 

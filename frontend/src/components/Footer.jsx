@@ -168,7 +168,7 @@ const PinterestIcon = () => (
 
 // Support contact shown in the footer. Phone is intentionally blank until the client provides it (row hidden while empty).
 const SUPPORT_EMAIL = "Thespiritualcompany108@gmail.com";
-const SUPPORT_PHONE = "";
+const SUPPORT_PHONE = "+91 7777068632";
 
 function Footer() {
 
@@ -195,8 +195,8 @@ function Footer() {
       links: [
         { label: "Our Mission", action: "mission" },
         { label: "Careers", to: "/career" },
-        { label: "Privacy", to: "/privacy-policy" },
-        { label: "Terms", to: "/terms" },
+        { label: "Privacy Policy", to: "/privacy-policy" },
+        { label: "Terms & Conditions", to: "/terms" },
       ],
     },
   ];

@@ -155,7 +155,7 @@ function AuthPage() {
 
       <div className={styles.card}>
         {/* Bhava: Logo */}
-        <img src="/bhava-icon.png" alt="Bhava:" className={styles.logoMark} />
+        <img src="/bhava-icon.webp" alt="Bhava:" className={styles.logoMark} />
         <h2 className={styles.heading}>BHAVA:</h2>
 
         <h1 className={styles.title}>

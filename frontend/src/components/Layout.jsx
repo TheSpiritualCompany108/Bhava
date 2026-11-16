@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Outlet, useLocation, useNavigationType } from "react-router-dom";
 import Navbar from "./Navbar";
 import PageBack from "./PageBack";
@@ -79,7 +79,9 @@ function Layout() {
       {!isAdminRoute && <Navbar />}
       {!isAdminRoute && <PageBack />}
       <ScrollToTopOnPush />
-      <Outlet />
+      <Suspense fallback={null}>
+        <Outlet />
+      </Suspense>
       {!isAdminRoute && <Footer />}
       {!isAdminRoute && (
         <>

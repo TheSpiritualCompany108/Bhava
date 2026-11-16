@@ -22,7 +22,7 @@ const initials = (name = "") =>
 function Stars({ value }) {
   const filled = Math.round(Number(value) || 0);
   return (
-    <span className={styles.stars} aria-label={`${filled} out of 5 stars`}>
+    <span className={styles.stars} role="img" aria-label={`${filled} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((n) => (
         <span key={n} className={n <= filled ? styles.starOn : styles.starOff} aria-hidden="true">
           ★

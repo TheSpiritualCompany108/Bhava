@@ -29,7 +29,7 @@ const timeAgo = (iso) => {
 export function Stars({ value, size = 16, interactive = false, onChange, onHover }) {
   const filled = Math.round(Number(value) || 0);
   return (
-    <span className={styles.stars} style={{ fontSize: size }} aria-label={`${value} out of 5 stars`}>
+    <span className={styles.stars} style={{ fontSize: size }} role="img" aria-label={`${value} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}

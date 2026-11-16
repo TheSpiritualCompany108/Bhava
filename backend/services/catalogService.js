@@ -80,6 +80,21 @@ export async function syncCatalog({ dryRun = false } = {}) {
     }
   }
 
+  // PDF §12: split legacy Sambrani & Camphor into separate categories (safe re-run)
+  if (!dryRun) {
+    const split = [
+      ["sacred-sambrani-offering-cups", "sambrani"],
+      ["camphor-ritual-duo", "camphor"],
+    ];
+    for (const [slug, category] of split) {
+      await CatalogProduct.updateOne({ slug, category: { $ne: category } }, { $set: { category } });
+    }
+    // Hide the combined legacy category once the split ones exist
+    if (await CatalogCategory.exists({ id: "sambrani" }) && await CatalogCategory.exists({ id: "camphor" })) {
+      await CatalogCategory.updateOne({ id: "sambrani-camphor" }, { $set: { active: false } });
+    }
+  }
+
   const usedSkus = new Map();
   for (const p of await CatalogProduct.find({}, "slug variants.sku").lean()) p.variants.forEach((v) => usedSkus.set(v.sku, p.slug));
 
@@ -239,6 +254,7 @@ export async function validateBundleInput(input, { existing } = {}) {
   d.tagline = str(input.tagline, 200);
   d.description = str(input.description, 2000);
   d.image = str(input.image, 500);
+  d.gallery = (Array.isArray(input.gallery) ? input.gallery : []).map((u) => str(u, 500)).filter(Boolean).slice(0, 10);
   d.approvalNotes = str(input.approvalNotes, 1000);
   d.sortOrder = Number.isFinite(Number(input.sortOrder)) ? Number(input.sortOrder) : 0;
   d.status = str(input.status || "active", 20);

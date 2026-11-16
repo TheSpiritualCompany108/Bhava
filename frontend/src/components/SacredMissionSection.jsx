@@ -73,7 +73,7 @@ export default function SacredMissionSection() {
 
         <div className={styles.imageCol}>
           <img
-            src="/Sacred Mission.png"
+            src="/Sacred Mission.webp" width={1366} height={768} loading="lazy" decoding="async"
             className={styles.image}
             alt="Praying figure illustration"
           />

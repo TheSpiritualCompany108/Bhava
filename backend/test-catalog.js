@@ -261,7 +261,12 @@ assert.deepEqual((await q({ search: "SN-DIS-OUD" })).items.map((i) => i.sku), ["
 assert.ok((await q({ search: "sacred notes discovery" })).items.length === 3);
 assert.ok((await q({ search: "sandalwood" })).items.every((i) => i.fragrances.includes("sandalwood")));
 assert.ok((await q({ search: "sandalwood" })).total >= 8);
-assert.deepEqual((await q({ category: "sambrani-camphor" })).items.map((i) => i.sku).sort(), ["CRD-44-GUG", "CRD-44-SAN", "SSC-21-GUG"]);
+assert.deepEqual((await q({ category: "sambrani" })).items.map((i) => i.sku).sort(), ["SSC-21-GUG"]);
+assert.deepEqual((await q({ category: "camphor" })).items.map((i) => i.sku).sort(), ["CRD-44-GUG", "CRD-44-SAN"]);
+assert.deepEqual(
+  [...(await q({ category: "sambrani" })).items, ...(await q({ category: "camphor" })).items].map((i) => i.sku).sort(),
+  ["CRD-44-GUG", "CRD-44-SAN", "SSC-21-GUG"],
+);
 assert.ok((await q({ stockStatus: "low" })).items.every((i) => i.stock > 0 && i.stock <= 5));
 assert.ok((await q({ stockStatus: "out" })).items.every((i) => i.stock === 0));
 assert.ok((await q({ stockStatus: "in" })).items.every((i) => i.stock > 5));

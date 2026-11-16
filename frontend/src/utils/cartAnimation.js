@@ -1,4 +1,9 @@
-import gsap from "gsap";
+import { imgSrc } from "../shop/shopUtils";
+
+// gsap is loaded on demand (keeps ~70 KB out of the initial bundle)
+let gsap;
+const loadGsap = () => import("gsap").then((m) => { gsap = m.default || m.gsap; });
+if (typeof window !== "undefined") (window.requestIdleCallback || ((f) => setTimeout(f, 3000)))(() => loadGsap().catch(() => {}));
 
 const COLORS = ["#E07B39", "#f0a86f", "#c0671e", "#4A0B1D", "#e89138", "#ffd9b3", "#2e7d52"];
 const CART_SELECTOR = 'button[aria-label="View cart"]';
@@ -34,7 +39,8 @@ function flyToCart(from, image) {
       width: `${size}px`,
       height: `${size}px`,
       borderRadius: "14px",
-      background: image ? `#fff url("${image}") center/cover no-repeat` : "#E07B39",
+      // image may be an admin upload (/uploads/… lives on the API host) — resolve it like the cards do
+      background: image ? `#fff url("${imgSrc(image)}") center/cover no-repeat` : "#E07B39",
       border: "2px solid #fff",
       boxShadow: "0 10px 28px rgba(74, 11, 29, 0.35)",
       zIndex: LAYER + 1,
@@ -78,7 +84,11 @@ function flyToCart(from, image) {
  * Polished "added to cart" animation.
  * Call right after the cart state is updated.
  */
-export function playAddToCartAnimation(btn, { image } = {}) {
+export function playAddToCartAnimation(btn, opts = {}) {
+  (gsap ? Promise.resolve() : loadGsap()).then(() => playNow(btn, opts)).catch(() => {});
+}
+
+function playNow(btn, { image } = {}) {
   if (!btn || reduced()) {
     if (image && btn) {
       const rect = btn.getBoundingClientRect();

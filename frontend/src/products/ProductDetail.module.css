@@ -1280,3 +1280,20 @@
 .addWrap .addToCartBtn {
   width: 100%;
 }
+
+/* Back button sits directly under the breadcrumb */
+.backRow { margin: -12px 0 16px; }
+@media (max-width: 600px) {
+  .page { padding-top: 20px; }
+  .breadcrumb { gap: 4px 6px; font-size: 12.5px; margin-bottom: 8px; line-height: 1.5; }
+  /* page title is already the heading right below — keep the trail short: Home / Shop / Category */
+  .breadcrumb > span:nth-last-child(2),
+  .breadcrumbCurrent { display: none; }
+  .backRow { margin: 0 0 14px -4px; }
+}
+
+/* Mobile: smaller badge + category tag */
+@media (max-width: 600px) {
+  .badgeOverlay { top: 10px; left: 10px; padding: 3px 8px; font-size: 9px; letter-spacing: 0.6px; }
+  .categoryTag { font-size: 9px; padding: 3px 9px; letter-spacing: 1px; margin-bottom: 10px; }
+}

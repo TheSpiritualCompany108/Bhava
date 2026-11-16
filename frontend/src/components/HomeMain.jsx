@@ -7,9 +7,9 @@ import useHomepageSection, { resolveHomepageImageUrl, PLACEHOLDER_IMAGE } from "
 const INTERVAL = 7000;
 
 const slides = [
-  { image: "./temple(4).png" },
+  { image: "/temple(4).webp" },
   {
-    image: "./Slide 01.png",
+    image: "/Slide 01.webp",
     title: ["A Daily Ritual.", "A Different Life."],
     description:
       "Eleven intentional minutes each day can create remarkable clarity over time. Bhava: helps you build a practice that quietly becomes part of who you are.",
@@ -17,7 +17,7 @@ const slides = [
     ctaPath: "/about",
   },
   {
-    image: "./Slide 02.png",
+    image: "/Slide 02.webp",
     title: ["Objects Made", "For Practice."],
     description:
       "Every Bhava: object has one purpose: to support your daily rhythm with simplicity, beauty, and intention.",
@@ -25,7 +25,7 @@ const slides = [
     ctaPath: "/products",
   },
   {
-    image: "./Slide 03.png",
+    image: "/Slide 03.webp",
     title: ["Stay With", "The Practice."],
     description:
       "Guided journeys, reflections, and structured challenges help transform occasional devotion into lasting habits.",
@@ -33,7 +33,7 @@ const slides = [
     ctaPath: "/knowledge",
   },
   {
-    image: "./Slide 04.png",
+    image: "/Slide 04.webp",
     title: ["Ancient Wisdom.", "Daily Life."],
     description:
       "Short reflections, timeless teachings, and practical guidance designed to accompany modern living.",
@@ -41,7 +41,7 @@ const slides = [
     ctaPath: "/knowledge",
   },
   {
-    image: "./Slide 05.png",
+    image: "/Slide 05.webp",
     title: ["Your Ritual,", "Supported Daily."],
     description:
       "Gentle reminders, progress tracking, and guided experiences that encourage consistency without distraction.",
@@ -49,7 +49,7 @@ const slides = [
     ctaPath: "/app",
   },
   {
-    image: "./Slide 06.png",
+    image: "/Slide 06.webp",
     title: ["Practice Together.", "Grow Together."],
     description:
       "Quiet stories, shared experiences, and a community that values consistency over perfection.",
@@ -124,6 +124,9 @@ function HomeMain() {
     setCurrent(next);
   };
 
+  const prev = () => goTo((current - 1 + displaySlides.length) % displaySlides.length);
+  const next = () => goTo((current + 1) % displaySlides.length);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       goTo((current + 1) % displaySlides.length);
@@ -143,6 +146,10 @@ function HomeMain() {
           key={current}
           src={bgImage}
           alt="Temple Background"
+          width={1600}
+          height={900}
+          fetchPriority="high"
+          decoding="async"
           className={styles.homeMainHeroBgImage}
           custom={dir}
           variants={imageVariants}
@@ -217,6 +224,12 @@ function HomeMain() {
           )}
         </AnimatePresence>
 
+        <div className={styles.sliderControls}>
+          {displaySlides.length > 1 && (
+            <button type="button" className={`${styles.navArrow} ${styles.navPrev}`} onClick={prev} aria-label="Previous slide">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
+          </button>
+          )}
         <ul className={styles.slideDots}>
           {displaySlides.map((_, i) => (
             <li key={i}>
@@ -229,6 +242,12 @@ function HomeMain() {
             </li>
           ))}
         </ul>
+          {displaySlides.length > 1 && (
+            <button type="button" className={`${styles.navArrow} ${styles.navNext}`} onClick={next} aria-label="Next slide">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5l7 7-7 7" /></svg>
+          </button>
+          )}
+        </div>
       </div>
     </div>
   );
