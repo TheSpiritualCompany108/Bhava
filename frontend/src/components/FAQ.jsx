@@ -1,3 +1,4 @@
+import { InlineBack } from "./PageBack";
 import { useState } from "react";
 import styles from "./FAQ.module.css";
 
@@ -75,6 +76,7 @@ function FAQ() {
 
   return (
     <section className={styles.faqSection}>
+      <div style={{ marginBottom: 22 }}><InlineBack fallback="/" /></div>
       {/* Header */}
       <h1 className={styles.title}>Have Questions ? Let us Help!</h1>
 

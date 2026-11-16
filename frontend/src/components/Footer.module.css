@@ -22,8 +22,8 @@
 }
 
 .footerContainer > .footerColumn:last-child {
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
 }
 
 /* Footer Heading */
@@ -70,18 +70,29 @@
 }
 
 .footerContainer > .footerColumn:last-child .footerSocialIcons {
-  justify-content: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
+.contactList { list-style: none; margin: 24px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.contactList li { display: flex; align-items: center; gap: 10px; color: #d5dbd8; font-size: 0.9rem; }
+.contactList svg { color: #e8b86d; flex-shrink: 0; }
+.addressRow { align-items: flex-start !important; }
+.addressRow svg { margin-top: 3px; }
+.addressRow address { font-style: normal; line-height: 1.6; max-width: 260px; }
+.contactList a { color: inherit; text-decoration: none; word-break: break-all; }
+.contactList a:hover { color: #e8b86d; }
+
 .footerAddress {
-  margin: 140px 0 0;
-  max-width: 360px;
+  margin: 26px 0 0;
+  padding-top: 22px;
+  max-width: 300px;
+  border-top: 1px solid rgba(184, 197, 190, 0.2);
   color: #d5dbd8;
   font-size: 0.88rem;
-  line-height: 1.85;
+  line-height: 1.8;
   letter-spacing: 0.2px;
-  word-spacing: 2px;
-  text-align: center;
+  text-align: left;
 }
 
 /* Icon-only circles — no label */

@@ -170,7 +170,7 @@ export default function ProductsPanel() {
                   <td data-label="">
                     <div className={s.rowActions}>
                       <button className={`${s.btn} ${s.btnSm}`} onClick={() => setForm({ slug: p.slug })}>Edit</button>
-                      <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => setQrProduct({ slug: p.slug, name: p.name })}>Generate QR</button>
+                      <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => setQrProduct({ slug: p.slug, name: p.name, mode: p.mode, category: p.category, variants: p.variants })}>Generate QR</button>
                       {p.status === "active" && <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => setStatusOf(p, "inactive")} disabled={busy}>Deactivate</button>}
                       {p.status !== "active" && <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => setStatusOf(p, "active")} disabled={busy}>{p.status === "archived" ? "Restore" : "Activate"}</button>}
                       {p.status !== "archived" && <button className={`${s.btn} ${s.btnDanger} ${s.btnSm}`} onClick={() => askArchive(p)}>Archive</button>}

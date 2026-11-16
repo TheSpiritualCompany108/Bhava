@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
 import shop from "../shop/Shop.module.css";
 import { useCart } from "../context/CartContext";
@@ -27,7 +27,9 @@ function ProductDetailInner({ slug }) {
   const { catalog, loading, error, reload } = useCatalog();
 
   const product = getProduct(catalog, slug);
-  const [picked, setPicked] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  // QR / shared links like ?fragrance=oud open the page with that fragrance already selected
+  const [picked, setPicked] = useState(() => (searchParams.get("fragrance") || "").toLowerCase());
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("about");
   const [toast, setToast] = useState(false);
@@ -326,7 +328,7 @@ function ProductDetailInner({ slug }) {
                         disabled={!ok}
                         title={ok ? "" : "Out of stock"}
                         className={`${shop.chip} ${variantKey === v.key ? shop.chipOn : ""}`}
-                        onClick={() => { setPicked(v.key); selectItem(product, v.key); }}
+                        onClick={() => { setPicked(v.key); selectItem(product, v.key); setSearchParams({ fragrance: v.key }, { replace: true }); }} /* keep the URL shareable: ?fragrance=oud */
                       >
                         {v.label}
                       </button>

@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 import { POLICIES } from "./policies";
+import { InlineBack } from "../components/PageBack";
 import styles from "./PolicyPage.module.css";
 
 export default function PolicyPage() {
@@ -24,6 +25,7 @@ export default function PolicyPage() {
         description={clipDesc(page.body[0])}
         canonical={`${siteOrigin()}/${slug}`}
       />
+      <InlineBack fallback="/" />
       <p className={styles.kicker}>{page.kicker}</p>
       <h1>{page.title}</h1>
       {page.body.map((p) => <p key={p}>{p}</p>)}

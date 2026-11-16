@@ -191,7 +191,15 @@ export function suggestAddOn(catalog, lines) {
   const has = (slug) => lines.some((l) => l.kind === "product" && l.slug === slug);
   const varOf = (slug) => lines.find((l) => l.kind === "product" && l.slug === slug)?.variant;
   const core = (v) => ["guggal", "oud", "sandalwood"].includes(v);
-  const pick = (slug, variant, reason) => (has(slug) ? null : { slug, variant, reason });
+  const live = (slug) => {
+    const p = getProduct(catalog, slug);
+    return !!(p && p.status !== "archived" && productInStock(catalog, p));
+  };
+  const pick = (slug, variant, reason) => {
+    if (has(slug) || !live(slug)) return null;
+    if (variant && !variantInStock(catalog, slug, variant)) return null;
+    return { slug, variant, reason };
+  };
 
   if (has("sacred-notes-discovery") && core(varOf("sacred-notes-discovery"))) {
     const v = varOf("sacred-notes-discovery");
@@ -206,9 +214,84 @@ export function suggestAddOn(catalog, lines) {
     return pick("camphor-ritual-duo", null, "A natural complement to Sambrani — choose your camphor fragrance.");
   if (has("camphor-ritual-duo"))
     return pick("sacred-sambrani-offering-cups", "guggal", "A traditional Guggal offering to go with your camphor.");
-  if (lines.some((l) => l.kind === "product" && l.slug.endsWith("-bracelet")))
-    return pick("sacred-notes-discovery", null, "Pair your bracelet with a fragrance to begin with.");
+
+  // Bracelet carts use suggestBraceletAddOns() in CartPage (§8.3 rows).
+  const braceletLines = cartBraceletLines(catalog, lines);
+  if (braceletLines.length >= 1) {
+    const rows = suggestBraceletAddOns(catalog, lines);
+    return rows[0] || null;
+  }
   return null;
+}
+
+function cartBraceletLines(catalog, lines) {
+  return (lines || []).filter(
+    (l) =>
+      l.kind === "product" &&
+      (String(l.slug || "").endsWith("-bracelet") || getProduct(catalog, l.slug)?.category === "sacred-beads")
+  );
+}
+
+/**
+ * §8.3 bracelet basket rows when cart has one (or more) bracelets:
+ * - 1 bracelet → one trade-up bracelet + cross-category + ritual complements
+ * - 2+ bracelets → cross-category / ritual only (trade-up already done)
+ */
+export function suggestBraceletAddOns(catalog, lines) {
+  if (!catalog || !lines?.length) return [];
+  const has = (slug) => lines.some((l) => l.kind === "product" && l.slug === slug);
+  const live = (slug) => {
+    const p = getProduct(catalog, slug);
+    return !!(p && p.status !== "archived" && productInStock(catalog, p));
+  };
+  const pick = (slug, variant, reason) => {
+    if (has(slug) || !live(slug)) return null;
+    if (variant && !variantInStock(catalog, slug, variant)) return null;
+    return { slug, variant, reason };
+  };
+
+  const braceletLines = cartBraceletLines(catalog, lines);
+  if (!braceletLines.length) return [];
+
+  const out = [];
+  if (braceletLines.length === 1) {
+    const inCart = new Set(braceletLines.map((l) => l.slug));
+    const second = (catalog.products || []).find(
+      (p) =>
+        p.category === "sacred-beads" &&
+        p.status !== "archived" &&
+        !inCart.has(p.slug) &&
+        productInStock(catalog, p)
+    );
+    if (second) {
+      const v = second.variants?.find((x) => x.active !== false)?.key || second.variants?.[0]?.key || "default";
+      if (variantInStock(catalog, second.slug, v)) {
+        out.push({
+          slug: second.slug,
+          variant: v,
+          reason: "Bracelet trade-up — add a second different intention.",
+        });
+      }
+    }
+  }
+
+  // Cross-category purchase (§8.3)
+  const cross = [
+    pick("sacred-notes-discovery", null, "Cross-category purchase — pair with Sacred Notes Discovery."),
+    pick("pure-ritual-single", null, "Cross-category purchase — pair with Pure Ritual Single."),
+    pick("sacred-ember", null, "Cross-category purchase — pair with Sacred Ember cones."),
+  ].filter(Boolean);
+  out.push(...cross);
+
+  // Ritual complements (§8.3)
+  const ritual = [
+    pick("sacred-sambrani-offering-cups", "guggal", "Ritual complement — add Sambrani Cups."),
+    pick("camphor-ritual-duo", null, "Ritual complement — add Camphor Ritual Duo."),
+  ].filter(Boolean);
+  out.push(...ritual);
+
+  // §8.3: never dump the whole table — one (or at most two) relevant add-ons
+  return out.slice(0, 2);
 }
 
 // Contents summary lines for a bundle, e.g. "1 × Sacred Notes Discovery"

@@ -17,15 +17,19 @@ const CARD = {
   borderWidth: 5,
 };
 
-export function productPageUrl(slug) {
+// Incense formats that are sold in one chosen fragrance get one QR per fragrance
+const FRAGRANCE_CATEGORIES = ["incense-sticks", "bamboo-less-incense", "incense-cones"];
+export const hasFragranceQr = (p) => p?.mode === "single" && FRAGRANCE_CATEGORIES.includes(p.category);
+
+export function productPageUrl(slug, fragrance = "") {
   if (!slug) return "";
-  // Match storefront route `/products/:id` + print footer style
-  return `${SITE}/products/${slug}`;
+  // Match storefront route `/products/:id`; ?fragrance= opens it with that fragrance selected
+  return `${SITE}/products/${slug}${fragrance ? `?fragrance=${fragrance}` : ""}`;
 }
 
-export function productQrDisplayPath(slug) {
+export function productQrDisplayPath(slug, fragrance = "") {
   if (!slug) return "bhavaglobal.com/products";
-  return `bhavaglobal.com/products/${slug}`;
+  return `bhavaglobal.com/products/${slug}${fragrance ? `?fragrance=${fragrance}` : ""}`;
 }
 
 async function waitForFonts() {
@@ -66,7 +70,7 @@ function logoOnClear(img) {
 }
 
 /** Compose branded Bhava: QR card (matches store print template). */
-async function buildBrandedQrCard(targetUrl, displayPath) {
+async function buildBrandedQrCard(targetUrl, displayPath, fragranceLabel = "") {
   await waitForFonts();
 
   const qrSize = 420;
@@ -133,7 +137,7 @@ async function buildBrandedQrCard(targetUrl, displayPath) {
   ctx.fillStyle = CARD.ink;
   ctx.textAlign = "center";
   ctx.font = '500 26px "Neue Haas Grotesk", Inter, Arial, sans-serif';
-  ctx.fillText("Sacred Collections", CARD.width / 2, 190);
+  ctx.fillText(fragranceLabel ? `Sacred Collections · ${fragranceLabel}` : "Sacred Collections", CARD.width / 2, 190);
 
   // QR
   const qrX = (CARD.width - qrSize) / 2;
@@ -209,8 +213,12 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 export default function QrDialog({ product, onClose }) {
-  const url = productPageUrl(product?.slug);
-  const displayPath = productQrDisplayPath(product?.slug);
+  const perFragrance = hasFragranceQr(product);
+  const fragrances = perFragrance ? (product.variants || []).filter((v) => v.active !== false) : [];
+  const [frag, setFrag] = useState(""); // "" = whole product page
+  const fragLabel = fragrances.find((v) => v.key === frag)?.label || "";
+  const url = productPageUrl(product?.slug, frag);
+  const displayPath = productQrDisplayPath(product?.slug, frag);
   const [dataUrl, setDataUrl] = useState("");
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
@@ -223,7 +231,7 @@ export default function QrDialog({ product, onClose }) {
       setError("This product has no slug, so a QR link cannot be generated.");
       return undefined;
     }
-    buildBrandedQrCard(url, displayPath)
+    buildBrandedQrCard(url, displayPath, fragLabel)
       .then((d) => {
         if (!cancelled) setDataUrl(d);
       })
@@ -233,7 +241,7 @@ export default function QrDialog({ product, onClose }) {
     return () => {
       cancelled = true;
     };
-  }, [url, displayPath]);
+  }, [url, displayPath, fragLabel]);
 
   const copyLink = async () => {
     try {
@@ -258,7 +266,7 @@ export default function QrDialog({ product, onClose }) {
           <a
             className={`${s.btn} ${!dataUrl ? s.btnDisabled : ""}`}
             href={dataUrl || undefined}
-            download={`${product.slug}-qr.png`}
+            download={`${product.slug}${frag ? `-${frag}` : ""}-qr.png`}
             aria-disabled={!dataUrl}
             onClick={(e) => {
               if (!dataUrl) e.preventDefault();
@@ -270,7 +278,15 @@ export default function QrDialog({ product, onClose }) {
       }
     >
       <div className={s.qrBox}>
-        <p className={s.qrName}>{product.name}</p>
+        <p className={s.qrName}>{product.name}{fragLabel ? ` — ${fragLabel}` : ""}</p>
+        {perFragrance && (
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", marginBottom: 10 }} role="group" aria-label="QR fragrance">
+            {[{ key: "", label: "Product" }, ...fragrances].map((v) => (
+              <button key={v.key || "all"} type="button" onClick={() => setFrag(v.key)}
+                className={`${s.btn} ${s.btnSm} ${frag === v.key ? "" : s.btnGhost}`}>{v.label}</button>
+            ))}
+          </div>
+        )}
         {error && (
           <p className={s.nErr} style={{ margin: "8px 0", padding: "8px 10px", borderRadius: 8 }}>
             {error}
@@ -293,7 +309,7 @@ export default function QrDialog({ product, onClose }) {
           {copied ? "Copied!" : "Copy link"}
         </button>
         <p className={s.hint} style={{ marginBottom: 0 }}>
-          Download the branded card — scan opens this product on the storefront.
+          {frag ? `Scan opens this product with ${fragLabel} already selected.` : "Download the branded card — scan opens this product on the storefront."}
         </p>
       </div>
     </Modal>

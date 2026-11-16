@@ -39,6 +39,22 @@ export default function QuickView({ product: p, catalog, onClose, onAdded }) {
     window.setTimeout(onClose, 180);
   };
 
+  // Reflect the open product + chosen fragrance in the address bar (shareable); restore the URL on close.
+  // Own params (qv / qf) so it never clashes with the shop's category / fragrance filters.
+  useEffect(() => {
+    const u = new URL(window.location.href);
+    u.searchParams.set("qv", p.slug);
+    if (variantKey) u.searchParams.set("qf", variantKey);
+    else u.searchParams.delete("qf");
+    window.history.replaceState(window.history.state, "", u);
+  }, [p.slug, variantKey]);
+  useEffect(() => () => {
+    const u = new URL(window.location.href);
+    u.searchParams.delete("qv");
+    u.searchParams.delete("qf");
+    window.history.replaceState(window.history.state, "", u);
+  }, []);
+
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && requestClose();
     document.addEventListener("keydown", onKey);
