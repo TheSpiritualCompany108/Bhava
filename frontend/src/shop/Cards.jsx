@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import QuickView from "./QuickView";
+import BundleQuickView from "./BundleQuickView";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Shop.module.css";
 import { useCart } from "../context/CartContext";
@@ -75,7 +76,7 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
         {!inStock ? (
           <button type="button" className={`${styles.btn} ${styles.btnDisabled}`} disabled>Out of stock</button>
         ) : single && !multiFrag ? (
-          <button type="button" className={styles.btn} onClick={quickAdd}>
+          <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={quickAdd}>
             <span data-label>
               {inCartLine ? "Go to Cart →" : "Add to Cart +"}
             </span>
@@ -83,13 +84,13 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
         ) : (
           <button
             type="button"
-            className={styles.btn}
+            className={`${styles.btn} ${styles.btnGhost}`}
             onClick={() => setQuickOpen(true)}
             aria-haspopup="dialog"
           >
             {anyVariantInCart
               ? (p.mode === "pair" ? "Add another pair" : "Add another")
-              : (p.mode === "pair" ? "Choose pair" : "Choose fragrance")}
+              : "Choose & add →"}
           </button>
         )}
       </div>
@@ -108,8 +109,17 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
 export function BundleCard({ bundle: b, catalog }) {
   const inStock = bundleInStock(catalog, b.slug);
   const thumb = bundleThumbImage(catalog, b);
+  const [quickOpen, setQuickOpen] = useState(false);
+  // "Choose & add" opens the popup; the rest of the card still opens the collection page
+  const onCardClick = (e) => {
+    if (inStock && e.target.closest?.("[data-bundle-quick]")) {
+      e.preventDefault();
+      setQuickOpen(true);
+    }
+  };
   return (
-    <Link to={`/collection/${b.slug}`} className={`${styles.bundleCard} ${inStock ? "" : styles.cardDim}`}>
+    <>
+    <Link to={`/collection/${b.slug}`} onClick={onCardClick} className={`${styles.bundleCard} ${inStock ? "" : styles.cardDim}`}>
       <div className={styles.bundleImg}>
         <ResponsiveImg
           src={thumb}
@@ -128,8 +138,10 @@ export function BundleCard({ bundle: b, catalog }) {
       </ul>
       <div className={styles.bundleFoot}>
         <span className={styles.price}>{inr(b.price)}</span>
-        <span className={`${styles.btn} ${inStock ? styles.btnGhost : styles.btnDisabled}`}>{inStock ? "Choose & add →" : "Unavailable"}</span>
+        <span data-bundle-quick className={`${styles.btn} ${inStock ? styles.btnGhost : styles.btnDisabled}`}>{inStock ? "Choose & add →" : "Unavailable"}</span>
       </div>
     </Link>
+    {quickOpen && <BundleQuickView bundle={b} catalog={catalog} onClose={() => setQuickOpen(false)} />}
+    </>
   );
 }

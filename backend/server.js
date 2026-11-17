@@ -123,6 +123,8 @@ const corsOptions = {
   credentials: true,
 };
 
+// Behind Vercel / a proxy: use the real client IP (needed for per-IP rate limits)
+app.set("trust proxy", 1);
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));

@@ -1,6 +1,7 @@
 import ProductsPanel from "./catalog/ProductsPanel";
 import BundlesPanel from "./catalog/BundlesPanel";
 import InventoryDashboard from "./catalog/InventoryDashboard";
+import EnquiriesPanel from "./catalog/EnquiriesPanel";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { invalidateHomepageSection } from "../hooks/useHomepageSection";
@@ -1102,7 +1103,7 @@ export default function AdminPage() {
       `}</style>
       {/* TOP NAV */}
       <div className="adm-top" style={{ position: "fixed", top: 0, left: 0, right: 0, background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "12px 20px", zIndex: 100, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {section === "homepage" ? "Homepage" : section === "quotes" ? "Quotes" : section === "mantraAudio" ? "108-Day Mantra" : section === "dhyanAudio" ? "21-Day Dhyān" : section === "inventory" ? "Inventory" : section === "catalogProducts" ? "Catalogue" : section === "catalogBundles" ? "Collections" : activeCategory}</h2>
+        <h2 style={{ margin: 0, color: "#4A0B1D" }}>Admin Dashboard - {section === "homepage" ? "Homepage" : section === "quotes" ? "Quotes" : section === "mantraAudio" ? "108-Day Mantra" : section === "dhyanAudio" ? "21-Day Dhyān" : section === "inventory" ? "Inventory" : section === "catalogProducts" ? "Catalogue" : section === "catalogBundles" ? "Collections" : section === "enquiries" ? "Enquiries" : activeCategory}</h2>
         <button onClick={logout} style={{ padding: "8px 16px", background: "#E07B39", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer" }}>Logout</button>
       </div>
 
@@ -1122,6 +1123,11 @@ export default function AdminPage() {
           ))}
         </ul>
 
+        <h3 style={{ marginTop: 20, color: "#4A0B1D", fontSize: 14, borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>Inbox</h3>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          <li onClick={() => setSection("enquiries")} style={{ cursor: "pointer", padding: "10px 12px", background: section === "enquiries" ? "#E07B39" : "transparent", color: section === "enquiries" ? "#fff" : "#4A0B1D", borderRadius: 8, marginBottom: 6, fontSize: 13 }}>📥 Enquiries &amp; Bookings</li>
+        </ul>
+
         <h3 style={{ marginTop: 20, color: "#4A0B1D", fontSize: 14, borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>Content</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
           <li onClick={() => { setSection("homepage"); if (homepageTab === "productsBanner") setHomepageTab("hero"); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "homepage" && homepageTab !== "productsBanner" ? "#E07B39" : 'transparent', color: section === "homepage" && homepageTab !== "productsBanner" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🏠 Homepage</li>
@@ -1133,7 +1139,11 @@ export default function AdminPage() {
         </ul>
       </aside>
 
-      {section === "inventory" || section === "catalogProducts" || section === "catalogBundles" ? (
+      {section === "enquiries" ? (
+        <main className="adm-main" style={{ flex: 1, minWidth: 0, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
+          <EnquiriesPanel />
+        </main>
+      ) : section === "inventory" || section === "catalogProducts" || section === "catalogBundles" ? (
         <main className="adm-main" style={{ flex: 1, minWidth: 0, padding: "80px 20px 20px", overflowY: "auto", maxHeight: "100vh" }}>
           {section === "inventory" ? <InventoryDashboard /> : section === "catalogProducts" ? <ProductsPanel /> : <BundlesPanel />}
         </main>

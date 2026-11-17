@@ -164,3 +164,19 @@
     line-height: 1.55;
   }
 }
+
+/* Mobile: centred intro, topics as a 2-column grid, one Explore button */
+@media (max-width: 480px) {
+  .section { padding: 40px 0 36px; }
+  .inner { width: calc(100% - 40px); gap: 22px; }
+  .left { text-align: center; padding-top: 0; }
+  .title { font-size: 28px; margin-bottom: 12px; }
+  .description { font-size: 15px; font-weight: 400; line-height: 1.6; letter-spacing: 0; color: #5c4a4f; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .card { padding: 14px 14px 16px; border-radius: 12px; }
+  .number { font-size: 12px; margin-bottom: 4px; }
+  .cardTitle { font-size: 17px; margin-bottom: 4px; }
+  .cardDescription { font-size: 12.5px; line-height: 1.45; letter-spacing: 0; font-weight: 400; color: #5c4a4f; }
+  .mobileTeaser { order: 3; text-align: center; max-width: none; }
+  .mobileTeaser p { display: none; }
+}

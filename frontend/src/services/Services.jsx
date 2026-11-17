@@ -1,4 +1,6 @@
+import { useRef, useState } from "react";
 import styles from "./Services.module.css";
+import ServiceBookingModal from "./ServiceBookingModal";
 
 const services = [
   {
@@ -9,7 +11,7 @@ const services = [
     description:
       "Schedule a traditional puja performed by verified temple priests. Choose from Ganesh Puja, Satyanarayan, Rudrabhishek, and 40+ more rituals performed live or on your behalf.",
     price: "Starting ₹999",
-    img: "/pujaRituals.png",
+    img: "/Explore Sacred Wisdom/Puja Rituals.png",
     highlight: false,
   },
   {
@@ -20,7 +22,7 @@ const services = [
     description:
       "Experience live streaming from 200+ sacred temples across India — Tirupati, Kashi Vishwanath, Shirdi, and more. Get prasad delivered home after every darshan.",
     price: "Starting ₹199",
-    img: "/templeBlessed.png",
+    img: "/Temple Blessed.png",
     highlight: false,
   },
   {
@@ -31,7 +33,7 @@ const services = [
     description:
       "One-on-one sessions with expert Vedic astrologers. Get personalised kundali analysis, muhurta selection, remedies, gemstone advice and yearly guidance.",
     price: "Starting ₹1,499",
-    img: "/mantrasPrayers.png",
+    img: "/astrology calculator.png",
     highlight: true,
   },
   {
@@ -53,7 +55,7 @@ const services = [
     description:
       "Fully curated pilgrimage packages to Char Dham, Kashi, Vrindavan, Tirupati, and Ashtavinayak. Includes transport, stay, guide, and ritual access.",
     price: "Starting ₹8,999",
-    img: "/temple.png",
+    img: "/Explore Sacred Wisdom/Temple Traditions.png",
     highlight: false,
   },
   {
@@ -95,6 +97,8 @@ const stats = [
 ];
 
 function Services() {
+  const [booking, setBooking] = useState(null);
+  const gridRef = useRef(null);
   return (
     <div className={styles.page}>
 
@@ -121,7 +125,7 @@ function Services() {
       </div>
 
       {/* ── Services grid ── */}
-      <div className={styles.container}>
+      <div className={styles.container} ref={gridRef}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>What We Offer</h2>
           <p className={styles.sectionSub}>
@@ -144,7 +148,7 @@ function Services() {
                 <h3 className={styles.cardTitle}>{s.title}</h3>
                 <p className={styles.cardDesc}>{s.description}</p>
                 <div className={styles.cardFooter}>
-                  <button className={styles.bookBtn}>Book Now</button>
+                  <button type="button" className={styles.bookBtn} onClick={() => setBooking(s)}>Book Now</button>
                 </div>
               </div>
             </div>
@@ -181,12 +185,13 @@ function Services() {
             Your first puja consultation is free.
           </p>
           <div className={styles.ctaBtns}>
-            <button className={styles.ctaPrimary}>Get Free Consultation</button>
-            <button className={styles.ctaSecondary}>Browse All Services</button>
+            <button type="button" className={styles.ctaPrimary} onClick={() => setBooking({ title: "Free puja consultation", tag: "Free consultation" })}>Get Free Consultation</button>
+            <button type="button" className={styles.ctaSecondary} onClick={() => gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}>Browse All Services</button>
           </div>
         </div>
       </div>
 
+      {booking && <ServiceBookingModal service={booking} onClose={() => setBooking(null)} />}
     </div>
   );
 }

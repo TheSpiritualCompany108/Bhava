@@ -5,7 +5,7 @@
 
 /* ── Hero ── */
 .hero {
-  background: linear-gradient(155deg, #0f2319 0%, #173927 45%, #255c3f 100%);
+  background: linear-gradient(155deg, #2B0712 0%, #4A0B1D 45%, #6B1A30 100%);
   padding: 88px 24px 76px;
   text-align: center;
   position: relative;
@@ -70,7 +70,7 @@
 
 .joinBtn {
   background: #E07B39;
-  color: #173927;
+  color: #4A0B1D;
   border: none;
   padding: 14px 34px;
   border-radius: 999px;
@@ -106,7 +106,7 @@
 
 /* ── Stats strip ── */
 .statsStrip {
-  background: #173927;
+  background: #4A0B1D;
   display: flex;
   justify-content: center;
 }
@@ -216,7 +216,7 @@
   position: absolute;
   top: 12px;
   left: 12px;
-  background: rgba(23, 57, 39, 0.88);
+  background: rgba(74, 11, 29, 0.88);
   color: #E07B39;
   font-size: 10px;
   font-weight: 700;
@@ -277,7 +277,7 @@
 .authorName {
   font-size: 12px;
   font-weight: 700;
-  color: #255c3f;
+  color: #6B1A30;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
 }
 
@@ -352,7 +352,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #173927, #255c3f);
+  background: linear-gradient(135deg, #4A0B1D, #6B1A30);
   color: #E07B39;
   font-size: 16px;
   font-weight: 700;
@@ -438,17 +438,17 @@
 }
 
 .typeVirtual {
-  background: rgba(37, 92, 63, 0.88);
+  background: rgba(107, 26, 48, 0.9);
   color: #ffffff;
 }
 
 .typeInPerson {
   background: rgba(224, 123, 57, 0.9);
-  color: #173927;
+  color: #4A0B1D;
 }
 
 .typeHybrid {
-  background: rgba(99, 102, 241, 0.88);
+  background: rgba(139, 90, 43, 0.92);
   color: #ffffff;
 }
 
@@ -503,8 +503,8 @@
 
 .rsvpBtn {
   background: transparent;
-  color: #255c3f;
-  border: 1.5px solid #255c3f;
+  color: #6B1A30;
+  border: 1.5px solid #6B1A30;
   padding: 8px 0;
   border-radius: 999px;
   font-size: 12px;
@@ -517,13 +517,13 @@
 }
 
 .rsvpBtn:hover {
-  background: #255c3f;
+  background: #6B1A30;
   color: #ffffff;
 }
 
 /* ── Join CTA ── */
 .ctaBanner {
-  background: linear-gradient(135deg, #173927 0%, #255c3f 100%);
+  background: linear-gradient(135deg, #4A0B1D 0%, #6B1A30 100%);
   padding: 80px 24px;
   position: relative;
   overflow: hidden;
@@ -587,7 +587,7 @@
 
 .ctaJoinBtn {
   background: #E07B39;
-  color: #173927;
+  color: #4A0B1D;
   border: none;
   padding: 13px 28px;
   border-radius: 999px;
@@ -644,3 +644,6 @@
 @media (max-width: 480px) {
   .heroTitle { font-size: 38px; }
 }
+
+/* hero buttons scroll to these sections — keep the title clear of the sticky navbar */
+.section, .ctaBanner { scroll-margin-top: 72px; }

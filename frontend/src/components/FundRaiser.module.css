@@ -98,3 +98,13 @@
     font-size: 26px;
   }
 }
+
+/* Mobile: lighter reading text, shorter photo */
+@media (max-width: 480px) {
+  .section { padding: 12px 20px 28px; }
+  .card { gap: 18px; }
+  .imageWrapper { border-radius: 16px; aspect-ratio: 16 / 10; }
+  .title { font-size: 25px; margin-bottom: 12px; font-weight: 600; }
+  .body { font-size: 15px; line-height: 1.65; font-weight: 400; color: #5c4a4f; margin-bottom: 10px; }
+  .closing { font-size: 30px; margin-top: 2px; }
+}
