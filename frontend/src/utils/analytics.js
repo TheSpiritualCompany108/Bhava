@@ -4,6 +4,23 @@ const dl = () => {
   return window.dataLayer;
 };
 
+// ── Meta Pixel (standard events) — mirrors the GA4 dataLayer events below ──
+// ids are the same item_id used for GA4 so SKU data stays consistent across both tools.
+const fb = (name, data, eventID) => {
+  try {
+    if (typeof window === "undefined" || typeof window.fbq !== "function") return;
+    window.fbq("track", name, data, eventID ? { eventID } : undefined);
+  } catch { /* tracking must never break the shop */ }
+};
+const fbContents = (items) => (items || []).map((i) => ({ id: i.item_id, quantity: i.quantity || 1, item_price: i.price }));
+
+export function searchEvent(query) {
+  const q = String(query || "").trim().slice(0, 100);
+  if (!q) return;
+  dl()?.push({ event: "search", search_term: q });
+  fb("Search", { search_string: q });
+}
+
 export const clearEcommerce = () => {
   dl()?.push({ ecommerce: null });
 };
@@ -19,7 +36,9 @@ const itemFromProduct = (p, variantKey, quantity = 1) => ({
 
 export function viewItem(p, variantKey) {
   clearEcommerce();
-  dl()?.push({ event: "view_item", ecommerce: { currency: "INR", value: p.price, items: [itemFromProduct(p, variantKey)] } });
+  const item = itemFromProduct(p, variantKey);
+  dl()?.push({ event: "view_item", ecommerce: { currency: "INR", value: p.price, items: [item] } });
+  fb("ViewContent", { content_type: "product", content_ids: [item.item_id], content_name: p.name, content_category: p.category, contents: fbContents([item]), value: p.price, currency: "INR" });
 }
 
 export function selectItem(p, variantKey) {
@@ -29,20 +48,16 @@ export function selectItem(p, variantKey) {
 
 export function addToCartEvent(line) {
   clearEcommerce();
-  dl()?.push({
-    event: "add_to_cart",
-    ecommerce: {
-      currency: "INR",
-      value: (line.priceNum || 0) * (line.quantity || 1),
-      items: [{
-        item_id: line.kind === "bundle" ? `bundle:${line.slug}` : `${line.slug}:${line.variant || ""}`,
-        item_name: line.title,
-        item_variant: line.variantLabel || line.variant,
-        price: line.priceNum,
-        quantity: line.quantity || 1,
-      }],
-    },
-  });
+  const item = {
+    item_id: line.kind === "bundle" ? `bundle:${line.slug}` : `${line.slug}:${line.variant || ""}`,
+    item_name: line.title,
+    item_variant: line.variantLabel || line.variant,
+    price: line.priceNum,
+    quantity: line.quantity || 1,
+  };
+  const value = (line.priceNum || 0) * (line.quantity || 1);
+  dl()?.push({ event: "add_to_cart", ecommerce: { currency: "INR", value, items: [item] } });
+  fb("AddToCart", { content_type: "product", content_ids: [item.item_id], content_name: line.title, contents: fbContents([item]), value, currency: "INR" });
   if (line.kind === "bundle") {
     dl()?.push({
       event: "bundle_select",
@@ -75,23 +90,19 @@ export function viewCart(items, value) {
 
 export function beginCheckout(items, value) {
   clearEcommerce();
-  dl()?.push({
-    event: "begin_checkout",
-    ecommerce: {
-      currency: "INR",
-      value,
-      items: (items || []).map((i) => ({
-        item_id: i.kind === "bundle" ? `bundle:${i.slug}` : `${i.slug}:${i.variant || ""}`,
-        item_name: i.title,
-        price: i.priceNum,
-        quantity: i.quantity,
-      })),
-    },
-  });
+  const mapped = (items || []).map((i) => ({
+    item_id: i.kind === "bundle" ? `bundle:${i.slug}` : `${i.slug}:${i.variant || ""}`,
+    item_name: i.title,
+    price: i.priceNum,
+    quantity: i.quantity,
+  }));
+  dl()?.push({ event: "begin_checkout", ecommerce: { currency: "INR", value, items: mapped } });
+  fb("InitiateCheckout", { content_type: "product", content_ids: mapped.map((i) => i.item_id), contents: fbContents(mapped), num_items: mapped.reduce((n, i) => n + (i.quantity || 1), 0), value, currency: "INR" });
 }
 
 export function bundleView(b, price) {
   dl()?.push({ event: "bundle_view", bundle_slug: b.slug, value: price });
+  fb("ViewContent", { content_type: "product", content_ids: [`bundle:${b.slug}`], content_name: b.name, content_category: "Collection", value: price, currency: "INR" });
 }
 
 const PURCHASE_KEY = "bhava_ga4_purchases";
@@ -115,4 +126,6 @@ export function purchaseOnce(orderId, { value, shipping = 0, items = [] }) {
       items,
     },
   });
+  // eventID = order id, so a future server-side (Conversions API) purchase can be deduplicated against this one
+  fb("Purchase", { content_type: "product", content_ids: items.map((i) => i.item_id), contents: fbContents(items), num_items: items.reduce((n, i) => n + (i.quantity || 1), 0), value, currency: "INR" }, `purchase_${id}`);
 }

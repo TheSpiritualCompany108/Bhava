@@ -9,6 +9,7 @@ import {
   productSearchText,
   bundleSearchText,
 } from "../../shop/shopUtils";
+import { searchEvent } from "../../utils/analytics";
 import styles from "./ExpandingSearchDock.module.css";
 
 const MAX_RESULTS = 8;
@@ -77,6 +78,7 @@ export function ExpandingSearchDock({
     e?.preventDefault();
     const q = query.trim();
     if (!q) return;
+    searchEvent(q);
     if (activeIdx >= 0 && results[activeIdx]) {
       goToItem(results[activeIdx]);
       return;
