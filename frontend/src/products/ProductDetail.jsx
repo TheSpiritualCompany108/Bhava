@@ -9,6 +9,7 @@ import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { ProductCard } from "../shop/Cards";
 import { faqsFor, PENDING_USE_SAFETY, PENDING_RETURNS, FOOTNOTE_PRICE } from "../shop/content";
 import { inr, imgSrc, shippingCopy, bundleContentLines, bundleThumbImage, productMaxQty, getProduct, getBundle, variantInStock, productInStock, productLine } from "../shop/shopUtils";
+import BundleQuickView from "../shop/BundleQuickView";
 import { RETURNS_POLICY_LIVE } from "../shop/storeFlags";
 import { viewItem, selectItem, addToCartEvent } from "../utils/analytics";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
@@ -36,6 +37,7 @@ function ProductDetailInner({ slug }) {
   const [addedQty, setAddedQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const [bundleQuick, setBundleQuick] = useState(false);
   const [reviewSummary, setReviewSummary] = useState(null);
   const [stickyBuy, setStickyBuy] = useState(false);
   const actionsRef = useRef(null);
@@ -471,7 +473,7 @@ function ProductDetailInner({ slug }) {
 
             {/* ── One highly relevant curated collection ── */}
             {bundle && (
-              <Link to={`/collection/${bundle.slug}`} className={shop.promo} style={{ borderStyle: "dashed" }}>
+              <Link to={`/collection/${bundle.slug}`} className={shop.promo} style={{ borderStyle: "dashed" }} onClick={(e) => { e.preventDefault(); setBundleQuick(true); }}>
                 <span className={shop.promoImg} aria-hidden="true">
                   <ResponsiveImg
                     src={bundleThumbImage(catalog, bundle)}
@@ -489,6 +491,9 @@ function ProductDetailInner({ slug }) {
                 </div>
                 <span className={shop.promoGo}>Choose &amp; add →</span>
               </Link>
+            )}
+            {bundle && bundleQuick && (
+              <BundleQuickView bundle={bundle} catalog={catalog} onClose={() => setBundleQuick(false)} />
             )}
           </div>
         </div>

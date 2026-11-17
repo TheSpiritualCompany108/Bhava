@@ -120,7 +120,7 @@ export default function HomeShop() {
       <section className={`${s.sec} ${s.secAlt}`} aria-labelledby="hs-coll" hidden={!collections.length}>
         <div className={s.wrap}>
           <Head kicker="Curated Collections" title="Thoughtfully Paired" sub="Each collection costs exactly the sum of what is inside — nothing hidden, nothing crossed out." />
-          <div className={s.grid3} id="hs-coll">
+          <div className={`${s.grid3} ${s.collSlider}`} id="hs-coll">
             {collections.map((b) => <BundleCard key={b.slug} bundle={b} catalog={catalog} />)}
           </div>
           <div className={s.center}>
@@ -145,7 +145,7 @@ export default function HomeShop() {
       <section className={`${s.sec} ${s.secAlt}`} aria-labelledby="hs-complete" hidden={!complete.length}>
         <div className={s.wrap}>
           <Head kicker="Complete The Ritual" title="A Fuller Home Ritual" sub="Incense in one fragrance, a traditional Guggal offering and — in the larger set — ritual camphor." />
-          <div className={s.grid3} id="hs-complete" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
+          <div className={`${s.grid3} ${s.collSlider}`} id="hs-complete" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
             {complete.map((b) => <BundleCard key={b.slug} bundle={b} catalog={catalog} />)}
           </div>
         </div>

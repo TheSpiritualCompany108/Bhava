@@ -6,7 +6,6 @@ import ExpandingSearchDock from "./ui/ExpandingSearchDock";
 import { getCustomerToken } from "../utils/customerAuth";
 
 const SHOP_NAV = [
-  { label: "Shop All", to: "/products" },
   { label: "Incense Sticks", to: "/products?category=incense-sticks" },
   { label: "Bamboo-less Incense", to: "/products?category=bamboo-less-incense" },
   { label: "Incense Cones", to: "/products?category=incense-cones" },
@@ -141,7 +140,14 @@ function Navbar() {
                   className={`${styles.navLink} ${/^\/(products?|collection)(\/|$)/.test(location.pathname) ? styles.navLinkActive : ""}`}
                   aria-expanded={shopOpen}
                   aria-haspopup="true"
-                  onClick={() => setShopOpen((o) => !o)}
+                  onClick={() => {
+                    // Mouse / mobile panel: Products opens the full catalogue. Touch screens with the desktop
+                    // layout have no hover, so a tap there opens the category list instead.
+                    const canHover = window.matchMedia("(hover: hover)").matches;
+                    const mobilePanel = window.matchMedia("(max-width: 1100px)").matches;
+                    if (canHover || mobilePanel) { closeMenu(); navigate("/products"); }
+                    else setShopOpen((o) => !o);
+                  }}
                 >
                   Products
                 </button>

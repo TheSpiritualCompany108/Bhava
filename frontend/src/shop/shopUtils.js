@@ -42,7 +42,7 @@ export const shopTabs = (catalog) => {
     }
   }
   return [
-    { id: "all", label: "Shop All" },
+    { id: "all", label: "All Products" },
     ...cats,
     { id: "curated-collections", label: "Curated Collections" },
   ];

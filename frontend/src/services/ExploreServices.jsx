@@ -29,7 +29,7 @@ const serviceCards = [
     color: "#4A0B1D",
     description:
       "Learn and explore India's sacred knowledge through courses, workshops and well-structured learning experiences.",
-    route: "/knowledge",
+    route: "/services",
   },
   {
     id: "retreats",
@@ -39,7 +39,7 @@ const serviceCards = [
     color: "#8A2642",
     description:
       "Step away from the everyday and reconnect within. Join immersive spiritual retreats and mindful experiences.",
-    route: "/community",
+    route: "/services",
   },
   {
     id: "creators",
@@ -49,7 +49,7 @@ const serviceCards = [
     color: "#C0671E",
     description:
       "Discover creators who share knowledge, practices, stories and experiences inspired by the Bhava: way.",
-    route: "/community",
+    route: "/services",
   },
 ];
 

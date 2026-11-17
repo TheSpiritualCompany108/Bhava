@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import styles from "./CommunityPage.module.css";
 
 const stats = [
@@ -50,7 +51,7 @@ const discussions = [
     location: "Singapore",
     replies: 61,
     likes: 193,
-    img: "/pujaRituals.png",
+    img: "/Explore Sacred Wisdom/Puja Rituals.png",
   },
   {
     id: 4,
@@ -122,7 +123,7 @@ const events = [
     title: "Mahashivaratri Community Satsang",
     desc: "An all-night virtual celebration with guided meditation, Shiva stotras and community chanting.",
     type: "VIRTUAL",
-    img: "/templeBlessed.png",
+    img: "/Temple Blessed.png",
   },
   {
     date: "MAR 15",
@@ -133,12 +134,12 @@ const events = [
     img: "/Daily Practices/Gita Reading.png",
   },
   {
-    date: "/APR 05",
+    date: "APR 05",
     day: "Saturday",
     title: "Vrindavan Pilgrimage Yatra",
     desc: "Join 40 seekers on a guided 5-day pilgrimage to Vrindavan, Mathura and Govardhan.",
     type: "IN-PERSON",
-    img: "/temple.png",
+    img: "/Explore Sacred Wisdom/Temple Traditions.png",
   },
   {
     date: "APR 13",
@@ -146,11 +147,20 @@ const events = [
     title: "Ugadi Celebrations & Vedic New Year",
     desc: "Cultural programmes, community feast, panchanga shravanam and collective prayer for the new year.",
     type: "HYBRID",
-    img: "/festivals.png",
+    img: "/Explore Sacred Wisdom/Festivals & Celebrations.png",
   },
 ];
 
 function CommunityPage() {
+  const discussionsRef = useRef(null);
+  const joinRef = useRef(null);
+  const emailRef = useRef(null);
+
+  const scrollTo = (ref, focus) => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (focus) setTimeout(() => emailRef.current?.focus({ preventScroll: true }), 600);
+  };
+
   return (
     <div className={styles.page}>
 
@@ -166,8 +176,8 @@ function CommunityPage() {
           other's sadhana and celebrating the richness of Dharmic life.
         </p>
         <div className={styles.heroBtns}>
-          <button className={styles.joinBtn}>Join the Community</button>
-          <button className={styles.exploreBtn}>Explore Discussions</button>
+          <button type="button" className={styles.joinBtn} onClick={() => scrollTo(joinRef, true)}>Join the Community</button>
+          <button type="button" className={styles.exploreBtn} onClick={() => scrollTo(discussionsRef)}>Explore Discussions</button>
         </div>
       </div>
 
@@ -182,7 +192,7 @@ function CommunityPage() {
       </div>
 
       {/* ── Popular discussions ── */}
-      <div className={styles.section}>
+      <div className={styles.section} ref={discussionsRef}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Popular Discussions</h2>
@@ -275,7 +285,7 @@ function CommunityPage() {
       </div>
 
       {/* ── Join CTA ── */}
-      <div className={styles.ctaBanner}>
+      <div className={styles.ctaBanner} ref={joinRef}>
         <div className={styles.ctaBg} />
         <div className={styles.ctaInner}>
           <h2 className={styles.ctaTitle}>Ready to Find Your Sangha?</h2>
@@ -285,6 +295,7 @@ function CommunityPage() {
           </p>
           <div className={styles.ctaInputRow}>
             <input
+              ref={emailRef}
               type="email"
               placeholder="Enter your email address"
               className={styles.ctaInput}

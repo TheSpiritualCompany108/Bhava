@@ -194,13 +194,14 @@
   padding-right: 36px;
 }
 
-.inputWithIcon .material-symbols-outlined {
+.inputWithIcon :global(.material-symbols-outlined) {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
   color: #C6A14A;
+  pointer-events: none;
 }
 
 .timeRangeLink {

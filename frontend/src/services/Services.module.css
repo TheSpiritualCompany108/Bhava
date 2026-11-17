@@ -5,7 +5,7 @@
 
 /* ── Hero ── */
 .hero {
-  background: linear-gradient(160deg, #173927 0%, #255c3f 60%, #1a4a30 100%);
+  background: linear-gradient(160deg, #4A0B1D 0%, #6B1A30 60%, #5A1226 100%);
   padding: 80px 24px 68px;
   text-align: center;
   position: relative;
@@ -62,7 +62,7 @@
 
 /* ── Stats strip ── */
 .statsStrip {
-  background: #173927;
+  background: #4A0B1D;
   display: flex;
   justify-content: center;
   gap: 0;
@@ -178,7 +178,7 @@
   position: absolute;
   top: 14px;
   left: 14px;
-  background: rgba(23, 57, 39, 0.88);
+  background: rgba(74, 11, 29, 0.88);
   color: #E07B39;
   font-size: 10px;
   font-weight: 700;
@@ -235,7 +235,7 @@
 }
 
 .bookBtn {
-  background: #173927;
+  background: #4A0B1D;
   color: #ffffff;
   border: none;
   padding: 9px 22px;
@@ -248,7 +248,7 @@
 }
 
 .bookBtn:hover {
-  background: #0f2319;
+  background: #2B0712;
   transform: translateY(-1px);
 }
 
@@ -309,7 +309,7 @@
 
 /* ── CTA banner ── */
 .ctaBanner {
-  background: linear-gradient(135deg, #173927 0%, #255c3f 100%);
+  background: linear-gradient(135deg, #4A0B1D 0%, #6B1A30 100%);
   padding: 72px 24px;
   position: relative;
   overflow: hidden;
@@ -358,7 +358,7 @@
 
 .ctaPrimary {
   background: #E07B39;
-  color: #173927;
+  color: #4A0B1D;
   border: none;
   padding: 14px 32px;
   border-radius: 999px;
@@ -421,3 +421,25 @@
   .heroTitle { font-size: 38px; }
   .sectionTitle { font-size: 28px; }
 }
+
+/* ── Booking request popup ── */
+.bkBackdrop { position: fixed; inset: 0; z-index: 10000; background: rgba(34, 18, 23, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.bkCard { position: relative; background: #fff; border-radius: 20px; width: 100%; max-width: 460px; max-height: 92vh; overflow: auto; padding: 30px 28px 26px; box-sizing: border-box; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35); font-family: 'Neue Haas Grotesk', Inter, sans-serif; color: #4A0B1D; }
+.bkClose { position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: #f4efe6; color: #4A0B1D; cursor: pointer; font-size: 15px; }
+.bkKicker { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #C0671E; text-transform: uppercase; }
+.bkTitle { font-family: 'Canela', serif; font-size: 26px; font-weight: 500; margin: 4px 0 6px; padding-right: 36px; }
+.bkSub { font-size: 14px; color: #6B3A45; margin: 0 0 16px; line-height: 1.5; }
+.bkLabel { display: block; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+.bkLabel small { font-weight: 400; color: #8a7a7e; }
+.bkInput { display: block; width: 100%; box-sizing: border-box; margin-top: 5px; padding: 11px 12px; border: 1px solid #dcd3c7; border-radius: 10px; font-size: 14px; font-family: inherit; color: #4A0B1D; background: #fff; resize: vertical; }
+.bkInput:focus { outline: none; border-color: #E07B39; box-shadow: 0 0 0 3px rgba(224, 123, 57, 0.18); }
+.bkInvalid { border-color: #c0392b; }
+.bkErr { display: block; color: #c0392b; font-size: 12px; font-weight: 500; margin-top: 4px; }
+.bkSubmit { width: 100%; margin-top: 6px; padding: 14px; border: 0; border-radius: 999px; background: #E07B39; color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
+.bkSubmit:hover:not(:disabled) { background: #c96a2c; }
+.bkSubmit:disabled { opacity: 0.6; cursor: wait; }
+.bkDone { text-align: center; padding: 14px 4px 4px; }
+.bkDone h3 { font-family: 'Canela', serif; font-size: 26px; font-weight: 500; margin: 10px 0 6px; }
+.bkDone p { font-size: 14px; color: #6B3A45; line-height: 1.55; margin: 0 0 18px; }
+.bkTick { display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 50%; background: #4A0B1D; color: #fff; font-size: 26px; }
+@media (max-width: 600px) { .bkBackdrop { align-items: flex-end; padding: 0; } .bkCard { border-radius: 20px 20px 0 0; max-width: 100%; } }

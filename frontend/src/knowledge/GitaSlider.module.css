@@ -452,3 +452,6 @@
     font-size: 22px;
   }
 }
+
+.shareBtn { background: #4A0B1D; }
+.shareBtn:hover { background: #E07B39; }
