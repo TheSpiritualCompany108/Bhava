@@ -244,6 +244,14 @@
   border-color: #C0C4BC;
 }
 
+/* Google's real button sits invisibly on top of .btnSocial so the look matches the page */
+.googleWrap { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+.googleWrap:hover .btnSocial { background: #f7f2ec; border-color: #C0C4BC; }
+.googleOverlay {
+  position: absolute; left: 0; right: 0; top: 50%; height: 40px; margin-top: -20px;
+  opacity: 0.01; cursor: pointer; transform-origin: center;
+}
+
 .socialIcon {
   width: 20px;
   height: 20px;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import AvatarImage from "../components/AvatarImage";
 import styles from "./AccountPage.module.css";
 
 const BASE = import.meta.env.VITE_API_URL || "";
@@ -67,10 +68,12 @@ export default function ProfilePage() {
           {/* Avatar */}
           <div className={styles.avatarSection}>
             <div className={styles.bigAvatar}>
-              {user.avatar
-                ? <img src={user.avatar} alt={user.name} className={styles.bigAvatarImg} />
-                : <span className={styles.bigAvatarInitials}>{initials}</span>
-              }
+              <AvatarImage
+                src={user.avatar}
+                alt={user.name}
+                className={styles.bigAvatarImg}
+                fallback={<span className={styles.bigAvatarInitials}>{initials}</span>}
+              />
             </div>
             <div>
               <p className={styles.avatarName}>{user.name}</p>
