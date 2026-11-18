@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import { useCart } from "../context/CartContext";
 import ExpandingSearchDock from "./ui/ExpandingSearchDock";
+import AvatarImage from "./AvatarImage";
 import { getCustomerToken } from "../utils/customerAuth";
 
 const SHOP_NAV = [
@@ -262,22 +263,24 @@ function Navbar() {
                   onClick={() => setDropdownOpen((p) => !p)}
                   aria-label="User menu"
                 >
-                  {user.avatar ? (
-                    <img src={user.avatar} alt={user.name} className={styles.avatarImg} />
-                  ) : (
-                    <span className={styles.avatarInitials}>{initials}</span>
-                  )}
+                  <AvatarImage
+                    src={user.avatar}
+                    alt={user.name}
+                    className={styles.avatarImg}
+                    fallback={<span className={styles.avatarInitials}>{initials}</span>}
+                  />
                 </button>
 
                 {dropdownOpen && (
                   <div className={styles.dropdown}>
                     <div className={styles.dropdownHeader}>
                       <div className={styles.dropdownAvatar}>
-                        {user.avatar ? (
-                          <img src={user.avatar} alt={user.name} className={styles.dropdownAvatarImg} />
-                        ) : (
-                          <span className={styles.dropdownAvatarInitials}>{initials}</span>
-                        )}
+                        <AvatarImage
+                          src={user.avatar}
+                          alt={user.name}
+                          className={styles.dropdownAvatarImg}
+                          fallback={<span className={styles.dropdownAvatarInitials}>{initials}</span>}
+                        />
                       </div>
                       <div>
                         <p className={styles.dropdownName}>{user.name}</p>
