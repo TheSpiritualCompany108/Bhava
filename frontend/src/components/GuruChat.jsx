@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import styles from "./GuruChat.module.css";
 import BhavaVoiceCall from "./BhavaVoiceCall";
 
@@ -7,6 +8,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const GREETING = "Namaste 🙏 I'm Bhava:. Ask me anything about Bhava: — our rituals, products, or practices.";
 
 function GuruChat() {
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [voiceCallOpen, setVoiceCallOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: "assistant", content: GREETING }]);
@@ -21,16 +23,45 @@ function GuruChat() {
     }
   }, [messages, loading, open]);
 
+  // While the chat panel is open the floating "Ask Bhava:" button hides (it used to sit on top of Send)
+  useEffect(() => {
+    if (!open) return undefined;
+    document.body.dataset.guruChat = "open";
+    // On phones the chat is a bottom sheet: freeze the page behind it so it can't scroll
+    const phone = window.matchMedia("(max-width: 480px)").matches;
+    const prevBody = document.body.style.overflow;
+    const prevHtml = document.documentElement.style.overflow;
+    if (phone) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    }
+    return () => {
+      delete document.body.dataset.guruChat;
+      if (phone) {
+        document.body.style.overflow = prevBody;
+        document.documentElement.style.overflow = prevHtml;
+      }
+    };
+  }, [open]);
+
   useEffect(() => {
     const openChat = () => setOpen(true);
+    const closeChat = () => setOpen(false);
     const openVoice = () => setVoiceCallOpen(true);
     window.addEventListener("guru:open", openChat);
+    window.addEventListener("guru:close", closeChat);
     window.addEventListener("guru:voice", openVoice);
     return () => {
       window.removeEventListener("guru:open", openChat);
+      window.removeEventListener("guru:close", closeChat);
       window.removeEventListener("guru:voice", openVoice);
     };
   }, []);
+
+  // Header / route changes should dismiss the sheet (don't leave it open under menus)
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname, location.search]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -64,6 +95,7 @@ function GuruChat() {
 
   return (
     <div className={styles.wrapper}>
+      {open && <div className={styles.backdrop} onClick={() => setOpen(false)} aria-hidden="true" />}
       {open && (
         <div className={styles.panel}>
           <div className={styles.header}>

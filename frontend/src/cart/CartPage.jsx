@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import useCartValidation from "../hooks/useCartValidation";
@@ -7,8 +7,9 @@ import {
   MAX_LINE_QTY, imgSrc, inr, suggestAddOn, suggestBraceletAddOns, getProduct, productLine, shippingCopy,
   productInStock,
 } from "../shop/shopUtils";
-import { playAddToCartAnimation } from "../utils/cartAnimation";
+import { playAddToCartAnimation, tweenSavingReveal, tweenTextIn, tweenTextSwap } from "../utils/cartAnimation";
 import { viewCart } from "../utils/analytics";
+import { loadAddressBook, syncAddressesFromServer } from "../account/addressBook";
 import styles from "./CartPage.module.css";
 import x from "./CartLayout.module.css";
 
@@ -47,15 +48,37 @@ export default function CartPage() {
   const { catalog } = useCatalog();
   const { loading, error, data } = useCartValidation(cartItems);
 
-  // Free-shipping celebration: fires only when the cart goes from "below threshold" to "unlocked"
+  // Free-shipping celebration: fires when cart crosses into free shipping
   const unlocked = !!data && data.allOk && data.shipping === 0;
   const [wasUnlocked, setWasUnlocked] = useState(null);
   const [burst, setBurst] = useState(0);
   const [likeCat, setLikeCat] = useState("all");
-  if (data && wasUnlocked !== unlocked) {
-    setWasUnlocked(unlocked);
-    if (wasUnlocked === false && unlocked) setBurst((b) => b + 1);
-  }
+  // Delivery address strip (mobile): the logged-in user's default / selected saved address
+  const [book, setBook] = useState(() => loadAddressBook());
+  const deliverTo = book.list.find((a) => a.id === book.selectedId) || book.list[0] || null;
+
+  // Sticky/desk ship copy — GSAP swaps text in place (no strip slide)
+  const stickyShipTextRef = useRef(null);
+  const deskShipTextRef = useRef(null);
+  const savingRef = useRef(null);
+  const shipSwapBusy = useRef(false);
+  const shipFadeIn = useRef(false);
+  const shipPending = useRef(null);
+  const shipUiRef = useRef(null);
+  const [shipUi, setShipUi] = useState(null); // { unlocked, remaining }
+  shipUiRef.current = shipUi;
+
+  useEffect(() => {
+    if (!data) return;
+    if (wasUnlocked === null) {
+      setWasUnlocked(unlocked);
+      return;
+    }
+    if (wasUnlocked !== unlocked) {
+      setWasUnlocked(unlocked);
+      if (!wasUnlocked && unlocked) setBurst((b) => b + 1);
+    }
+  }, [data, unlocked, wasUnlocked]);
 
   const alsoLike = useMemo(() => {
     if (!catalog?.products?.length) return [];
@@ -90,6 +113,21 @@ export default function CartPage() {
     if (cartItems.length && data) viewCart(cartItems, data.total);
   }, [cartItems, data]);
 
+  useEffect(() => {
+    if (!localStorage.getItem("bhava_token")) return undefined;
+    let cancelled = false;
+    syncAddressesFromServer().then((b) => { if (!cancelled) setBook(b); });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Tells global CSS the mobile sticky checkout bar is on screen (lifts the chat button, pads the page end)
+  const hasBag = cartItems.length > 0;
+  useEffect(() => {
+    if (!hasBag) return undefined;
+    document.body.dataset.cartBar = "1";
+    return () => { delete document.body.dataset.cartBar; };
+  }, [hasBag]);
+
   const likeCategories = useMemo(() => {
     const ids = [...new Set(alsoLike.map((p) => p.category))];
     ids.sort((a, b) => catRank(a) - catRank(b));
@@ -101,6 +139,88 @@ export default function CartPage() {
       })),
     ];
   }, [alsoLike, catalog]);
+
+  // GSAP: swap free-shipping copy in place (fade/slide), keep the tab fixed
+  useEffect(() => {
+    if (!data?.allOk) return undefined;
+    const freeAbove = Number(data?.shippingRule?.freeAbove || catalog?.shipping?.freeAbove) || 501;
+    const next = {
+      unlocked: data.shipping === 0,
+      remaining: freeAbove - (data.subtotal ?? 0),
+    };
+    const cur = shipUiRef.current;
+    if (!cur) {
+      setShipUi(next);
+      return undefined;
+    }
+    // Unlocked copy is static — only re-tween when lock state flips or remaining amount changes
+    const same =
+      cur.unlocked === next.unlocked &&
+      (next.unlocked || cur.remaining === next.remaining);
+    if (same) return undefined;
+    if (shipSwapBusy.current) {
+      shipPending.current = next;
+      return undefined;
+    }
+
+    let cancelled = false;
+    shipSwapBusy.current = true;
+    shipPending.current = null;
+    tweenTextSwap(
+      [stickyShipTextRef.current, deskShipTextRef.current],
+      () => {
+        if (cancelled) {
+          shipSwapBusy.current = false;
+          return;
+        }
+        shipFadeIn.current = true;
+        setShipUi(next);
+      }
+    ).catch(() => {
+      if (!cancelled) {
+        setShipUi(next);
+        shipSwapBusy.current = false;
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [data, catalog]);
+
+  useLayoutEffect(() => {
+    if (!shipFadeIn.current || !shipUi) return;
+    shipFadeIn.current = false;
+    tweenTextIn([stickyShipTextRef.current, deskShipTextRef.current]).finally(() => {
+      shipSwapBusy.current = false;
+      const pending = shipPending.current;
+      if (!pending) return;
+      shipPending.current = null;
+      const cur = shipUiRef.current;
+      if (
+        cur &&
+        cur.unlocked === pending.unlocked &&
+        (pending.unlocked || cur.remaining === pending.remaining)
+      ) return;
+      shipSwapBusy.current = true;
+      tweenTextSwap(
+        [stickyShipTextRef.current, deskShipTextRef.current],
+        () => {
+          shipFadeIn.current = true;
+          setShipUi(pending);
+        }
+      ).catch(() => {
+        setShipUi(pending);
+        shipSwapBusy.current = false;
+      });
+    });
+  }, [shipUi]);
+
+  // "You're saving ₹X…" — GSAP text pop when free shipping is on
+  useLayoutEffect(() => {
+    if (!unlocked || !savingRef.current) return;
+    tweenSavingReveal(savingRef.current);
+  }, [unlocked, burst]);
 
   if (cartItems.length === 0) {
     return (
@@ -140,7 +260,9 @@ export default function CartPage() {
   const shipping = typeof data?.shipping === "number" ? data.shipping : 0;
   const total = data?.total ?? 0;
   const allOk = !!data?.allOk;
-  const remaining = shipRule.freeAbove - subtotal;
+  const freeAbove = Number(shipRule.freeAbove) || 501;
+  const remaining = freeAbove - subtotal;
+  const shipProgress = Math.min(100, Math.max(0, (subtotal / freeAbove) * 100));
   // Count only items that are actually included in the total (unavailable lines are excluded)
   const payableCount = data ? data.lines.reduce((n, l) => n + (l.ok ? l.quantity : 0), 0) : itemCount;
   const braceletAddOns = catalog ? suggestBraceletAddOns(catalog, cartItems) : [];
@@ -192,6 +314,26 @@ export default function CartPage() {
     navigate(token ? "/checkout" : "/auth", token ? undefined : { state: { from: "/checkout" } });
   };
 
+  const deliverBlock = (mode) => {
+    if (!deliverTo?.line1) return null;
+    return (
+      <div className={`${x.deliverBar} ${mode === "mob" ? x.deliverMob : x.deliverDesk}`}>
+        <div className={x.deliverText}>
+          <p className={x.deliverTop}>
+            Deliver to: <strong>{[deliverTo.fullName, deliverTo.pincode].filter(Boolean).join(", ")}</strong>
+          </p>
+          <p className={x.deliverAddr}>
+            {[deliverTo.line1, deliverTo.line2, deliverTo.city, deliverTo.state].filter(Boolean).join(", ")}
+          </p>
+        </div>
+        <button type="button" className={x.deliverChange} onClick={() => navigate("/checkout")}>
+          <span className={x.deliverChangeDesk}>CHANGE ADDRESS</span>
+          <span className={x.deliverChangeMob}>Change</span>
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className={x.page}>
       {/* Step indicator: BAG → ADDRESS → PAYMENT */}
@@ -205,10 +347,16 @@ export default function CartPage() {
         </ol>
       </nav>
 
+      {/* Mobile: flush white strip under steps (no cream gap) */}
+      {deliverBlock("mob")}
+
       <div className={x.wrap}>
         <div className={x.layout}>
           {/* ── Left: items ── */}
           <section className={x.left} aria-label="Items in your bag">
+            {/* Desktop: Myntra card in the bag column */}
+            {deliverBlock("desk")}
+
             <div className={x.selectedBar}>
               <strong>{cartItems.length} {cartItems.length === 1 ? "ITEM" : "ITEMS"} IN YOUR BAG</strong>
               <button className={x.linkBtn} onClick={clearCart}>REMOVE ALL</button>
@@ -299,7 +447,7 @@ export default function CartPage() {
           </section>
 
           {/* ── Right: price details ── */}
-          <aside className={x.right} aria-label="Price details">
+          <aside className={x.right} id="cart-price-details" aria-label="Price details">
             <h2 className={x.sectionH}>PRICE DETAILS ({payableCount} {payableCount === 1 ? "Item" : "Items"})</h2>
             <div className={x.row}><span>Total MRP</span><span>{loading && !data ? "…" : inr(subtotal)}</span></div>
             <div className={x.row}>
@@ -309,21 +457,69 @@ export default function CartPage() {
             <div className={`${x.row} ${x.total}`}><span>Total Amount</span><span>{loading && !data ? "…" : inr(total)}</span></div>
             <p className={x.gst}>Inclusive of applicable GST.</p>
 
-            {data && allOk && (
-              <div
-                key={burst > 0 && shipping === 0 ? `u${burst}` : "badge"}
-                className={`${x.ship} ${styles.savingsBadge} ${burst > 0 && shipping === 0 ? styles.unlockedPop : ""}`}
-              >
-                {shipping === 0 ? "Free shipping unlocked" : `Add ${inr(remaining)} more to unlock free shipping.`}
+            {data && allOk && shipUi && (
+              <div className={`${x.ship} ${x.shipDesk}`}>
+                <span className={x.shipText} ref={deskShipTextRef}>
+                  {shipUi.unlocked ? (
+                    <>🎉 <strong className={x.shipAmt}>Free shipping unlocked</strong></>
+                  ) : (
+                    <>Add <strong className={x.shipAmt}>{inr(shipUi.remaining)}</strong> more to unlock <strong>free shipping</strong></>
+                  )}
+                </span>
+                <div className={x.shipBar}>
+                  <div
+                    className={x.shipTrack}
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round(shipProgress)}
+                    aria-label="Free shipping progress"
+                  >
+                    <span className={x.shipFill} style={{ width: `${shipProgress}%` }} />
+                  </div>
+                  <span
+                    className={x.shipMarker}
+                    style={{ left: `${shipProgress}%`, transform: `translateX(-${shipProgress}%)` }}
+                    aria-hidden="true"
+                  >
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                      {shipping === 0 ? (
+                        <path d="M5 12.5l4.5 4.5L19 7.5" />
+                      ) : (
+                        <>
+                          <path d="M2 6h11v10H2zM13 9h4.5L21 12.5V16h-8z" />
+                          <circle cx="7" cy="18" r="1.8" />
+                          <circle cx="17" cy="18" r="1.8" />
+                        </>
+                      )}
+                    </svg>
+                  </span>
+                </div>
                 {burst > 0 && shipping === 0 && (
-                  <span className={styles.burst} aria-hidden="true">
+                  <span key={`desk-burst-${burst}`} className={styles.burst} aria-hidden="true">
                     {BURST.map((p, i) => (
-                      <i key={i} className={styles.particle}
-                        style={{ "--x": `${p.x}px`, "--y": `${p.y}px`, background: p.c, width: p.s, height: p.s, animationDelay: `${p.d}ms` }} />
+                      <i
+                        key={i}
+                        className={styles.particle}
+                        style={{
+                          "--x": `${p.x}px`,
+                          "--y": `${p.y}px`,
+                          background: p.c,
+                          width: p.s,
+                          height: p.s,
+                          animationDelay: `${p.d}ms`,
+                        }}
+                      />
                     ))}
                   </span>
                 )}
               </div>
+            )}
+
+            {data && allOk && shipping === 0 && shipRule.fee > 0 && (
+              <p className={x.saving} ref={savingRef}>
+                You&apos;re saving <strong>{inr(shipRule.fee)}</strong> on delivery on this order
+              </p>
             )}
 
             {error && <p role="alert" className={x.alert}>{error}</p>}
@@ -333,11 +529,82 @@ export default function CartPage() {
               By placing the order, you agree to Bhava: <Link to="/terms" className={x.termsLink}>Terms and Conditions</Link> and{" "}
               <Link to="/privacy-policy" className={x.termsLink}>Privacy Policy</Link>
             </p>
-            <button className={x.cta} onClick={handleCheckout} disabled={!allOk || loading}>
+            <button className={`${x.cta} ${x.ctaDesk}`} onClick={handleCheckout} disabled={!allOk || loading}>
               {loading ? "CHECKING AVAILABILITY…" : "PROCEED TO CHECKOUT"}
             </button>
             <p className={x.secure}>🔒 Secure checkout · {catalog ? shippingCopy(catalog.shipping) : ""}</p>
           </aside>
+        </div>
+      </div>
+
+      {/* Mobile sticky checkout bar: free-shipping line, then total + checkout button */}
+      <div className={x.stickyBar} role="region" aria-label="Checkout">
+        {data && allOk && shipUi && (
+          <div className={x.stickyShip}>
+            <span className={x.shipText} ref={stickyShipTextRef}>
+              {shipUi.unlocked ? (
+                <>🎉 <strong className={x.shipAmt}>Free shipping unlocked</strong></>
+              ) : (
+                <>Add <strong className={x.shipAmt}>{inr(shipUi.remaining)}</strong> more to unlock <strong>free shipping</strong></>
+              )}
+            </span>
+            <div className={x.shipBar}>
+              <div
+                className={x.shipTrack}
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(shipProgress)}
+                aria-label="Free shipping progress"
+              >
+                <span className={x.shipFill} style={{ width: `${shipProgress}%` }} />
+              </div>
+              <span className={x.shipMarker} style={{ left: `${shipProgress}%`, transform: `translateX(-${shipProgress}%)` }} aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  {shipping === 0 ? (
+                    <path d="M5 12.5l4.5 4.5L19 7.5" />
+                  ) : (
+                    <>
+                      <path d="M2 6h11v10H2zM13 9h4.5L21 12.5V16h-8z" />
+                      <circle cx="7" cy="18" r="1.8" />
+                      <circle cx="17" cy="18" r="1.8" />
+                    </>
+                  )}
+                </svg>
+              </span>
+            </div>
+            {burst > 0 && shipping === 0 && (
+              <span key={`burst-${burst}`} className={styles.burst} aria-hidden="true">
+                {BURST.map((p, i) => (
+                  <i
+                    key={i}
+                    className={styles.particle}
+                    style={{
+                      "--x": `${p.x}px`,
+                      "--y": `${p.y}px`,
+                      background: p.c,
+                      width: p.s,
+                      height: p.s,
+                      animationDelay: `${p.d}ms`,
+                    }}
+                  />
+                ))}
+              </span>
+            )}
+          </div>
+        )}
+        <div className={x.stickyRow}>
+          <a
+            href="#cart-price-details"
+            className={x.stickyTotal}
+            onClick={(e) => { e.preventDefault(); document.getElementById("cart-price-details")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+          >
+            <strong>{loading && !data ? "…" : inr(total)}</strong>
+            <span>View price details</span>
+          </a>
+          <button type="button" className={x.stickyCta} onClick={handleCheckout} disabled={!allOk || loading}>
+            {loading ? "Checking…" : "Proceed to checkout"}
+          </button>
         </div>
       </div>
 

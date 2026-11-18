@@ -2,6 +2,7 @@ import ProductsPanel from "./catalog/ProductsPanel";
 import BundlesPanel from "./catalog/BundlesPanel";
 import InventoryDashboard from "./catalog/InventoryDashboard";
 import EnquiriesPanel from "./catalog/EnquiriesPanel";
+import { optimizeImage } from "./catalog/adminApi";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { invalidateHomepageSection } from "../hooks/useHomepageSection";
@@ -88,70 +89,11 @@ const ASTROLOGY_TOOLS_ITEMS = [
   { id: "numerology-calculator", label: "Numerology Calculator", defaultTitle: "Numerology Calculator", defaultDescription: "Discover your life path, destiny number and hidden patterns in your life.", defaultCta: "Calculate Now" },
 ];
 
-const HERO_SLIDES = [
-  {
-    id: "slide-0",
-    label: "Slide 1 (main hero)",
-    type: "hero",
-    defaultHeadline: "Awaken Bhava: : Live Divine",
-    defaultHighlight: "Every Day",
-    defaultDescription: "A Simple Daily Ritual System For Modern Homes.",
-    defaultDescription1: "Ritual is not reserved for special occasions. It is the quiet return to yourself, every single day.",
-    defaultPrimaryCta: "Shop the Ritual",
-    defaultSecondaryCta: "Explore the System",
-  },
-  {
-    id: "slide-1",
-    label: "Slide 2",
-    type: "slide",
-    defaultTitle0: "A Daily Ritual.",
-    defaultTitle1: "A Different Life.",
-    defaultDescription: "Eleven intentional minutes each day can create remarkable clarity over time. Bhava: helps you build a practice that quietly becomes part of who you are.",
-    defaultCta: "Begin Your Ritual",
-  },
-  {
-    id: "slide-2",
-    label: "Slide 3",
-    type: "slide",
-    defaultTitle0: "Objects Made",
-    defaultTitle1: "For Practice.",
-    defaultDescription: "Every Bhava: object has one purpose: to support your daily rhythm with simplicity, beauty, and intention.",
-    defaultCta: "Explore Ritual Systems",
-  },
-  {
-    id: "slide-3",
-    label: "Slide 4",
-    type: "slide",
-    defaultTitle0: "Stay With",
-    defaultTitle1: "The Practice.",
-    defaultDescription: "Guided journeys, reflections, and structured challenges help transform occasional devotion into lasting habits.",
-    defaultCta: "Explore Bhakti",
-  },
-  {
-    id: "slide-4",
-    label: "Slide 5",
-    type: "slide",
-    defaultTitle0: "Ancient Wisdom.",
-    defaultTitle1: "Daily Life.",
-    defaultDescription: "Short reflections, timeless teachings, and practical guidance designed to accompany modern living.",
-    defaultCta: "Read Today's Reflection",
-  },
-  {
-    id: "slide-5",
-    label: "Slide 6",
-    type: "slide",
-    defaultTitle0: "Your Ritual,",
-    defaultTitle1: "Supported Daily.",
-    defaultDescription: "Gentle reminders, progress tracking, and guided experiences that encourage consistency without distraction.",
-    defaultCta: "Explore the App",
-  },
-];
-
 const HOMEPAGE_TABS = [
   {
-    key: "hero",
+    key: "heroBanner",
     label: "Hero / Top Banner",
-    hint: "The big rotating banner at the very top of the homepage — the first thing every visitor sees.",
+    hint: "The big banner slider at the very top of the homepage — the first thing every visitor sees. Upload full-width banner images (about 1900 × 620 px works best).",
   },
   {
     key: "productsBanner",
@@ -351,6 +293,13 @@ export default function AdminPage() {
     reader.readAsDataURL(file);
   };
 
+  // Banner uploads are shrunk + converted to WebP in the browser first (max 2000px wide), so huge
+  // originals never reach the server or slow the homepage down.
+  const handleBannerImageSelect = async (itemId, file, maxW = 2000) => {
+    if (!file) return;
+    handleHomepageImageSelect(itemId, await optimizeImage(file, maxW, 0.85));
+  };
+
   const handleHomepageTestimonialChange = (idx, field, value) => {
     setHomepageSaved(false);
     setHomepageData((prev) => {
@@ -406,36 +355,6 @@ export default function AdminPage() {
   const restoreHomepageCard = (id) => {
     setHomepageSaved(false);
     setHomepageData((prev) => ({ ...prev, hiddenIds: (prev.hiddenIds || []).filter((x) => x !== id) }));
-  };
-
-  // Hero slides — same idea, separate keys since a slide's fields differ
-  // from a card's (title0/title1 vs title, plus its own hidden/extra lists).
-  const addHomepageSlide = () => {
-    setHomepageSaved(false);
-    const id = `custom-slide-${Date.now()}-${Math.round(Math.random() * 1e5)}`;
-    setHomepageData((prev) => ({
-      ...prev,
-      extraSlideIds: [...(Array.isArray(prev.extraSlideIds) ? prev.extraSlideIds : []), id],
-      items: { ...(prev.items || {}), [id]: { title0: "", title1: "", description: "", cta: "" } },
-    }));
-  };
-
-  const removeHomepageSlide = (id, isExtra) => {
-    setHomepageSaved(false);
-    clearHomepagePendingImage(id);
-    setHomepageData((prev) => {
-      if (isExtra) {
-        const items = { ...(prev.items || {}) };
-        delete items[id];
-        return { ...prev, extraSlideIds: (prev.extraSlideIds || []).filter((x) => x !== id), items };
-      }
-      return { ...prev, hiddenSlideIds: [...(prev.hiddenSlideIds || []), id] };
-    });
-  };
-
-  const restoreHomepageSlide = (id) => {
-    setHomepageSaved(false);
-    setHomepageData((prev) => ({ ...prev, hiddenSlideIds: (prev.hiddenSlideIds || []).filter((x) => x !== id) }));
   };
 
   const saveHomepageSection = async () => {
@@ -1130,7 +1049,7 @@ export default function AdminPage() {
 
         <h3 style={{ marginTop: 20, color: "#4A0B1D", fontSize: 14, borderTop: "1px solid #e0e0e0", paddingTop: 16 }}>Content</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
-          <li onClick={() => { setSection("homepage"); if (homepageTab === "productsBanner") setHomepageTab("hero"); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "homepage" && homepageTab !== "productsBanner" ? "#E07B39" : 'transparent', color: section === "homepage" && homepageTab !== "productsBanner" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🏠 Homepage</li>
+          <li onClick={() => { setSection("homepage"); if (homepageTab === "productsBanner") setHomepageTab("heroBanner"); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "homepage" && homepageTab !== "productsBanner" ? "#E07B39" : 'transparent', color: section === "homepage" && homepageTab !== "productsBanner" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🏠 Homepage</li>
           <li onClick={() => { setSection("homepage"); setHomepageTab("productsBanner"); }} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "homepage" && homepageTab === "productsBanner" ? "#E07B39" : 'transparent', color: section === "homepage" && homepageTab === "productsBanner" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🛍️ Products Banner</li>
           <li onClick={() => setSection("quotes")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "quotes" ? "#E07B39" : 'transparent', color: section === "quotes" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>📜 Quotes</li>
           <li onClick={() => setSection("mantraAudio")} style={{ cursor: 'pointer', padding: "10px 12px", background: section === "mantraAudio" ? "#E07B39" : 'transparent', color: section === "mantraAudio" ? '#fff' : '#4A0B1D', borderRadius: 8, marginBottom: 6, fontSize: 13 }}>🎵 108-Day Mantra</li>
@@ -1401,8 +1320,9 @@ export default function AdminPage() {
         )}
 
         <div style={{ background: "#fff", padding: 20, borderRadius: 8, border: "1px solid #eee", maxWidth: 760 }}>
-          {homepageTab === "productsBanner" && (() => {
+          {(homepageTab === "productsBanner" || homepageTab === "heroBanner") && (() => {
             const activeTab = HOMEPAGE_TABS.find((t) => t.key === homepageTab);
+            const isHeroBanner = homepageTab === "heroBanner";
             const legacyImg =
               homepageData.bannerImage ||
               homepageData.image ||
@@ -1415,7 +1335,7 @@ export default function AdminPage() {
                 : [];
 
             const addBannerSlide = () => {
-              const id = `pb-${Date.now()}`;
+              const id = `${isHeroBanner ? "hb" : "pb"}-${Date.now()}`;
               setHomepageSaved(false);
               setHomepageData((prev) => ({
                 ...prev,
@@ -1426,6 +1346,7 @@ export default function AdminPage() {
             const removeBannerSlide = (id) => {
               setHomepageSaved(false);
               clearHomepagePendingImage(id);
+              clearHomepagePendingImage(`${id}__mobile`);
               setHomepageData((prev) => {
                 const nextSlides = (Array.isArray(prev.slides) && prev.slides.length ? prev.slides : slides).filter((s) => s.id !== id);
                 const next = { ...prev, slides: nextSlides };
@@ -1438,6 +1359,14 @@ export default function AdminPage() {
                 next.bannerImage = first;
                 next.image = first;
                 return next;
+              });
+            };
+
+            const updateBannerSlide = (id, patch) => {
+              setHomepageSaved(false);
+              setHomepageData((prev) => {
+                const list = Array.isArray(prev.slides) && prev.slides.length ? prev.slides : slides;
+                return { ...prev, slides: list.map((s) => (s.id === id ? { ...s, ...patch } : s)) };
               });
             };
 
@@ -1455,14 +1384,16 @@ export default function AdminPage() {
             return (
               <div style={{ marginBottom: 20 }}>
                 <div style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #f0f0f0" }}>
-                  <h4 style={{ margin: "0 0 8px 0", color: "#4A0B1D", fontSize: 15 }}>Products Banner Slider</h4>
+                  <h4 style={{ margin: "0 0 8px 0", color: "#4A0B1D", fontSize: 15 }}>{isHeroBanner ? "Homepage Banner Slider" : "Products Banner Slider"}</h4>
                   <p style={{ margin: "0 0 14px 0", fontSize: 13, color: "#6f6064" }}>
-                    Add multiple images — they rotate as a slider on the Products page (/products). First slide is the default fallback banner.
+                    {isHeroBanner
+                      ? "Upload finished banner images (text and buttons are part of the picture). They rotate as a slider at the top of the homepage — use ↑ ↓ to reorder, Remove to delete. Slide 1 shows first."
+                      : "Add multiple images — they rotate as a slider on the Products page (/products). First slide is the default fallback banner."}
                   </p>
 
                   {slides.length === 0 && (
                     <div style={{ marginBottom: 14, border: "2px dashed #E0D0C0", borderRadius: 8, padding: 18, textAlign: "center", background: "#FAF7F2", color: "#8a7a7e", fontSize: 13 }}>
-                      No slides yet. Default site banner will show until you add one.
+                      {isHeroBanner ? "No slides yet — the homepage shows no banner until you upload one." : "No slides yet. Default site banner will show until you add one."}
                     </div>
                   )}
 
@@ -1501,9 +1432,82 @@ export default function AdminPage() {
                               type="file"
                               accept="image/*"
                               style={{ display: "none" }}
-                              onChange={(e) => handleHomepageImageSelect(s.id, e.target.files[0])}
+                              onChange={(e) => { handleBannerImageSelect(s.id, e.target.files[0]); e.target.value = ""; }}
                             />
                           </label>
+
+                          {isHeroBanner && (() => {
+                            const mobileKey = `${s.id}__mobile`;
+                            const mobilePreview = homepageImagePreviews[mobileKey];
+                            const mobileImg = mobilePreview || (s.mobileImage ? resolveImageUrl(s.mobileImage) : "");
+                            return (
+                              <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px dashed #E0D0C0" }}>
+                                <strong style={{ color: "#4A0B1D", fontSize: 13 }}>📱 Mobile banner (optional)</strong>
+                                <p style={{ margin: "4px 0 10px", fontSize: 12, color: "#6f6064" }}>
+                                  Phones (screens up to 768px wide) show this image instead of the desktop one. Best size: 1080 × 1350 px (4:5 portrait). If you skip it, phones show the desktop banner above.
+                                </p>
+                                <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
+                                  <div style={{ width: 120, flex: "0 0 auto", border: "1px dashed #E0D0C0", borderRadius: 8, padding: 4, background: "#fff", textAlign: "center" }}>
+                                    {mobileImg ? (
+                                      <img src={mobileImg} alt={`Slide ${idx + 1} mobile`} style={{ width: "100%", aspectRatio: "4 / 5", objectFit: "cover", borderRadius: 5, display: "block" }} />
+                                    ) : (
+                                      <p style={{ margin: "34px 0", fontSize: 11, color: "#8a7a7e" }}>No mobile image</p>
+                                    )}
+                                  </div>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-start" }}>
+                                    <label style={{ padding: "7px 12px", background: "#4A0B1D", color: "#fff", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}>
+                                      📱 {mobileImg ? "Replace Mobile Image" : "Upload Mobile Image"}
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: "none" }}
+                                        onChange={(e) => { handleBannerImageSelect(mobileKey, e.target.files[0], 1200); e.target.value = ""; }}
+                                      />
+                                    </label>
+                                    {mobilePreview && (
+                                      <span style={{ fontSize: 12, color: "#E07B39", fontWeight: 600 }}>● New image selected (Save Changes to publish)</span>
+                                    )}
+                                    {mobileImg && (
+                                      <button
+                                        type="button"
+                                        onClick={() => { clearHomepagePendingImage(mobileKey); updateBannerSlide(s.id, { mobileImage: "" }); }}
+                                        style={{ padding: "5px 10px", fontSize: 12, borderRadius: 6, border: "1px solid #c0392b", background: "#fff", color: "#c0392b", cursor: "pointer", fontWeight: 600 }}
+                                      >
+                                        Remove mobile image
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })()}
+
+                          {isHeroBanner && (
+                            <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
+                              <label style={{ fontSize: 12, color: "#6f6064" }}>
+                                Click opens (optional) — e.g. /products, /app or https://…
+                                <input
+                                  type="text"
+                                  value={s.link || ""}
+                                  placeholder="/products"
+                                  maxLength={300}
+                                  onChange={(e) => updateBannerSlide(s.id, { link: e.target.value })}
+                                  style={{ display: "block", width: "100%", marginTop: 4, padding: "8px 10px", border: "1px solid #ddd", borderRadius: 6, fontSize: 13, boxSizing: "border-box" }}
+                                />
+                              </label>
+                              <label style={{ fontSize: 12, color: "#6f6064" }}>
+                                Image description for accessibility / SEO (optional)
+                                <input
+                                  type="text"
+                                  value={s.alt || ""}
+                                  placeholder="e.g. Bhava Evil Eye Collection — protection in every bead"
+                                  maxLength={200}
+                                  onChange={(e) => updateBannerSlide(s.id, { alt: e.target.value })}
+                                  style={{ display: "block", width: "100%", marginTop: 4, padding: "8px 10px", border: "1px solid #ddd", borderRadius: 6, fontSize: 13, boxSizing: "border-box" }}
+                                />
+                              </label>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -1522,7 +1526,7 @@ export default function AdminPage() {
                         type="button"
                         onClick={() => {
                           setHomepageSaved(false);
-                          slides.forEach((s) => clearHomepagePendingImage(s.id));
+                          slides.forEach((s) => { clearHomepagePendingImage(s.id); clearHomepagePendingImage(`${s.id}__mobile`); });
                           clearHomepagePendingImage("banner");
                           setHomepageData((prev) => ({
                             ...prev,
@@ -1539,6 +1543,7 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {!isHeroBanner && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   <h4 style={{ margin: "0 0 4px 0", color: "#4A0B1D", fontSize: 15 }}>Headings (Categories ke upar)</h4>
                   <p style={{ margin: "0 0 8px 0", fontSize: 13, color: "#6f6064" }}>
@@ -1565,6 +1570,7 @@ export default function AdminPage() {
                     textarea
                   />
                 </div>
+                )}
               </div>
             );
           })()}
@@ -1727,94 +1733,6 @@ export default function AdminPage() {
               )}
             </div>
           )}
-
-          {homepageTab === "hero" && (
-            <p style={{ margin: "0 0 16px 0", fontSize: 12, color: "#8a7a7e" }}>
-              These slides rotate automatically on the homepage banner (one at a time, every few seconds) — they don't show side by side. Use the dots at the bottom of the banner on the live site to jump to a specific slide and check your changes.
-            </p>
-          )}
-          {homepageTab === "hero" &&
-            (() => {
-              const hiddenSlideIds = homepageData.hiddenSlideIds || [];
-              const extraSlideIds = Array.isArray(homepageData.extraSlideIds) ? homepageData.extraSlideIds : [];
-              const visibleBase = HERO_SLIDES.filter((s) => !hiddenSlideIds.includes(s.id));
-              const hiddenBase = HERO_SLIDES.filter((s) => hiddenSlideIds.includes(s.id));
-              const allSlides = [
-                ...visibleBase.map((s) => ({ ...s, isExtra: false })),
-                ...extraSlideIds.map((id, i) => ({ id, label: `New Slide ${i + 1}`, type: "slide", isExtra: true })),
-              ];
-
-              return (
-                <>
-                  {allSlides.map((s) => {
-                    const o = (homepageData.items || {})[s.id] || {};
-                    const preview = homepageImagePreviews[s.id];
-                    return (
-                      <div key={s.id} style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f0f0f0" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                          <h4 style={{ margin: 0, color: "#4A0B1D", fontSize: 14 }}>{s.label}</h4>
-                          <button
-                            onClick={() => removeHomepageSlide(s.id, s.isExtra)}
-                            style={{ padding: "4px 10px", background: "#fff", color: "#ff6b6b", border: "1px solid #ff6b6b", borderRadius: 4, cursor: "pointer", fontSize: 11, fontWeight: 600 }}
-                          >
-                            {s.isExtra ? "🗑 Delete Slide" : "Hide This Slide"}
-                          </button>
-                        </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                          {s.type === "hero" ? (
-                            <>
-                              <HomepageField label="Headline" value={o.headline} defaultValue={s.defaultHeadline} onChange={(v) => handleHomepageItemChange(s.id, "headline", v)} />
-                              <HomepageField label="Highlighted word(s)" value={o.highlight} defaultValue={s.defaultHighlight} onChange={(v) => handleHomepageItemChange(s.id, "highlight", v)} />
-                              <HomepageField label="Description line" value={o.description} defaultValue={s.defaultDescription} onChange={(v) => handleHomepageItemChange(s.id, "description", v)} />
-                              <HomepageField label="Second description line" value={o.description1} defaultValue={s.defaultDescription1} onChange={(v) => handleHomepageItemChange(s.id, "description1", v)} />
-                              <HomepageField label="Primary button text" value={o.primaryCta} defaultValue={s.defaultPrimaryCta} onChange={(v) => handleHomepageItemChange(s.id, "primaryCta", v)} />
-                              <HomepageField label="Secondary button text" value={o.secondaryCta} defaultValue={s.defaultSecondaryCta} onChange={(v) => handleHomepageItemChange(s.id, "secondaryCta", v)} />
-                            </>
-                          ) : (
-                            <>
-                              <HomepageField label="Title line 1" value={o.title0} defaultValue={s.defaultTitle0} onChange={(v) => handleHomepageItemChange(s.id, "title0", v)} />
-                              <HomepageField label="Title line 2" value={o.title1} defaultValue={s.defaultTitle1} onChange={(v) => handleHomepageItemChange(s.id, "title1", v)} />
-                              <HomepageField label="Description" value={o.description} defaultValue={s.defaultDescription} onChange={(v) => handleHomepageItemChange(s.id, "description", v)} textarea />
-                              <HomepageField label="Button text" value={o.cta} defaultValue={s.defaultCta} onChange={(v) => handleHomepageItemChange(s.id, "cta", v)} />
-                            </>
-                          )}
-                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                            {(preview || o.image) && (
-                              <img src={preview || resolveImageUrl(o.image)} alt="" style={{ width: 90, height: 60, objectFit: "cover", borderRadius: 6 }} />
-                            )}
-                            <label style={{ padding: "8px 14px", background: "#E07B39", color: "#fff", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
-                              {o.image || preview ? "Replace Background Image" : "Upload Background Image"}
-                              <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleHomepageImageSelect(s.id, e.target.files[0])} />
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  <button onClick={addHomepageSlide} style={{ display: "block", padding: "10px 16px", background: "#4CAF50", color: "#fff", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
-                    + Add New Slide
-                  </button>
-
-                  {hiddenBase.length > 0 && (
-                    <div style={{ marginTop: 8 }}>
-                      <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#8a7a7e" }}>Hidden slides:</p>
-                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                        {hiddenBase.map((s) => (
-                          <button
-                            key={s.id}
-                            onClick={() => restoreHomepageSlide(s.id)}
-                            style={{ padding: "4px 10px", background: "#fff", color: "#4A0B1D", border: "1px solid #ddd", borderRadius: 999, cursor: "pointer", fontSize: 12 }}
-                          >
-                            ↺ Restore "{s.label}"
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              );
-            })()}
 
           <button
             onClick={saveHomepageSection}

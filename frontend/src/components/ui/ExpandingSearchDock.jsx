@@ -19,6 +19,7 @@ const MAX_RESULTS = 8;
  */
 export function ExpandingSearchDock({
   onSearch,
+  onOpen,
   placeholder = "Search incense, beads, rituals…",
 }) {
   const navigate = useNavigate();
@@ -33,6 +34,11 @@ export function ExpandingSearchDock({
     setOpen(false);
     setQuery("");
     setActiveIdx(-1);
+  };
+
+  const openDock = () => {
+    onOpen?.();
+    setOpen(true);
   };
 
   const results = useMemo(() => {
@@ -134,7 +140,7 @@ export function ExpandingSearchDock({
         <button
           type="button"
           className={styles.iconBtn}
-          onClick={() => setOpen(true)}
+          onClick={openDock}
           aria-label="Search"
           aria-expanded={false}
         >

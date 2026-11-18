@@ -1,5 +1,6 @@
 .page {
   background: #f6f1e8;
+  overflow-x: hidden;
 }
 
 .inner {
@@ -218,6 +219,7 @@
 .experienceSection {
   padding: 64px 0 96px;
   text-align: center;
+  background: linear-gradient(180deg, #f6f1e8 0%, #fbf8f2 55%, #f6f1e8 100%);
 }
 
 .experienceTitle {
@@ -228,24 +230,60 @@
 }
 
 .experienceDivider {
-  height: 1px;
-  background: rgba(74, 11, 29, 0.15);
-  margin: 0 0 40px;
+  width: 56px;
+  height: 2px;
+  background: linear-gradient(90deg, #e07b39, #c6a14a);
+  margin: 0 auto 40px;
+  border-radius: 2px;
 }
 
 .experienceGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 28px;
+  gap: 20px;
   text-align: left;
   margin-bottom: 48px;
+}
+
+.experienceCol {
+  background: #fff;
+  border: 1px solid rgba(74, 11, 29, 0.08);
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 8px 22px rgba(62, 9, 24, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 100%;
+}
+
+.experienceIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(224, 123, 57, 0.12);
+  color: #e07b39;
+  font-size: 22px;
+  margin-bottom: 14px;
 }
 
 .experienceColTitle {
   margin: 0 0 8px;
   font-family: "Canela", Cormorant, serif;
   font-size: 21px;
-  color: #4A0B1D;
+  color: #4a0b1d;
+}
+
+.experienceColDesc {
+  margin: 0;
+  font-family: "Neue Haas Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4a4a4a;
+  font-weight: 450;
 }
 
 .experienceClosing {
@@ -272,26 +310,209 @@
 }
 
 /* ── Responsive ── */
-@media (max-width: 900px) {
-  .beliefGrid {
-    grid-template-columns: 1fr;
+@media (max-width: 1024px) {
+  .inner {
+    width: min(1180px, calc(100% - 40px));
   }
-  .beliefImageWrapper {
-    order: -1;
-    aspect-ratio: 16 / 10;
-  }
-  .philosophyGrid,
+
   .pillarsGrid,
   .craftingGrid {
-    grid-template-columns: 1fr;
-  }
-  .experienceGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .beliefGrid {
+    gap: 28px;
   }
 }
 
-@media (max-width: 520px) {
-  .experienceGrid {
+@media (max-width: 900px) {
+  .heroSection {
+    padding: 48px 0 40px;
+  }
+
+  .heroTitle {
+    margin: 0 0 28px;
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+    line-height: 1.15;
+  }
+
+  .beliefGrid {
     grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .beliefImageWrapper {
+    order: -1;
+    aspect-ratio: 16 / 10;
+    border-radius: 14px;
+  }
+
+  .philosophySection,
+  .pillarsSection,
+  .craftingSection {
+    padding: 48px 0;
+  }
+
+  .experienceSection {
+    padding: 48px 0 72px;
+  }
+
+  .philosophyGrid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .experienceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .kickerLarge {
+    margin-bottom: 28px;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .inner {
+    width: calc(100% - 32px);
+  }
+
+  .heroSection {
+    padding: 36px 0 32px;
+  }
+
+  .kicker {
+    font-size: 13px;
+  }
+
+  .kickerCentered {
+    font-size: 15px;
+  }
+
+  .sectionTitle {
+    margin-bottom: 18px;
+    font-size: clamp(1.45rem, 6vw, 1.85rem);
+  }
+
+  .body,
+  .bodyAccent,
+  .beliefList li {
+    font-size: 15px;
+  }
+
+  .colHeading {
+    font-size: 1.15rem;
+    margin-bottom: 12px;
+  }
+
+  .pillarsGrid,
+  .craftingGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .pillarCard,
+  .craftingCard {
+    padding: 22px 18px;
+  }
+
+  .pillarCard:hover,
+  .craftingCard:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .philosophySection,
+  .pillarsSection,
+  .craftingSection {
+    padding: 40px 0;
+  }
+
+  .experienceSection {
+    padding: 40px 0 64px;
+  }
+
+  .experienceTitle {
+    margin-bottom: 18px;
+    font-size: clamp(1.45rem, 6vw, 1.85rem);
+    line-height: 1.2;
+  }
+
+  .experienceDivider {
+    margin-bottom: 24px;
+  }
+
+  .experienceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .experienceCol {
+    padding: 18px 14px;
+    border-radius: 14px;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .experienceIcon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .experienceColTitle {
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+  }
+
+  .experienceColDesc {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .experienceClosing {
+    font-size: 14.5px;
+    margin-bottom: 18px;
+    padding: 0 2px;
+  }
+
+  .experienceTagline {
+    font-size: 1.1rem;
+    line-height: 1.35;
+    padding: 0 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .inner {
+    width: calc(100% - 28px);
+  }
+
+  .heroTitle {
+    font-size: 1.75rem;
+  }
+
+  .beliefImageWrapper {
+    aspect-ratio: 5 / 3;
+  }
+
+  .pillarTitle {
+    font-size: 1.1rem;
+  }
+
+  .experienceCol {
+    padding: 16px 12px;
+  }
+
+  .experienceColTitle {
+    font-size: 1rem;
+  }
+
+  .experienceColDesc {
+    font-size: 12px;
   }
 }

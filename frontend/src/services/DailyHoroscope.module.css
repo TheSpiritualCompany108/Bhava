@@ -3,6 +3,7 @@
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
   color: #4A0B1D;
+  overflow-x: hidden;
 }
 
 .hero {
@@ -13,7 +14,7 @@
 
 .title {
   font-family: "Playfair Display", serif;
-  font-size: 2.4rem;
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
   color: #7A3B12;
   margin: 0;
 }
@@ -95,6 +96,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
   min-width: 78px;
+  flex-shrink: 0;
 }
 
 .signBtn:hover {
@@ -717,4 +719,138 @@
   font-size: 0.85rem;
   cursor: pointer;
   padding: 6px;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 36px 16px 20px;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    padding: 0 4px;
+  }
+
+  .container {
+    padding: 20px 16px 64px;
+  }
+
+  .signPickerWrap {
+    margin: 0 -16px 22px;
+  }
+
+  .signPickerLabel {
+    padding: 0 16px;
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+  }
+
+  .signPicker {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px 16px 10px;
+  }
+
+  .signPicker::-webkit-scrollbar {
+    display: none;
+  }
+
+  .signBtn,
+  .signBtnActive {
+    scroll-snap-align: center;
+    min-width: 76px;
+    padding: 11px 14px;
+  }
+
+  .grid {
+    gap: 16px;
+  }
+
+  .mainCol,
+  .sideCol {
+    gap: 16px;
+  }
+
+  .card,
+  .ritualCard {
+    padding: 18px 16px;
+    border-radius: 16px;
+  }
+
+  .signHeaderRow {
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .todayRow {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .todayLabel {
+    font-size: 0.78rem;
+  }
+
+  .horoscopeText {
+    font-size: 0.95rem;
+  }
+
+  .categoryGrid {
+    gap: 10px;
+  }
+
+  .categoryCard {
+    padding: 12px 10px;
+  }
+
+  .weekRow {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .weekRow::-webkit-scrollbar {
+    display: none;
+  }
+
+  .weekDay,
+  .weekDayActive {
+    min-width: 44px;
+    flex: 0 0 auto;
+  }
+
+  .calendarOverlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .calendarPanel {
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    max-height: 85vh;
+  }
+}
+
+@media (max-width: 420px) {
+  .signBtn,
+  .signBtnActive {
+    min-width: 70px;
+    padding: 10px 12px;
+  }
+
+  .signName {
+    font-size: 0.72rem;
+  }
+
+  .factsRow {
+    gap: 10px;
+  }
 }

@@ -37,6 +37,7 @@ function Navbar() {
   useEffect(() => {
     setMenuOpen(false);
     setShopOpen(false);
+    window.dispatchEvent(new Event("guru:close"));
   }, [location.pathname, location.search]);
 
   useEffect(() => {
@@ -91,7 +92,12 @@ function Navbar() {
         .toUpperCase()
     : "";
 
+  const dismissChat = () => {
+    window.dispatchEvent(new Event("guru:close"));
+  };
+
   const closeMenu = () => {
+    dismissChat();
     setMenuOpen(false);
     setShopOpen(false);
   };
@@ -102,11 +108,17 @@ function Navbar() {
         <div className={styles.topBar}>
           <div
             className={styles.brandContainer}
-            onClick={() => navigate("/")}
+            onClick={() => {
+              dismissChat();
+              navigate("/");
+            }}
             role="link"
             tabIndex={0}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") navigate("/");
+              if (e.key === "Enter" || e.key === " ") {
+                dismissChat();
+                navigate("/");
+              }
             }}
           >
             <img src="/bhava-icon.webp" alt="Bhava: Logo" className={styles.logo} width={49} height={70} />
@@ -228,7 +240,9 @@ function Navbar() {
           <div className={styles.actions}>
             <ExpandingSearchDock
               placeholder="Search products…"
+              onOpen={dismissChat}
               onSearch={(q) => {
+                dismissChat();
                 closeMenu();
                 navigate(`/products?q=${encodeURIComponent(q)}`);
               }}
@@ -237,7 +251,10 @@ function Navbar() {
             <button
               type="button"
               className={styles.cartIconBtn}
-              onClick={() => navigate("/cart")}
+              onClick={() => {
+                dismissChat();
+                navigate("/cart");
+              }}
               aria-label="View cart"
             >
               <svg className={styles.cartSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -260,7 +277,10 @@ function Navbar() {
                 <button
                   type="button"
                   className={styles.avatarBtn}
-                  onClick={() => setDropdownOpen((p) => !p)}
+                  onClick={() => {
+                    dismissChat();
+                    setDropdownOpen((p) => !p);
+                  }}
                   aria-label="User menu"
                 >
                   <AvatarImage
@@ -341,7 +361,10 @@ function Navbar() {
               <button
                 type="button"
                 className={`${styles.btnGetStarted} ${styles.desktopOnlyCta}`}
-                onClick={() => navigate("/auth")}
+                onClick={() => {
+                  dismissChat();
+                  navigate("/auth");
+                }}
               >
                 Get Started
               </button>
@@ -350,7 +373,10 @@ function Navbar() {
             <button
               type="button"
               className={styles.hamburger}
-              onClick={() => setMenuOpen((p) => !p)}
+              onClick={() => {
+                dismissChat();
+                setMenuOpen((p) => !p);
+              }}
               aria-label="Toggle menu"
               aria-expanded={menuOpen}
             >

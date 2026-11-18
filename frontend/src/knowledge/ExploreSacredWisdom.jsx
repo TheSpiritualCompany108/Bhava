@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useRef } from "react";
+import { useState, useLayoutEffect, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
 import styles from "./ExploreSacredWisdom.module.css";
@@ -19,9 +19,14 @@ export const wisdomRoutes = [
   { path: "festivals-celebrations", element: <FestivalCelebrations /> },
 ];
 
-const WISDOM_VISIBLE = 4;
-const WISDOM_STEP = 2;
-const WISDOM_GAP = 20;
+const WISDOM_GAP = 14;
+
+function visibleCountForWidth(w) {
+  if (w < 640) return 1;
+  if (w < 900) return 2;
+  if (w < 1180) return 3;
+  return 4;
+}
 
 const knowledgeCategories = [
   {
@@ -70,6 +75,7 @@ const knowledgeCategories = [
 
 function WisdomFlipCard({ category, width, navigate }) {
   const [flipped, setFlipped] = useState(false);
+
   return (
     <div
       className={styles.wisdomCardOuter}
@@ -77,6 +83,16 @@ function WisdomFlipCard({ category, width, navigate }) {
       style={width ? { flex: `0 0 ${width}px`, width } : {}}
       onMouseEnter={() => setFlipped(true)}
       onMouseLeave={() => setFlipped(false)}
+      onClick={() => setFlipped((v) => !v)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setFlipped((v) => !v);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`${category.title} card`}
     >
       <motion.div
         className={styles.wisdomCardInner}
@@ -96,8 +112,12 @@ function WisdomFlipCard({ category, width, navigate }) {
             <h3 className={styles.wisdomFrontTitle}>{category.title}</h3>
             <p className={styles.wisdomFrontDesc}>{category.description}</p>
             <button
+              type="button"
               className={styles.wisdomFrontBtn}
-              onClick={() => { navigate(category.route); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(category.route);
+              }}
             >
               Explore More
             </button>
@@ -112,31 +132,43 @@ function ExploreSacredWisdom() {
   const navigate = useNavigate();
   const [wisdomIndex, setWisdomIndex] = useState(0);
   const [wisdomCardW, setWisdomCardW] = useState(0);
+  const [visible, setVisible] = useState(4);
   const wisdomRef = useRef(null);
 
   useLayoutEffect(() => {
     const el = wisdomRef.current;
-    if (!el) return;
+    if (!el) return undefined;
+
     const measure = () => {
       const w = el.clientWidth;
-      if (w > 0) setWisdomCardW((w - WISDOM_GAP * (WISDOM_VISIBLE - 1)) / WISDOM_VISIBLE);
+      if (w <= 0) return;
+      const nextVisible = visibleCountForWidth(w);
+      setVisible(nextVisible);
+      setWisdomCardW((w - WISDOM_GAP * (nextVisible - 1)) / nextVisible);
     };
+
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
-  const prevWisdom = () => setWisdomIndex((p) => Math.max(0, p - WISDOM_STEP));
-  const nextWisdom = () =>
-    setWisdomIndex((p) => Math.min(knowledgeCategories.length - WISDOM_VISIBLE, p + WISDOM_STEP));
+  useEffect(() => {
+    const maxIndex = Math.max(0, knowledgeCategories.length - visible);
+    setWisdomIndex((i) => Math.min(i, maxIndex));
+  }, [visible]);
+
+  const step = Math.max(1, Math.min(2, visible));
+  const maxIndex = Math.max(0, knowledgeCategories.length - visible);
+  const prevWisdom = () => setWisdomIndex((p) => Math.max(0, p - step));
+  const nextWisdom = () => setWisdomIndex((p) => Math.min(maxIndex, p + step));
 
   return (
     <div className={styles.sacredCollectionSection}>
       <div className={styles.container}>
         <div className={styles.sectionGoldDivider} />
         <h1 className={styles.sectionTitle}>
-          Explore <span className={styles.highlight}>Sacred Wisdom</span>
+          <span className={styles.highlight}>Explore</span> Sacred Wisdom
         </h1>
       </div>
 
@@ -144,6 +176,7 @@ function ExploreSacredWisdom() {
         <div className={styles.wisdomTrackOuter} ref={wisdomRef}>
           <motion.div
             className={styles.wisdomTrack}
+            style={{ gap: WISDOM_GAP }}
             animate={{ x: -wisdomIndex * (wisdomCardW + WISDOM_GAP) }}
             transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
           >
@@ -159,6 +192,7 @@ function ExploreSacredWisdom() {
         </div>
 
         <button
+          type="button"
           className={`${styles.wisdomArrow} ${styles.wisdomArrowLeft}`}
           onClick={prevWisdom}
           disabled={wisdomIndex === 0}
@@ -168,13 +202,28 @@ function ExploreSacredWisdom() {
         </button>
 
         <button
+          type="button"
           className={`${styles.wisdomArrow} ${styles.wisdomArrowRight}`}
           onClick={nextWisdom}
-          disabled={wisdomIndex >= knowledgeCategories.length - WISDOM_VISIBLE}
+          disabled={wisdomIndex >= maxIndex}
           aria-label="Next"
         >
           ›
         </button>
+
+        <div className={styles.wisdomDots} role="tablist" aria-label="Sacred wisdom slides">
+          {Array.from({ length: maxIndex + 1 }, (_, i) => (
+            <button
+              key={i}
+              type="button"
+              role="tab"
+              aria-selected={i === wisdomIndex}
+              aria-label={`Slide ${i + 1}`}
+              className={`${styles.wisdomDot} ${i === wisdomIndex ? styles.wisdomDotOn : ""}`}
+              onClick={() => setWisdomIndex(i)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

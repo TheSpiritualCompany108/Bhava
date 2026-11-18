@@ -51,7 +51,7 @@ function ScrollToTopOnPush() {
  
 function Layout() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith("/admin");
+  const isAdminRoute = location.pathname.toLowerCase().startsWith("/admin"); // /ADMIN also matches the route (React Router ignores case)
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {

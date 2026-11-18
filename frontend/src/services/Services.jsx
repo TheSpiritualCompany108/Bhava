@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./Services.module.css";
 import ServiceBookingModal from "./ServiceBookingModal";
 
@@ -98,11 +98,38 @@ const stats = [
 
 function Services() {
   const [booking, setBooking] = useState(null);
+  const [active, setActive] = useState(0);
   const gridRef = useRef(null);
+  const sliderRef = useRef(null);
+
+  useEffect(() => {
+    const el = sliderRef.current;
+    if (!el) return undefined;
+
+    const onScroll = () => {
+      const card = el.querySelector(`.${styles.card}`);
+      if (!card) return;
+      const gap = 16;
+      const step = card.offsetWidth + gap;
+      const next = Math.round(el.scrollLeft / step);
+      setActive(Math.max(0, Math.min(services.length - 1, next)));
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const goTo = (i) => {
+    const el = sliderRef.current;
+    if (!el) return;
+    const card = el.querySelector(`.${styles.card}`);
+    if (!card) return;
+    el.scrollTo({ left: i * (card.offsetWidth + 16), behavior: "smooth" });
+    setActive(i);
+  };
+
   return (
     <div className={styles.page}>
-
-      {/* ── Hero ── */}
       <div className={styles.hero}>
         <p className={styles.eyebrow}>BHAVA: SACRED SERVICES</p>
         <h1 className={styles.heroTitle}>
@@ -114,7 +141,6 @@ function Services() {
         </p>
       </div>
 
-      {/* ── Stats strip ── */}
       <div className={styles.statsStrip}>
         {stats.map((s, i) => (
           <div key={i} className={styles.statItem}>
@@ -124,7 +150,6 @@ function Services() {
         ))}
       </div>
 
-      {/* ── Services grid ── */}
       <div className={styles.container} ref={gridRef}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>What We Offer</h2>
@@ -133,30 +158,47 @@ function Services() {
           </p>
         </div>
 
-        <div className={styles.grid}>
-          {services.map((s) => (
-            <div
-              key={s.id}
-              className={`${styles.card} ${s.highlight ? styles.cardHighlight : ""}`}
-            >
-              <div className={styles.cardImg}>
-                <img src={s.img} alt={s.title} />
-                <span className={styles.cardTag}>{s.tag}</span>
-              </div>
-              <div className={styles.cardBody}>
-                <div className={styles.cardIcon}>{s.icon}</div>
-                <h3 className={styles.cardTitle}>{s.title}</h3>
-                <p className={styles.cardDesc}>{s.description}</p>
-                <div className={styles.cardFooter}>
-                  <button type="button" className={styles.bookBtn} onClick={() => setBooking(s)}>Book Now</button>
+        <div className={styles.sliderWrap}>
+          <div className={styles.grid} ref={sliderRef}>
+            {services.map((s) => (
+              <div
+                key={s.id}
+                className={`${styles.card} ${s.highlight ? styles.cardHighlight : ""}`}
+              >
+                <div className={styles.cardImg}>
+                  <img src={s.img} alt={s.title} />
+                  <span className={styles.cardTag}>{s.tag}</span>
+                </div>
+                <div className={styles.cardBody}>
+                  <div className={styles.cardIcon}>{s.icon}</div>
+                  <h3 className={styles.cardTitle}>{s.title}</h3>
+                  <p className={styles.cardDesc}>{s.description}</p>
+                  <div className={styles.cardFooter}>
+                    <button type="button" className={styles.bookBtn} onClick={() => setBooking(s)}>
+                      Book Now
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <div className={styles.sliderDots} role="tablist" aria-label="Services">
+            {services.map((s, i) => (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={i === active}
+                aria-label={`Show ${s.title}`}
+                className={`${styles.sliderDot} ${i === active ? styles.sliderDotOn : ""}`}
+                onClick={() => goTo(i)}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* ── How it works ── */}
       <div className={styles.howSection}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
@@ -176,7 +218,6 @@ function Services() {
         </div>
       </div>
 
-      {/* ── CTA banner ── */}
       <div className={styles.ctaBanner}>
         <div className={styles.ctaInner}>
           <h2 className={styles.ctaTitle}>Begin Your Sacred Journey Today</h2>
@@ -185,8 +226,20 @@ function Services() {
             Your first puja consultation is free.
           </p>
           <div className={styles.ctaBtns}>
-            <button type="button" className={styles.ctaPrimary} onClick={() => setBooking({ title: "Free puja consultation", tag: "Free consultation" })}>Get Free Consultation</button>
-            <button type="button" className={styles.ctaSecondary} onClick={() => gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}>Browse All Services</button>
+            <button
+              type="button"
+              className={styles.ctaPrimary}
+              onClick={() => setBooking({ title: "Free puja consultation", tag: "Free consultation" })}
+            >
+              Get Free Consultation
+            </button>
+            <button
+              type="button"
+              className={styles.ctaSecondary}
+              onClick={() => gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            >
+              Browse All Services
+            </button>
           </div>
         </div>
       </div>

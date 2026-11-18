@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DailyHoroscope.module.css";
 
@@ -66,6 +66,7 @@ function Stars({ rating }) {
 
 function DailyHoroscope() {
   const navigate = useNavigate();
+  const signPickerRef = useRef(null);
   const [sign, setSign] = useState("aries");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -77,6 +78,14 @@ function DailyHoroscope() {
   const [calendarMonth, setCalendarMonth] = useState(null);
   const [monthData, setMonthData] = useState(null);
   const [monthLoading, setMonthLoading] = useState(false);
+
+  useEffect(() => {
+    const track = signPickerRef.current;
+    if (!track) return;
+    const activeBtn = track.querySelector("[data-active='true']");
+    if (!activeBtn) return;
+    activeBtn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [sign]);
 
   useEffect(() => {
     let cancelled = false;
@@ -192,10 +201,12 @@ function DailyHoroscope() {
           <p className={styles.signPickerLabel}>
             <span className={styles.ornamentDotSmall} /> Choose Your Zodiac Sign <span className={styles.ornamentDotSmall} />
           </p>
-          <div className={styles.signPicker}>
+          <div className={styles.signPicker} ref={signPickerRef}>
             {ZODIAC_SIGNS.map((s) => (
               <button
                 key={s.key}
+                type="button"
+                data-active={s.key === sign ? "true" : "false"}
                 className={s.key === sign ? styles.signBtnActive : styles.signBtn}
                 onClick={() => setSign(s.key)}
               >

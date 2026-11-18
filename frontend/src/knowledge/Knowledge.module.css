@@ -26,6 +26,7 @@
   background: var(--temple-ivory);
   min-height: 100vh;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
+  overflow-x: hidden;
 }
 
 /* 
@@ -668,12 +669,7 @@
   color: #fff;
   margin: 0;
   font-family: 'Canela', Cormorant, serif;
-}
-
-/* Ensure titles inside back overlays don't drift */
-.wisdomCardBackTitle {
   align-self: flex-start !important;
-  margin-bottom: 480px !important;
 }
 
 /* Front — details revealed on hover flip */

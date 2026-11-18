@@ -648,9 +648,10 @@
     margin-right: 0;
   }
 
+  /* Keep logo under the drawer/backdrop so it doesn't peek through the open menu */
   .brandContainer {
     position: relative;
-    z-index: 1100;
+    z-index: 1;
   }
 
   .navPanelOpen {

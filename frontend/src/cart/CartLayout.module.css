@@ -1,5 +1,5 @@
 /* Cart layout — bag → address → payment flow, item list left, price details right */
-.page { background: #fff; min-height: 100vh; font-family: 'Neue Haas Grotesk', Inter, sans-serif; color: #4A0B1D; padding-bottom: 120px; }
+.page { background: #fff; min-height: 100vh; font-family: 'Neue Haas Grotesk', Inter, sans-serif; color: #4A0B1D; padding-bottom: 0; }
 
 .stepsBar { border-bottom: 1px solid #eee3d3; background: #fff; }
 .steps { list-style: none; margin: 0 auto; padding: 22px 16px; display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #8a7a7e; }
@@ -99,16 +99,101 @@
 .gst { margin: 0 0 14px; font-size: 12px; color: #8a7a7e; }
 .ship {
   margin-bottom: 14px;
-  background: #f6efe3 !important;
-  color: #4A0B1D !important;
-  border: 0 !important;
-  border-radius: 4px !important;
-  font-size: 15px;
+  background: linear-gradient(180deg, #fff6e9 0%, #f6e7d2 100%);
+  color: #4A0B1D;
+  border: 1px solid rgba(224, 123, 57, 0.28);
+  border-radius: 10px;
+  font-size: 13.5px;
   font-weight: 600;
   text-align: center;
-  padding: 12px 14px;
-  line-height: 1.4;
+  padding: 10px 14px 11px;
+  line-height: 1.25;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  position: relative;
+  overflow: visible;
+}
+
+.shipText {
+  display: block;
+  line-height: 1.25;
+}
+
+.shipText strong { font-weight: 800; }
+
+.shipAmt {
+  color: #C0671E;
+  display: inline-block;
+  animation: amtPulse 2.6s ease-in-out infinite;
+}
+
+.shipBar {
+  position: relative;
+  height: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.shipTrack {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(74, 11, 29, 0.13);
+  box-shadow: inset 0 1px 2px rgba(74, 11, 29, 0.12);
+  overflow: hidden;
+}
+
+.shipFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e07b39 0%, #c0671e 100%);
+  transition: width 0.45s ease;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.shipFill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 55%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%);
+  animation: fillShine 2.2s ease-in-out 1s infinite;
+}
+
+.shipMarker {
+  position: absolute;
+  top: 50%;
+  margin-top: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  color: #C0671E;
+  border: 1.5px solid #E07B39;
+  box-shadow: 0 1px 4px rgba(74, 11, 29, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: left 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: markerIn 1s cubic-bezier(0.22, 1, 0.36, 1), markerBob 1.6s ease-in-out 1s infinite;
+}
+
+.shipMarker svg { width: 8px; height: 8px; }
+
+@keyframes markerIn { from { left: 0; transform: translateX(0); } }
+@keyframes markerBob { 0%, 100% { margin-top: -7px; } 50% { margin-top: -8px; } }
+@keyframes fillShine { 0% { transform: translateX(-120%); } 60%, 100% { transform: translateX(260%); } }
+@keyframes amtPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .shipFill::after, .shipMarker, .shipAmt { animation: none; }
 }
 .alert { background: #fdecea; color: #8a1c10; border-radius: 6px; padding: 10px 12px; font-size: 13px; margin: 0 0 14px; line-height: 1.5; }
 .cta { width: 100%; border: 0; background: #E07B39; color: #fff; font-weight: 700; font-size: 14px; letter-spacing: 1.2px; padding: 15px 10px; border-radius: 4px; cursor: pointer; transition: background .15s; }
@@ -117,13 +202,70 @@
 .secure { margin: 12px 0 0; text-align: center; font-size: 12px; color: #8a7a7e; line-height: 1.5; }
 
 @media (max-width: 860px) {
-  .layout { grid-template-columns: 1fr; }
+  .layout { grid-template-columns: 1fr; margin-top: 12px; }
   .left { padding-right: 0; }
-  .right { position: static; border-left: 0; border-top: 8px solid #f6efe3; padding: 20px 0 0; margin-top: 14px; }
+  .right { position: static; border-left: 0; border-top: 8px solid #f6efe3; padding: 16px 0 8px; margin-top: 10px; }
   .wrap { padding: 0 14px; }
-  .dash { width: 28px; }
-  .steps { gap: 8px; letter-spacing: 1.5px; font-size: 12px; }
-  .thumb { flex-basis: 88px; width: 88px; height: 112px; }
+
+  .stepsBar { border-bottom-color: #f0e4d4; }
+  .steps {
+    padding: 10px 12px;
+    gap: 6px;
+    letter-spacing: 1px;
+    font-size: 11px;
+  }
+  .dash { width: 18px; flex: 0 0 18px; }
+  .stepOn { padding-bottom: 2px; }
+
+  .selectedBar { padding: 10px 2px 12px; font-size: 13px; }
+  .item { gap: 12px; padding: 12px; margin-bottom: 12px; }
+  .thumb { flex-basis: 78px; width: 78px; height: 100px; }
+  .info { padding-right: 22px; }
+  .title { font-size: 14.5px; }
+  .chips { margin-top: 8px; }
+  .priceRow { margin-top: 8px; font-size: 15px; }
+
+  .addon {
+    gap: 10px;
+    padding: 10px;
+    align-items: flex-start;
+  }
+  .addon img { width: 48px; height: 48px; }
+  .addonText { font-size: 13px; }
+  .addBtn {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    font-size: 11.5px;
+    letter-spacing: 0.5px;
+    align-self: center;
+  }
+
+  .continue { margin-top: 4px; font-size: 13px; }
+  .sectionH { margin-bottom: 12px; }
+}
+
+@media (max-width: 480px) {
+  .steps {
+    padding: 8px 10px;
+    gap: 5px;
+    font-size: 10.5px;
+    letter-spacing: 0.8px;
+  }
+  .dash { width: 14px; flex-basis: 14px; }
+  .wrap { padding: 0 12px; }
+  .layout { margin-top: 0; }
+  .deliverMob { padding: 12px; }
+  .item { gap: 10px; padding: 10px; }
+  .thumb { flex-basis: 72px; width: 72px; height: 92px; }
+  .qtyBtn { width: 30px; height: 30px; font-size: 16px; }
+  .qtyValue { min-width: 24px; font-size: 13px; }
+  .addon {
+    flex-wrap: wrap;
+  }
+  .addBtn {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 .terms { margin: 0 0 12px; font-size: 12px; line-height: 1.6; color: #6f6064; }
@@ -131,8 +273,8 @@
 
 /* ── You may also like (Myntra-style) ── */
 .likeSection {
-  margin-top: 36px;
-  padding: 32px 0 52px;
+  margin-top: 28px;
+  padding: 28px 0 32px;
   background: #fff8f1;
   border-top: 1px solid #f0e4d4;
 }
@@ -155,12 +297,22 @@
 
 .likeChips {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
-  margin-bottom: 20px;
+  margin: 0 -24px 20px;
+  padding: 2px 24px 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+
+.likeChips::-webkit-scrollbar {
+  display: none;
 }
 
 .likeChip {
+  flex: 0 0 auto;
   border: 1px solid #ddd2c4;
   background: #fff;
   color: #4A0B1D;
@@ -170,6 +322,8 @@
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
+  white-space: nowrap;
+  scroll-snap-align: start;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
@@ -332,10 +486,167 @@
 
 @media (max-width: 860px) {
   .likeWrap { padding: 0 14px; }
+  .likeChips { margin: 0 -14px 16px; padding: 2px 14px 10px; gap: 8px; }
   .likeGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 }
 
 @media (max-width: 560px) {
   .likeGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .likeTitle { font-size: 16px; }
+  .likeChip { padding: 7px 12px; font-size: 12px; }
+}
+
+/* Shared deliver row bits */
+.deliverBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box;
+}
+.deliverText { min-width: 0; flex: 1; }
+.deliverTop {
+  margin: 0;
+  font-size: 14px;
+  color: #4A0B1D;
+  line-height: 1.35;
+}
+.deliverTop strong { font-weight: 800; }
+.deliverAddr {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #8a7a7e;
+  line-height: 1.4;
+}
+.deliverChange {
+  flex: 0 0 auto;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.deliverChangeDesk { display: inline; }
+.deliverChangeMob { display: none; }
+
+/* Desktop: Myntra card in left column */
+.deliverDesk {
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 14px 16px;
+  background: #faf6f0;
+  border: 1px solid #eee3d3;
+  border-radius: 8px;
+}
+.deliverDesk .deliverAddr {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.deliverDesk .deliverChange {
+  background: #fff;
+  border: 1px solid #E07B39;
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  color: #E07B39;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.deliverDesk .deliverChange:hover {
+  background: #E07B39;
+  color: #fff;
+}
+
+/* Mobile strip is off on desktop */
+.deliverMob { display: none; }
+
+/* ── Mobile cart extras: price card, sticky checkout bar ── */
+.stickyBar, .saving { display: none; }
+
+@media (max-width: 860px) {
+  .page { background: #f8f5f0; }
+
+  /* Mobile: white strip flush under steps — cream only below */
+  .deliverDesk { display: none; }
+  .deliverMob {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 12px 14px;
+    gap: 12px;
+    background: #fff;
+    border: 0;
+    border-bottom: 1px solid #eee3d3;
+    border-radius: 0;
+  }
+  .deliverMob .deliverTop {
+    font-size: 13.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .deliverMob .deliverAddr {
+    margin-top: 2px;
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .deliverMob .deliverChange {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    padding: 6px 2px;
+    font-size: 13.5px;
+    letter-spacing: 0;
+    color: #C0671E;
+  }
+  .deliverMob .deliverChange:hover {
+    background: none;
+    color: #E07B39;
+  }
+  .deliverChangeDesk { display: none; }
+  .deliverChangeMob { display: inline; }
+
+  .layout { margin-top: 0; }
+
+  /* price details as a rounded card */
+  .right { background: #fff; border: 1px solid #eee3d3; border-radius: 14px; padding: 16px; margin: 6px 0 14px; }
+  .sectionH { font-size: 13px; color: #4A0B1D; }
+  .total { border-top: 1px dashed #d9c9b2; font-size: 17px; }
+  .saving { display: block; margin: 4px 0 14px; padding: 10px 12px; border-radius: 10px; background: #e3f4dc; border: 1px solid #b9dfae; color: #1f5a1a; font-size: 13.5px; text-align: center; }
+  .saving strong { font-weight: 800; }
+
+  /* these two now live in the sticky bar on phones */
+  .shipDesk, .ctaDesk { display: none; }
+
+  .stickyBar { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 900; background: #fff; box-shadow: 0 -6px 20px rgba(74, 11, 29, 0.12); padding-bottom: env(safe-area-inset-bottom, 0px); overflow: visible; }
+  .stickyShip {
+    margin: 0;
+    padding: 7px 14px 8px;
+    text-align: center;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #4A0B1D;
+    background: linear-gradient(180deg, #fff6e9 0%, #f6e7d2 100%);
+    border: 0;
+    border-top: 1px solid rgba(224, 123, 57, 0.28);
+    border-radius: 0;
+    position: relative;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .stickyRow { display: flex; align-items: center; gap: 14px; padding: 8px 14px; }
+  .stickyTotal { display: flex; flex-direction: column; gap: 1px; text-decoration: none; color: #4A0B1D; flex: 0 0 auto; }
+  .stickyTotal strong { font-size: 19px; line-height: 1.1; }
+  .stickyTotal span { font-size: 11.5px; color: #C0671E; font-weight: 700; text-decoration: underline; }
+  .stickyCta { flex: 1; border: 0; border-radius: 10px; background: #E07B39; color: #fff; font: inherit; font-size: 15px; font-weight: 800; padding: 12px 10px; cursor: pointer; }
+  .stickyCta:disabled { opacity: .55; cursor: not-allowed; }
+
+  /* keep the end of the page clear of the bar */
+  :global(body[data-cart-bar]) { padding-bottom: 96px; }
 }

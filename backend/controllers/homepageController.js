@@ -14,6 +14,9 @@ export const getAllSections = async (req, res, next) => {
   }
 };
 
+// Sections that are an admin-managed list of banner images (slides[] + items{})
+const BANNER_KEYS = new Set(["productsBanner", "heroBanner", "hero"]);
+
 /** Ensure slides[].image stays in sync with items, and orphan uploads become slides. */
 function healBannerSlides(data = {}) {
   const items = data.items && typeof data.items === "object" ? data.items : {};
@@ -57,7 +60,7 @@ export const getSection = async (req, res, next) => {
   try {
     const section = await HomepageSection.findOne({ key: req.params.key });
     let data = section?.data || {};
-    if (req.params.key === "productsBanner" || req.params.key === "hero") {
+    if (BANNER_KEYS.has(req.params.key)) {
       data = healBannerSlides(data);
     }
     res.json({ success: true, data });
@@ -95,6 +98,14 @@ export const upsertSection = async (req, res, next) => {
         data.bannerImage = url;
       } else if (file.fieldname.startsWith("image__")) {
         const itemKey = file.fieldname.slice("image__".length);
+        // "<slideId>__mobile" = the separate phone-size banner for that slide (stored on the slide only)
+        if (itemKey.endsWith("__mobile")) {
+          const slideId = itemKey.slice(0, -"__mobile".length);
+          if (Array.isArray(data.slides)) {
+            data.slides = data.slides.map((s) => (s && s.id === slideId ? { ...s, mobileImage: url } : s));
+          }
+          continue;
+        }
         data.items = data.items || {};
         data.items[itemKey] = { ...(data.items[itemKey] || {}), image: url };
         // Keep productsBanner slides[] in sync when admin uploads per-slide images
@@ -114,7 +125,7 @@ export const upsertSection = async (req, res, next) => {
 
     // Admin submitted an explicit slide list: whatever is not in it was removed on purpose.
     // Drop stale per-slide items so healBannerSlides() cannot resurrect them as "orphans".
-    if (key === "productsBanner" && Array.isArray(data.slides) && data.items && typeof data.items === "object") {
+    if ((key === "productsBanner" || key === "heroBanner") && Array.isArray(data.slides) && data.items && typeof data.items === "object") {
       const keep = new Set(data.slides.map((s) => s?.id).filter(Boolean));
       data.items = Object.fromEntries(Object.entries(data.items).filter(([id]) => keep.has(id)));
     }
@@ -134,7 +145,7 @@ export const upsertSection = async (req, res, next) => {
       }
     }
 
-    if (key === "productsBanner" || key === "hero") {
+    if (BANNER_KEYS.has(key)) {
       data = healBannerSlides(data);
     }
 
