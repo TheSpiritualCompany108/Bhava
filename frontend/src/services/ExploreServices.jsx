@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ExploreServices.module.css";
 
@@ -70,6 +71,35 @@ function PromoBand({ band, navigate }) {
 
 function ExploreServices() {
   const navigate = useNavigate();
+  const sliderRef = useRef(null);
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const el = sliderRef.current;
+    if (!el) return undefined;
+
+    const onScroll = () => {
+      const card = el.querySelector(`.${styles.card}`);
+      if (!card) return;
+      const gap = 16;
+      const step = card.offsetWidth + gap;
+      const next = Math.round(el.scrollLeft / step);
+      setActive(Math.max(0, Math.min(serviceCards.length - 1, next)));
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const goTo = (i) => {
+    const el = sliderRef.current;
+    if (!el) return;
+    const card = el.querySelector(`.${styles.card}`);
+    if (!card) return;
+    const gap = 16;
+    el.scrollTo({ left: i * (card.offsetWidth + gap), behavior: "smooth" });
+    setActive(i);
+  };
 
   return (
     <div className={styles.page}>
@@ -88,29 +118,45 @@ function ExploreServices() {
           spiritual and personal journey.
         </p>
 
-        <div className={styles.cardGrid}>
-          {serviceCards.map((card) => (
-            <div key={card.id} className={styles.card}>
-              <div className={styles.cardImageWrap}>
-                <img src={card.image} alt={card.title} className={styles.cardImage} />
-                <span className={styles.cardIconBadge} style={{ color: card.color }}>
-                  <span className="material-symbols-outlined">{card.icon}</span>
-                </span>
+        <div className={styles.cardSliderWrap}>
+          <div className={styles.cardGrid} ref={sliderRef}>
+            {serviceCards.map((card) => (
+              <div key={card.id} className={styles.card}>
+                <div className={styles.cardImageWrap}>
+                  <img src={card.image} alt={card.title} className={styles.cardImage} />
+                  <span className={styles.cardIconBadge} style={{ color: card.color }}>
+                    <span className="material-symbols-outlined">{card.icon}</span>
+                  </span>
+                </div>
+                <h3 className={styles.cardTitle} style={{ color: card.color }}>
+                  {card.title}
+                </h3>
+                <div className={styles.cardDivider} style={{ background: card.color }} />
+                <p className={styles.cardDescription}>{card.description}</p>
+                <button
+                  className={styles.cardLink}
+                  style={{ color: card.color }}
+                  onClick={() => navigate(card.route)}
+                >
+                  Explore <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
               </div>
-              <h3 className={styles.cardTitle} style={{ color: card.color }}>
-                {card.title}
-              </h3>
-              <div className={styles.cardDivider} style={{ background: card.color }} />
-              <p className={styles.cardDescription}>{card.description}</p>
+            ))}
+          </div>
+
+          <div className={styles.sliderDots} role="tablist" aria-label="Service cards">
+            {serviceCards.map((card, i) => (
               <button
-                className={styles.cardLink}
-                style={{ color: card.color }}
-                onClick={() => navigate(card.route)}
-              >
-                Explore <span className="material-symbols-outlined">arrow_forward</span>
-              </button>
-            </div>
-          ))}
+                key={card.id}
+                type="button"
+                role="tab"
+                aria-selected={i === active}
+                aria-label={`Show ${card.title}`}
+                className={`${styles.sliderDot} ${i === active ? styles.sliderDotOn : ""}`}
+                onClick={() => goTo(i)}
+              />
+            ))}
+          </div>
         </div>
 
         <button className={styles.exploreAllBtn} onClick={() => navigate("/services")}>

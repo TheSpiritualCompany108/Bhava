@@ -109,6 +109,13 @@ export default function CheckoutPage() {
     if (priced?.allOk) beginCheckout(cartItems, priced.total);
   }, [priced?.allOk, priced?.total, cartItems]);
 
+  // Mobile sticky checkout CTA (same bar as cart) — lifts page end + chat FAB
+  useEffect(() => {
+    if (placed || cartItems.length === 0) return undefined;
+    document.body.dataset.cartBar = "1";
+    return () => { delete document.body.dataset.cartBar; };
+  }, [placed, cartItems.length]);
+
   const subtotal = priced?.subtotal ?? 0;
   const shipping = typeof priced?.shipping === "number" ? priced.shipping : 0;
   const total = priced?.total ?? 0;
@@ -499,7 +506,8 @@ export default function CheckoutPage() {
       </nav>
 
       <div className={x.wrap}>
-        <form className={x.layout} onSubmit={placeOrder} noValidate>
+        <form onSubmit={placeOrder} noValidate>
+          <div className={x.layout}>
           <div className={x.left}>
             {step === "address" ? (
               <>
@@ -773,7 +781,7 @@ export default function CheckoutPage() {
             )}
           </div>
 
-          <aside className={x.right} aria-label="Order summary">
+          <aside className={x.right} id="checkout-price-details" aria-label="Order summary">
             <h2 className={x.sectionH}>PRICE DETAILS ({payableCount} {payableCount === 1 ? "Item" : "Items"})</h2>
 
             <ul className={styles.items}>
@@ -825,7 +833,7 @@ export default function CheckoutPage() {
 
             <button
               type={step === "payment" ? "submit" : "button"}
-              className={x.cta}
+              className={`${x.cta} ${x.ctaDesk}`}
               disabled={placing || pricing || !cartOk}
               onClick={step === "address" ? goToPayment : undefined}
             >
@@ -835,6 +843,34 @@ export default function CheckoutPage() {
             </button>
             <p className={x.secure}>🔒 Secure checkout · Your details are safe</p>
           </aside>
+          </div>
+
+          {/* Mobile sticky bar — cart-style: total left + CTA right */}
+          <div className={x.stickyBar} role="region" aria-label="Checkout actions">
+            <div className={x.stickyRow}>
+              <a
+                href="#checkout-price-details"
+                className={x.stickyTotal}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById("checkout-price-details")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                <strong>{priced ? inr(total) : "…"}</strong>
+                <span>View price details</span>
+              </a>
+              <button
+                type={step === "payment" ? "submit" : "button"}
+                className={x.stickyCta}
+                disabled={placing || pricing || !cartOk}
+                onClick={step === "address" ? goToPayment : undefined}
+              >
+                {step === "address"
+                  ? (pricing ? "Checking…" : "Continue to payment")
+                  : (placing ? "Placing…" : pricing ? "Checking…" : "Place order")}
+              </button>
+            </div>
+          </div>
         </form>
       </div>
     </div>

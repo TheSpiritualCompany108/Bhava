@@ -70,10 +70,10 @@ const craftingCards = [
 ];
 
 const experienceColumns = [
-  { title: "Objects", description: "Tactile creations that invite intentional, daily practice." },
-  { title: "Guidance", description: "Clear instruction that offers deep clarity and confidence." },
-  { title: "Journeys", description: "Structured pathways designed to help habits take root." },
-  { title: "Community", description: "A shared space that inspires quiet, lifelong growth." },
+  { title: "Objects", description: "Tactile creations that invite intentional, daily practice.", icon: "spa" },
+  { title: "Guidance", description: "Clear instruction that offers deep clarity and confidence.", icon: "menu_book" },
+  { title: "Journeys", description: "Structured pathways designed to help habits take root.", icon: "route" },
+  { title: "Community", description: "A shared space that inspires quiet, lifelong growth.", icon: "groups" },
 ];
 
 function AboutUs() {

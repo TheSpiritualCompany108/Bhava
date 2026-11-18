@@ -213,3 +213,66 @@ function playNow(btn, { image } = {}) {
 
   if (image) flyToCart(rect, image);
 }
+
+/** Fade/slide text out → call onSwap (update React) → fade/slide new text in. */
+export function tweenTextSwap(nodes, onSwap) {
+  const els = (Array.isArray(nodes) ? nodes : [nodes]).filter(Boolean);
+  const finish = () => {
+    onSwap?.();
+    return Promise.resolve();
+  };
+  if (!els.length || reduced()) return finish();
+
+  const run = () =>
+    new Promise((resolve) => {
+      gsap.to(els, {
+        opacity: 0,
+        y: 8,
+        duration: 0.2,
+        ease: "power2.in",
+        overwrite: true,
+        onComplete: () => {
+          onSwap?.();
+          // Caller should re-run fade-in after paint via tweenTextIn
+          resolve();
+        },
+      });
+    });
+
+  return (gsap ? Promise.resolve() : loadGsap()).then(run).catch(finish);
+}
+
+/** Fade/slide text nodes in (call after React has painted the new copy). */
+export function tweenTextIn(nodes) {
+  const els = (Array.isArray(nodes) ? nodes : [nodes]).filter(Boolean);
+  if (!els.length || reduced()) return Promise.resolve();
+  const run = () => {
+    gsap.fromTo(
+      els,
+      { opacity: 0, y: -8 },
+      { opacity: 1, y: 0, duration: 0.34, ease: "power2.out", overwrite: true }
+    );
+  };
+  return (gsap ? Promise.resolve() : loadGsap()).then(run).catch(() => {});
+}
+
+/** "You're saving ₹X…" reveal — soft fade on the line, pop on the amount. */
+export function tweenSavingReveal(box) {
+  if (!box || reduced()) return Promise.resolve();
+  const run = () => {
+    const amount = box.querySelector("strong");
+    gsap.killTweensOf([box, amount].filter(Boolean));
+    gsap.set(box, { opacity: 0, y: 10 });
+    if (amount) gsap.set(amount, { scale: 0.72, transformOrigin: "center center" });
+    const tl = gsap.timeline();
+    tl.to(box, { opacity: 1, y: 0, duration: 0.42, ease: "power2.out" });
+    if (amount) {
+      tl.to(
+        amount,
+        { scale: 1, duration: 0.55, ease: "back.out(2.4)" },
+        "-=0.22"
+      );
+    }
+  };
+  return (gsap ? Promise.resolve() : loadGsap()).then(run).catch(() => {});
+}

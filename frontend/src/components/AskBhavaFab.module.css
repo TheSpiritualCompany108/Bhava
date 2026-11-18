@@ -159,3 +159,11 @@
   .label,
   .logo { transition: none; }
 }
+
+/* Cart page (mobile): sit above the sticky checkout bar */
+@media (max-width: 860px) {
+  :global(body[data-cart-bar]) .fab { bottom: 156px; }
+}
+
+/* Chat panel open: the panel owns the bottom-right corner (its Send button sits exactly there) */
+:global(body[data-guru-chat]) .fab { opacity: 0; visibility: hidden; pointer-events: none; transform: scale(0.8); }

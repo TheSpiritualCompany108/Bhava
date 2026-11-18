@@ -122,120 +122,99 @@ const tiles = [
 function TigerEyeSection() {
   const navigate = useNavigate();
   const [activeSlide, setActiveSlide] = useState(0);
-  const [hovered, setHovered] = useState(false);
-  const trackOuterRef = useRef(null);
-  const [outerWidth, setOuterWidth] = useState(0);
+  const trackRef = useRef(null);
 
   useEffect(() => {
-    const el = trackOuterRef.current;
-    if (!el) return;
-    setOuterWidth(el.clientWidth);
-    const ro = new ResizeObserver(() => setOuterWidth(el.clientWidth));
-    ro.observe(el);
-    return () => ro.disconnect();
+    const el = trackRef.current;
+    if (!el) return undefined;
+
+    const onScroll = () => {
+      const card = el.querySelector(`.${styles.card}`);
+      if (!card) return;
+      const stylesGap = 16;
+      const step = card.offsetWidth + stylesGap;
+      if (step <= 0) return;
+      const next = Math.round(el.scrollLeft / step);
+      setActiveSlide(Math.max(0, Math.min(tiles.length - 1, next)));
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
-  const PEEK = 88;
-  const GAP = 16;
-  const cardWidth = outerWidth ? outerWidth - PEEK - GAP : 0;
-  const step = cardWidth + GAP;
-
-  const prevSlide = () => setActiveSlide((p) => Math.max(0, p - 1));
-  const nextSlide = () => setActiveSlide((p) => Math.min(tiles.length - 1, p + 1));
+  const goTo = (i) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const card = el.querySelector(`.${styles.card}`);
+    if (!card) return;
+    el.scrollTo({ left: i * (card.offsetWidth + 16), behavior: "smooth" });
+    setActiveSlide(i);
+  };
 
   return (
     <section className={styles.carouselSection}>
-      <div
-        className={styles.trackWrapper}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        <div className={styles.trackOuter} ref={trackOuterRef}>
-          <div
-            className={styles.track}
-            style={{ transform: `translateX(${-activeSlide * step}px)` }}
-          >
-            {tiles.map((tile, idx) => (
-              <div
-                key={tile.id}
-                className={styles.card}
-                style={{ "--card-color": tile.color, width: cardWidth || undefined }}
-              >
-                <div className={styles.cardLeft} style={{ background: tile.color }}>
-                  <div className={styles.cardLeftInner}>
-                    {tile.eyebrow && (
-                      <span className={styles.cardEyebrow}>{tile.eyebrow}</span>
-                    )}
-                    <h3 className={styles.cardTitle}>{tile.title}</h3>
-                    <ul className={styles.cardHighlights}>
-                      {tile.highlights.map((h, i) => (
-                        <li key={i}>
-                          <span className={styles.cardDot} />
-                          {h}
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      className={styles.cardBtn}
-                      onClick={() =>
-                        navigate("/knowledge/tiger-eye", { state: { tile } })
-                      }
-                    >
-                      Explore →
-                    </button>
-                  </div>
-                </div>
-
-                <div className={styles.cardRight} style={{ backgroundColor: tile.color }}>
-                  <img
-                    src={tile.image}
-                    alt={tile.title}
-                    className={styles.cardImage}
-                  />
-                  <div
-                    className={styles.cardImageOverlay}
-                    style={{
-                      background: `linear-gradient(to right, ${tile.color} 0%, ${tile.color}99 18%, transparent 50%)`,
-                    }}
-                  />
+      <div className={styles.trackWrapper}>
+        <div className={styles.track} ref={trackRef}>
+          {tiles.map((tile) => (
+            <div
+              key={tile.id}
+              className={styles.card}
+              style={{ "--card-color": tile.color }}
+            >
+              <div className={styles.cardLeft} style={{ background: tile.color }}>
+                <div className={styles.cardLeftInner}>
+                  {tile.eyebrow && (
+                    <span className={styles.cardEyebrow}>{tile.eyebrow}</span>
+                  )}
+                  <h3 className={styles.cardTitle}>{tile.title}</h3>
+                  <ul className={styles.cardHighlights}>
+                    {tile.highlights.map((h, i) => (
+                      <li key={i}>
+                        <span className={styles.cardDot} />
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    className={styles.cardBtn}
+                    onClick={() =>
+                      navigate("/knowledge/tiger-eye", { state: { tile } })
+                    }
+                  >
+                    Explore →
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
+
+              <div className={styles.cardRight} style={{ backgroundColor: tile.color }}>
+                <img
+                  src={tile.image}
+                  alt={tile.title}
+                  className={styles.cardImage}
+                />
+                <div
+                  className={styles.cardImageOverlay}
+                  style={{
+                    background: `linear-gradient(to right, ${tile.color} 0%, ${tile.color}99 18%, transparent 50%)`,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
-
-        <button
-          className={`${styles.edgeArrow} ${styles.edgeArrowLeft} ${
-            hovered && activeSlide > 0
-              ? styles.edgeArrowVisible
-              : styles.edgeArrowHidden
-          }`}
-          onClick={prevSlide}
-          aria-label="Previous"
-        >
-          ‹
-        </button>
-
-        <button
-          className={`${styles.edgeArrow} ${
-            hovered && activeSlide < tiles.length - 1
-              ? styles.edgeArrowVisible
-              : styles.edgeArrowHidden
-          }`}
-          onClick={nextSlide}
-          aria-label="Next"
-        >
-          ›
-        </button>
       </div>
 
       <div className={styles.navRow}>
-        <div className={styles.dots}>
-          {tiles.map((_, i) => (
+        <div className={styles.dots} role="tablist" aria-label="Tiger Eye slides">
+          {tiles.map((tile, i) => (
             <button
-              key={i}
+              key={tile.id}
+              type="button"
+              role="tab"
+              aria-selected={i === activeSlide}
               className={`${styles.dot} ${i === activeSlide ? styles.dotActive : ""}`}
-              onClick={() => setActiveSlide(i)}
+              onClick={() => goTo(i)}
               aria-label={`Slide ${i + 1}`}
             />
           ))}

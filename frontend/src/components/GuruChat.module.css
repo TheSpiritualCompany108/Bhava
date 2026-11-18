@@ -216,12 +216,54 @@
   cursor: not-allowed;
 }
 
+/* backdrop only exists on phones (see the media query below) */
+.backdrop { display: none; }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .panel, .backdrop { animation: none; }
+}
+
 /* ── Responsive ── */
 @media (max-width: 480px) {
+  /* chat slides up from the bottom as a sheet (a bit more than half the screen), not a floating popup */
   .wrapper {
-    right: 16px;
-    bottom: 16px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    gap: 0;
+    align-items: stretch;
   }
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 5, 10, 0.35);
+    touch-action: none; /* swipes on the dimmed area must not scroll the page behind */
+    animation: backdropIn 0.3s ease-out;
+  }
+  .panel {
+    position: relative;
+    width: 100%;
+    /* Tall sheet: sits just under the header (green-line height) */
+    height: calc(100vh - 78px);
+    height: calc(100dvh - 78px);
+    min-height: 0;
+    max-height: calc(100dvh - 78px);
+    border: 0;
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.28);
+    animation: sheetUp 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .messages { overscroll-behavior: contain; }
+  .header { padding: 14px 14px 14px 16px; }
+  .closeBtn { padding: 6px; }
+  .messages { padding: 14px; }
+  .bubbleUser, .bubbleAssistant { font-size: 14.5px; max-width: 88%; }
+  .inputRow { padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); align-items: center; }
+  .input { font-size: 16px; padding: 11px 16px; min-width: 0; } /* 16px stops iOS zooming into the field */
+  .sendBtn { width: 44px; height: 44px; }
+  .bubbleToggle { align-self: flex-end; }
   .bubbleLabel {
     display: none;
   }
