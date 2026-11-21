@@ -250,9 +250,12 @@ export async function validateProductInput(input, { existing } = {}) {
       if (!APLUS_TYPES.includes(type)) return null;
       const validLayouts = APLUS_LAYOUTS[type] || ["full-width", "default"];
       const layout = validLayouts.includes(m.layout) ? m.layout : validLayouts[0];
+      const validDevices = ["desktop", "mobile", "all"];
+      const device = validDevices.includes(m.device) ? m.device : "desktop";
       const mod = {
         type,
         layout,
+        device,
         order: Number.isFinite(Number(m.order)) ? Number(m.order) : idx,
         headline:    str(m.headline, 200),
         subheadline: str(m.subheadline, 200),

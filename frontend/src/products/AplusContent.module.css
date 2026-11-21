@@ -2,13 +2,35 @@
 .aplusRoot {
   width: 100%;
   margin: 48px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
 }
 
 .modWrap {
   width: 100%;
+}
+
+/* ── Device separation (Strict Desktop vs Mobile) ───────────────────────── */
+.desktopOnly {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.mobileOnly {
+  display: none !important;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* On mobile / tablet screens: completely hide desktop and show mobile */
+@media (max-width: 768px) {
+  .desktopOnly {
+    display: none !important;
+  }
+  .mobileOnly {
+    display: flex !important;
+  }
 }
 
 /* ── Pure A+ Image Banners (Amazon / E-commerce style) ─────────────────── */
