@@ -14,6 +14,7 @@ import { RETURNS_POLICY_LIVE } from "../shop/storeFlags";
 import { viewItem, selectItem, addToCartEvent } from "../utils/analytics";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 import ReviewsSection, { Stars } from "./ReviewsSection";
+import AplusContent from "./AplusContent";
 import ResponsiveImg from "../components/ResponsiveImg";
 import { InlineBack } from "../components/PageBack";
 
@@ -563,8 +564,12 @@ function ProductDetailInner({ slug }) {
           </div>
         </section>
 
-        {/* ── You May Also Like ── */}
-        {alsoLike.length > 0 && (
+        {/* ── A+ Content ── */}
+        {product.aplusContent?.length > 0 && (
+          <AplusContent modules={product.aplusContent} />
+        )}
+
+        {/* ── You May Also Like ── */}        {alsoLike.length > 0 && (
           <section className={styles.similarSection} aria-labelledby="also-like-title">
             <div className={styles.similarHeader}>
               <span className={styles.similarKicker}>Sacred Pairings</span>

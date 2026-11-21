@@ -8,7 +8,107 @@ const EMPTY = {
   pack: "", packQuantity: "", netWeight: "", fitNote: "", materials: "", usage: "", safety: "", storage: "", contents: [], faqs: [],
   image: "", gallery: [], seoTitle: "", seoDescription: "", copyPending: false, approvalNotes: "", sortOrder: 0,
   related: { upsell: "", upsellAlt: "", upsellBundle: "", crossSell: [], bundle: "" },
+  aplusContent: [],
 };
+
+// ── A+ module definitions ────────────────────────────────────────────────────
+const APLUS_TYPES = [
+  { key: "hero_banner",      label: "Hero Banner",       layouts: ["default", "centered", "split"] },
+  { key: "text_image",       label: "Text + Image",      layouts: ["image-left", "image-right", "image-top"] },
+  { key: "feature_grid",     label: "Feature Grid",      layouts: ["3-col", "2-col", "4-col"] },
+  { key: "highlight_strip",  label: "Highlight Strip",   layouts: ["horizontal", "vertical"] },
+  { key: "brand_story",      label: "Brand Story",       layouts: ["default", "centered"] },
+  { key: "comparison_chart", label: "Comparison Chart",  layouts: ["default"] },
+  { key: "faq_block",        label: "FAQ Block",         layouts: ["default", "compact"] },
+];
+const APLUS_EMPTY = (type = "hero_banner", order = 0) => ({
+  type, layout: APLUS_TYPES.find(t => t.key === type)?.layouts[0] || "default",
+  order, headline: "", subheadline: "", body: "", image: "",
+  items: [], columns: [], rows: [],
+});
+const aplusBtnSm = { padding: "4px 10px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: "0.8rem", background: "#e8d8c8", color: "#3b0f1e" };
+const aplusBtnGhost = { ...aplusBtnSm, background: "transparent", border: "1px solid #c9b8a8" };
+const aplusInput = { display: "block", width: "100%", padding: "6px 10px", borderRadius: 6, border: "1px solid #c9b8a8", fontSize: "0.85rem", marginBottom: 6, boxSizing: "border-box", background: "#fff" };
+
+function AplusModuleEditor({ mod, idx, total, onChange, onRemove, onMove }) {
+  const typeDef = APLUS_TYPES.find(t => t.key === mod.type) || APLUS_TYPES[0];
+  const upd = patch => onChange({ ...mod, ...patch });
+  const hasImage = ["hero_banner", "text_image", "brand_story"].includes(mod.type);
+  const hasItems = ["feature_grid", "highlight_strip", "faq_block"].includes(mod.type);
+  return (
+    <div style={{ border: "1px solid #c9b8a8", borderRadius: 10, padding: 14, marginBottom: 12, background: "#fdf8f3" }}>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12, flexWrap: "wrap" }}>
+        <strong style={{ color: "#3b0f1e", fontSize: "0.9rem" }}>#{idx + 1}</strong>
+        <select style={{ flex: 1, padding: "4px 8px", borderRadius: 6, border: "1px solid #c9b8a8", fontSize: "0.85rem" }}
+          value={mod.type} onChange={e => onChange(APLUS_EMPTY(e.target.value, mod.order))}>
+          {APLUS_TYPES.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
+        </select>
+        <select style={{ flex: 1, padding: "4px 8px", borderRadius: 6, border: "1px solid #c9b8a8", fontSize: "0.85rem" }}
+          value={mod.layout} onChange={e => upd({ layout: e.target.value })}>
+          {typeDef.layouts.map(l => <option key={l} value={l}>{l}</option>)}
+        </select>
+        <input type="number" value={mod.order} onChange={e => upd({ order: Number(e.target.value) })}
+          style={{ width: 54, padding: "4px 6px", borderRadius: 6, border: "1px solid #c9b8a8", fontSize: "0.85rem" }} title="Sort order" />
+        <button onClick={() => onMove(idx, -1)} disabled={idx === 0} style={aplusBtnSm}>↑</button>
+        <button onClick={() => onMove(idx, 1)} disabled={idx === total - 1} style={aplusBtnSm}>↓</button>
+        <button onClick={onRemove} style={{ ...aplusBtnSm, background: "#a2331f", color: "#fff" }}>✕</button>
+      </div>
+      <input placeholder="Headline" value={mod.headline} maxLength={200} onChange={e => upd({ headline: e.target.value })} style={aplusInput} />
+      {["hero_banner", "text_image"].includes(mod.type) && (
+        <input placeholder="Subheadline" value={mod.subheadline} maxLength={200} onChange={e => upd({ subheadline: e.target.value })} style={aplusInput} />
+      )}
+      {hasImage && (
+        <>
+          <textarea placeholder="Body text" value={mod.body} rows={3} maxLength={2000} onChange={e => upd({ body: e.target.value })} style={{ ...aplusInput, resize: "vertical" }} />
+          <input placeholder="Image URL" value={mod.image} maxLength={500} onChange={e => upd({ image: e.target.value })} style={aplusInput} />
+        </>
+      )}
+      {["feature_grid", "highlight_strip"].includes(mod.type) && (
+        <div style={{ marginTop: 6 }}>
+          <span style={{ fontSize: "0.82rem", color: "#7a5e66", display: "block", marginBottom: 6 }}>Items</span>
+          {(mod.items || []).map((it, i) => (
+            <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
+              <input placeholder="Icon" value={it.icon || ""} maxLength={10} onChange={e => { const items = [...mod.items]; items[i] = { ...it, icon: e.target.value }; upd({ items }); }} style={{ ...aplusInput, width: 64, margin: 0 }} />
+              <input placeholder="Title" value={it.title || ""} maxLength={120} onChange={e => { const items = [...mod.items]; items[i] = { ...it, title: e.target.value }; upd({ items }); }} style={{ ...aplusInput, flex: 1, margin: 0 }} />
+              <input placeholder="Text" value={it.text || ""} maxLength={500} onChange={e => { const items = [...mod.items]; items[i] = { ...it, text: e.target.value }; upd({ items }); }} style={{ ...aplusInput, flex: 2, margin: 0 }} />
+              <input placeholder="Image URL" value={it.image || ""} maxLength={500} onChange={e => { const items = [...mod.items]; items[i] = { ...it, image: e.target.value }; upd({ items }); }} style={{ ...aplusInput, flex: 1, margin: 0 }} />
+              <button onClick={() => upd({ items: mod.items.filter((_, j) => j !== i) })} style={{ ...aplusBtnSm, background: "#a2331f", color: "#fff" }}>✕</button>
+            </div>
+          ))}
+          {(mod.items || []).length < 12 && <button style={aplusBtnGhost} onClick={() => upd({ items: [...(mod.items || []), { icon: "", title: "", text: "", image: "" }] })}>+ Add item</button>}
+        </div>
+      )}
+      {mod.type === "faq_block" && (
+        <div style={{ marginTop: 6 }}>
+          <span style={{ fontSize: "0.82rem", color: "#7a5e66", display: "block", marginBottom: 6 }}>FAQ Items</span>
+          {(mod.items || []).map((it, i) => (
+            <div key={i} style={{ marginBottom: 8, border: "1px solid #e8d8c8", borderRadius: 6, padding: 8 }}>
+              <input placeholder="Question" value={it.title || ""} maxLength={200} onChange={e => { const items = [...mod.items]; items[i] = { ...it, title: e.target.value }; upd({ items }); }} style={aplusInput} />
+              <textarea placeholder="Answer" value={it.text || ""} rows={2} maxLength={1500} onChange={e => { const items = [...mod.items]; items[i] = { ...it, text: e.target.value }; upd({ items }); }} style={{ ...aplusInput, resize: "vertical", marginBottom: 4 }} />
+              <button onClick={() => upd({ items: mod.items.filter((_, j) => j !== i) })} style={{ ...aplusBtnSm, background: "#a2331f", color: "#fff" }}>Remove</button>
+            </div>
+          ))}
+          {(mod.items || []).length < 15 && <button style={aplusBtnGhost} onClick={() => upd({ items: [...(mod.items || []), { title: "", text: "" }] })}>+ Add FAQ item</button>}
+        </div>
+      )}
+      {mod.type === "comparison_chart" && (
+        <div style={{ marginTop: 6 }}>
+          <span style={{ fontSize: "0.82rem", color: "#7a5e66", display: "block", marginBottom: 4 }}>Columns (comma-separated)</span>
+          <input placeholder="Basic, Premium, Deluxe" value={(mod.columns || []).join(", ")} onChange={e => upd({ columns: e.target.value.split(",").map(c => c.trim()).filter(Boolean) })} style={aplusInput} />
+          <span style={{ fontSize: "0.82rem", color: "#7a5e66", display: "block", margin: "8px 0 4px" }}>Rows</span>
+          {(mod.rows || []).map((r, i) => (
+            <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, alignItems: "center" }}>
+              <input placeholder="Row label" value={r.label || ""} maxLength={80} onChange={e => { const rows = [...mod.rows]; rows[i] = { ...r, label: e.target.value }; upd({ rows }); }} style={{ ...aplusInput, flex: 1, margin: 0 }} />
+              <input placeholder="Values (comma-separated)" value={(r.values || []).join(", ")} onChange={e => { const rows = [...mod.rows]; rows[i] = { ...r, values: e.target.value.split(",").map(v => v.trim()) }; upd({ rows }); }} style={{ ...aplusInput, flex: 2, margin: 0 }} />
+              <button onClick={() => upd({ rows: mod.rows.filter((_, j) => j !== i) })} style={{ ...aplusBtnSm, background: "#a2331f", color: "#fff" }}>✕</button>
+            </div>
+          ))}
+          <button style={aplusBtnGhost} onClick={() => upd({ rows: [...(mod.rows || []), { label: "", values: [] }] })}>+ Add row</button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Field({ label, hint, error, full, children, htmlFor }) {
   return (
@@ -217,6 +317,31 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
           ))}
           <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => set("faqs", [...form.faqs, { q: "", a: "" }])}>+ Add FAQ</button>
           <div className={s.hint} style={{ marginTop: 4 }}>Quantity, fragrance, contents and shipping FAQs are generated automatically from the product data.</div>
+
+          <div className={s.sect}>A+ Content — Product Page Highlights</div>
+          <div style={{ fontSize: "0.82rem", color: "#7a5e66", marginBottom: 10 }}>
+            Add rich modules below the product tabs. Choose the module type, pick a layout, and use ↑↓ or the order number to reorder.
+          </div>
+          {(form.aplusContent || []).map((mod, i) => (
+            <AplusModuleEditor
+              key={i} mod={mod} idx={i} total={(form.aplusContent || []).length}
+              onChange={updated => set("aplusContent", form.aplusContent.map((m, j) => j === i ? updated : m))}
+              onRemove={() => set("aplusContent", form.aplusContent.filter((_, j) => j !== i))}
+              onMove={(idx, dir) => {
+                const arr = [...form.aplusContent];
+                const swap = idx + dir;
+                if (swap < 0 || swap >= arr.length) return;
+                [arr[idx], arr[swap]] = [arr[swap], arr[idx]];
+                set("aplusContent", arr.map((m, j) => ({ ...m, order: j })));
+              }}
+            />
+          ))}
+          {(form.aplusContent || []).length < 20 && (
+            <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`}
+              onClick={() => set("aplusContent", [...(form.aplusContent || []), APLUS_EMPTY("hero_banner", (form.aplusContent || []).length)])}>
+              + Add A+ module
+            </button>
+          )}
 
           <div className={s.sect}>SEO</div>
           <div className={s.grid2}>

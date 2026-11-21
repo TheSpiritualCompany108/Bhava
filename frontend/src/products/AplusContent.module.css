@@ -1,0 +1,329 @@
+/* ── Root ───────────────────────────────────────────────────────────────── */
+.aplusRoot {
+  width: 100%;
+  margin: 48px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.modWrap {
+  width: 100%;
+}
+
+/* ── Shared typography ──────────────────────────────────────────────────── */
+.modH {
+  font-family: 'Canela', serif;
+  font-size: 1.5rem;
+  color: #3b0f1e;
+  margin: 0 0 10px;
+}
+.modSub {
+  font-size: 1rem;
+  color: #7a5e66;
+  margin: 0 0 14px;
+}
+.modBody {
+  font-size: 0.95rem;
+  color: #4a3540;
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* ── Hero Banner ────────────────────────────────────────────────────────── */
+.heroBanner {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  background: #2a0a14;
+}
+.heroBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.heroBg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+}
+.heroText {
+  position: relative;
+  z-index: 1;
+  padding: 48px 40px;
+  max-width: 640px;
+}
+.heroH {
+  font-family: 'Canela', serif;
+  font-size: 2rem;
+  color: #fff8f0;
+  margin: 0 0 10px;
+}
+.heroSub {
+  font-size: 1.1rem;
+  color: #f4d8c0;
+  margin: 0 0 12px;
+}
+.heroBody {
+  font-size: 0.95rem;
+  color: #f0e0d0;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Layout: centered */
+.hero_centered .heroText {
+  margin: 0 auto;
+  text-align: center;
+  max-width: 700px;
+}
+
+/* Layout: split (image beside text) */
+.hero_split {
+  flex-direction: row;
+  min-height: 320px;
+}
+.hero_split .heroBg {
+  position: relative;
+  width: 48%;
+  flex-shrink: 0;
+}
+.hero_split .heroBg img {
+  opacity: 1;
+}
+.hero_split .heroText {
+  background: #fff8f0;
+  flex: 1;
+}
+.hero_split .heroH   { color: #3b0f1e; }
+.hero_split .heroSub { color: #7a5e66; }
+.hero_split .heroBody{ color: #4a3540; }
+
+/* ── Text + Image ───────────────────────────────────────────────────────── */
+.textImage {
+  display: grid;
+  gap: 32px;
+  align-items: center;
+  grid-template-columns: 1fr 1fr;
+}
+.ti_image_left  { }
+.ti_image_right { direction: rtl; }
+.ti_image_right > * { direction: ltr; }
+.ti_image_top {
+  grid-template-columns: 1fr;
+}
+.tiImg img {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+  max-height: 420px;
+}
+.tiText {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Feature Grid ───────────────────────────────────────────────────────── */
+.featureSection { }
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(var(--fg-cols, 3), 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+.featureCard {
+  background: #fdf6ee;
+  border: 1px solid #e8d8c8;
+  border-radius: 12px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+.featureImg {
+  width: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+  max-height: 140px;
+}
+.featureIcon {
+  font-size: 1.8rem;
+}
+.featureTitle {
+  font-size: 0.95rem;
+  color: #3b0f1e;
+}
+.featureText {
+  font-size: 0.88rem;
+  color: #6a4a52;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Highlight Strip ────────────────────────────────────────────────────── */
+.highlightSection { }
+.highlightH {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+.highlightV {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+.highlightItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fdf6ee;
+  border: 1px solid #e8d8c8;
+  border-radius: 10px;
+  padding: 12px 16px;
+  flex: 1 1 160px;
+}
+.hlIcon  { font-size: 1.4rem; flex-shrink: 0; }
+.hlTitle { font-size: 0.9rem; color: #3b0f1e; font-weight: 600; }
+.hlText  { font-size: 0.85rem; color: #7a5e66; }
+
+/* ── Brand Story ────────────────────────────────────────────────────────── */
+.brandStory {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: center;
+  background: #2a0a14;
+  border-radius: 16px;
+  overflow: hidden;
+  color: #fff8f0;
+}
+.brandCentered {
+  grid-template-columns: 1fr;
+  text-align: center;
+}
+.brandImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.brandText {
+  padding: 40px 36px;
+}
+.brandH {
+  font-family: 'Canela', serif;
+  font-size: 1.8rem;
+  color: #fff8f0;
+  margin: 0 0 16px;
+}
+.brandBody {
+  font-size: 0.95rem;
+  color: #f0ddd0;
+  line-height: 1.8;
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* ── Comparison Chart ───────────────────────────────────────────────────── */
+.chartSection { }
+.chartScroll {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+.compTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.compTable th, .compTable td {
+  padding: 10px 16px;
+  border: 1px solid #e8d8c8;
+  text-align: left;
+  color: #3b0f1e;
+}
+.compTable thead th {
+  background: #2a0a14;
+  color: #fff8f0;
+  font-weight: 600;
+}
+.compTable tbody tr:nth-child(even) td,
+.compTable tbody tr:nth-child(even) th {
+  background: #fdf6ee;
+}
+
+/* ── FAQ Block ──────────────────────────────────────────────────────────── */
+.faqSection { }
+.faqDefault, .faqCompact {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.faqItem {
+  border: 1px solid #e8d8c8;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.faqQ {
+  padding: 14px 18px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #3b0f1e;
+  cursor: pointer;
+  list-style: none;
+  background: #fdf6ee;
+}
+.faqQ::-webkit-details-marker { display: none; }
+.faqQ::before { content: "＋ "; }
+details[open] .faqQ::before { content: "－ "; }
+.faqA {
+  padding: 12px 18px 16px;
+  font-size: 0.9rem;
+  color: #5a4048;
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-line;
+}
+.faqCompact .faqItem {
+  border-radius: 6px;
+}
+.faqCompact .faqQ {
+  padding: 10px 14px;
+  font-size: 0.88rem;
+}
+.faqCompact .faqA {
+  padding: 8px 14px 12px;
+  font-size: 0.85rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .textImage, .hero_split, .brandStory {
+    grid-template-columns: 1fr;
+  }
+  .ti_image_right { direction: ltr; }
+  .featureGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .heroText { padding: 32px 20px; }
+  .brandText { padding: 28px 20px; }
+  .heroH { font-size: 1.5rem; }
+  .brandH { font-size: 1.5rem; }
+}
+@media (max-width: 480px) {
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+  .highlightH {
+    flex-direction: column;
+  }
+}
