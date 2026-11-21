@@ -38,6 +38,7 @@ const publicProduct = (p) => {
     pack: p.pack, contents, fitNote: p.fitNote || "", materials: p.materials || "", usage: p.usage || "", safety: p.safety || "", storage: p.storage || "",
     faqs: p.faqs || [], image: p.image, gallery: p.gallery || [], seoTitle: p.seoTitle || "", seoDescription: p.seoDescription || "",
     related: p.related || {},
+    aplusContent: p.aplusContent || [],
   };
 };
 

@@ -39,6 +39,37 @@ const catalogProductSchema = new mongoose.Schema(
     storage: { type: String, default: "" },
     faqs: { type: [{ q: String, a: String, _id: false }], default: [] },
 
+    // ── A+ Content ──────────────────────────────────────────────────────────
+    // Each module has: type, layout, order, and type-specific content fields.
+    // Supported types: hero_banner | text_image | feature_grid | highlight_strip | brand_story | comparison_chart | faq_block
+    aplusContent: {
+      type: [
+        {
+          _id: false,
+          type: { type: String, required: true },        // module type key
+          layout: { type: String, default: "default" },  // layout variant (e.g. "image-left", "image-right", "3-col", "2-col")
+          order: { type: Number, default: 0 },           // controls render sequence
+          // shared optional fields
+          headline: { type: String, default: "" },
+          subheadline: { type: String, default: "" },
+          body: { type: String, default: "" },
+          image: { type: String, default: "" },
+          // feature_grid / highlight_strip items
+          items: {
+            type: [{ _id: false, icon: String, title: String, text: String, image: String }],
+            default: [],
+          },
+          // comparison_chart
+          columns: { type: [String], default: [] },
+          rows: {
+            type: [{ _id: false, label: String, values: [String] }],
+            default: [],
+          },
+        },
+      ],
+      default: [],
+    },
+
     image: { type: String, default: "" },
     gallery: { type: [String], default: [] },
     seoTitle: { type: String, default: "" },

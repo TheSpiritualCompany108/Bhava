@@ -229,6 +229,49 @@ export async function validateProductInput(input, { existing } = {}) {
   d.contents = (Array.isArray(input.contents) ? input.contents : []).map((c) => ({ label: str(c.label, 60), value: str(c.value, 200) })).filter((c) => c.label && c.value).slice(0, 15);
   d.faqs = (Array.isArray(input.faqs) ? input.faqs : []).map((f) => ({ q: str(f.q, 200), a: str(f.a, 1500) })).filter((f) => f.q && f.a).slice(0, 15);
 
+  // ── A+ Content ────────────────────────────────────────────────────────────
+  const APLUS_TYPES = ["hero_banner", "text_image", "feature_grid", "highlight_strip", "brand_story", "comparison_chart", "faq_block"];
+  const APLUS_LAYOUTS = {
+    hero_banner:      ["default", "centered", "split"],
+    text_image:       ["image-left", "image-right", "image-top"],
+    feature_grid:     ["2-col", "3-col", "4-col"],
+    highlight_strip:  ["horizontal", "vertical"],
+    brand_story:      ["default", "centered"],
+    comparison_chart: ["default"],
+    faq_block:        ["default", "compact"],
+  };
+  d.aplusContent = (Array.isArray(input.aplusContent) ? input.aplusContent : [])
+    .slice(0, 20)
+    .map((m, idx) => {
+      const type = str(m.type, 40);
+      if (!APLUS_TYPES.includes(type)) return null;
+      const validLayouts = APLUS_LAYOUTS[type] || ["default"];
+      const layout = validLayouts.includes(m.layout) ? m.layout : validLayouts[0];
+      const mod = {
+        type,
+        layout,
+        order: Number.isFinite(Number(m.order)) ? Number(m.order) : idx,
+        headline:    str(m.headline, 200),
+        subheadline: str(m.subheadline, 200),
+        body:        str(m.body, 2000),
+        image:       str(m.image, 500),
+        items: (Array.isArray(m.items) ? m.items : []).slice(0, 12).map((it) => ({
+          icon:  str(it.icon, 60),
+          title: str(it.title, 120),
+          text:  str(it.text, 500),
+          image: str(it.image, 500),
+        })),
+        columns: (Array.isArray(m.columns) ? m.columns : []).slice(0, 6).map((c) => str(c, 80)),
+        rows: (Array.isArray(m.rows) ? m.rows : []).slice(0, 20).map((r) => ({
+          label:  str(r.label, 80),
+          values: (Array.isArray(r.values) ? r.values : []).slice(0, 6).map((v) => str(v, 200)),
+        })),
+      };
+      return mod;
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.order - b.order);
+
   const rel = input.related || {};
   d.related = { upsell: str(rel.upsell, 80), upsellAlt: str(rel.upsellAlt, 80), upsellBundle: str(rel.upsellBundle, 80), crossSell: cleanList(rel.crossSell, 6), bundle: str(rel.bundle, 80) };
   for (const s of [d.related.upsell, d.related.upsellAlt, ...d.related.crossSell].filter(Boolean)) {
