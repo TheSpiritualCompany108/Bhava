@@ -4,11 +4,43 @@
   margin: 48px 0 0;
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 24px;
 }
 
 .modWrap {
   width: 100%;
+}
+
+/* ── Pure A+ Image Banners (Amazon / E-commerce style) ─────────────────── */
+.imageBanner {
+  width: 100%;
+  display: block;
+}
+.bannerImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.img_full_width {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.img_contained {
+  max-width: 960px;
+  margin: 0 auto;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.img_2_col {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 /* ── Shared typography ──────────────────────────────────────────────────── */

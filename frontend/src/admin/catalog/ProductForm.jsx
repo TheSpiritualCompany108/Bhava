@@ -11,104 +11,7 @@ const EMPTY = {
   aplusContent: [],
 };
 
-// ── A+ module definitions ────────────────────────────────────────────────────
-const APLUS_TYPES = [
-  { key: "hero_banner",      label: "Hero Banner",       layouts: ["default", "centered", "split"] },
-  { key: "text_image",       label: "Text + Image",      layouts: ["image-left", "image-right", "image-top"] },
-  { key: "feature_grid",     label: "Feature Grid",      layouts: ["3-col", "2-col", "4-col"] },
-  { key: "highlight_strip",  label: "Highlight Strip",   layouts: ["horizontal", "vertical"] },
-  { key: "brand_story",      label: "Brand Story",       layouts: ["default", "centered"] },
-  { key: "comparison_chart", label: "Comparison Chart",  layouts: ["default"] },
-  { key: "faq_block",        label: "FAQ Block",         layouts: ["default", "compact"] },
-];
-const APLUS_EMPTY = (type = "hero_banner", order = 0) => ({
-  type, layout: APLUS_TYPES.find(t => t.key === type)?.layouts[0] || "default",
-  order, headline: "", subheadline: "", body: "", image: "",
-  items: [], columns: [], rows: [],
-});
-const aplusBtnSm = { padding: "4px 10px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: "0.8rem", background: "#e8d8c8", color: "#3b0f1e" };
-const aplusBtnGhost = { ...aplusBtnSm, background: "transparent", border: "1px solid #c9b8a8" };
-const aplusInput = { display: "block", width: "100%", padding: "6px 10px", borderRadius: 6, border: "1px solid #c9b8a8", fontSize: "0.85rem", marginBottom: 6, boxSizing: "border-box", background: "#fff" };
-
-function AplusModuleEditor({ mod, idx, total, onChange, onRemove, onMove }) {
-  const typeDef = APLUS_TYPES.find(t => t.key === mod.type) || APLUS_TYPES[0];
-  const upd = patch => onChange({ ...mod, ...patch });
-  const hasImage = ["hero_banner", "text_image", "brand_story"].includes(mod.type);
-  const hasItems = ["feature_grid", "highlight_strip", "faq_block"].includes(mod.type);
-  return (
-    <div style={{ border: "1px solid #c9b8a8", borderRadius: 10, padding: 14, marginBottom: 12, background: "#fdf8f3" }}>
-      <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12, flexWrap: "wrap" }}>
-        <strong style={{ color: "#3b0f1e", fontSize: "0.9rem" }}>#{idx + 1}</strong>
-        <select style={{ flex: 1, padding: "4px 8px", borderRadius: 6, border: "1px solid #c9b8a8", fontSize: "0.85rem" }}
-          value={mod.type} onChange={e => onChange(APLUS_EMPTY(e.target.value, mod.order))}>
-          {APLUS_TYPES.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
-        </select>
-        <select style={{ flex: 1, padding: "4px 8px", borderRadius: 6, border: "1px solid #c9b8a8", fontSize: "0.85rem" }}
-          value={mod.layout} onChange={e => upd({ layout: e.target.value })}>
-          {typeDef.layouts.map(l => <option key={l} value={l}>{l}</option>)}
-        </select>
-        <input type="number" value={mod.order} onChange={e => upd({ order: Number(e.target.value) })}
-          style={{ width: 54, padding: "4px 6px", borderRadius: 6, border: "1px solid #c9b8a8", fontSize: "0.85rem" }} title="Sort order" />
-        <button onClick={() => onMove(idx, -1)} disabled={idx === 0} style={aplusBtnSm}>↑</button>
-        <button onClick={() => onMove(idx, 1)} disabled={idx === total - 1} style={aplusBtnSm}>↓</button>
-        <button onClick={onRemove} style={{ ...aplusBtnSm, background: "#a2331f", color: "#fff" }}>✕</button>
-      </div>
-      <input placeholder="Headline" value={mod.headline} maxLength={200} onChange={e => upd({ headline: e.target.value })} style={aplusInput} />
-      {["hero_banner", "text_image"].includes(mod.type) && (
-        <input placeholder="Subheadline" value={mod.subheadline} maxLength={200} onChange={e => upd({ subheadline: e.target.value })} style={aplusInput} />
-      )}
-      {hasImage && (
-        <>
-          <textarea placeholder="Body text" value={mod.body} rows={3} maxLength={2000} onChange={e => upd({ body: e.target.value })} style={{ ...aplusInput, resize: "vertical" }} />
-          <input placeholder="Image URL" value={mod.image} maxLength={500} onChange={e => upd({ image: e.target.value })} style={aplusInput} />
-        </>
-      )}
-      {["feature_grid", "highlight_strip"].includes(mod.type) && (
-        <div style={{ marginTop: 6 }}>
-          <span style={{ fontSize: "0.82rem", color: "#7a5e66", display: "block", marginBottom: 6 }}>Items</span>
-          {(mod.items || []).map((it, i) => (
-            <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
-              <input placeholder="Icon" value={it.icon || ""} maxLength={10} onChange={e => { const items = [...mod.items]; items[i] = { ...it, icon: e.target.value }; upd({ items }); }} style={{ ...aplusInput, width: 64, margin: 0 }} />
-              <input placeholder="Title" value={it.title || ""} maxLength={120} onChange={e => { const items = [...mod.items]; items[i] = { ...it, title: e.target.value }; upd({ items }); }} style={{ ...aplusInput, flex: 1, margin: 0 }} />
-              <input placeholder="Text" value={it.text || ""} maxLength={500} onChange={e => { const items = [...mod.items]; items[i] = { ...it, text: e.target.value }; upd({ items }); }} style={{ ...aplusInput, flex: 2, margin: 0 }} />
-              <input placeholder="Image URL" value={it.image || ""} maxLength={500} onChange={e => { const items = [...mod.items]; items[i] = { ...it, image: e.target.value }; upd({ items }); }} style={{ ...aplusInput, flex: 1, margin: 0 }} />
-              <button onClick={() => upd({ items: mod.items.filter((_, j) => j !== i) })} style={{ ...aplusBtnSm, background: "#a2331f", color: "#fff" }}>✕</button>
-            </div>
-          ))}
-          {(mod.items || []).length < 12 && <button style={aplusBtnGhost} onClick={() => upd({ items: [...(mod.items || []), { icon: "", title: "", text: "", image: "" }] })}>+ Add item</button>}
-        </div>
-      )}
-      {mod.type === "faq_block" && (
-        <div style={{ marginTop: 6 }}>
-          <span style={{ fontSize: "0.82rem", color: "#7a5e66", display: "block", marginBottom: 6 }}>FAQ Items</span>
-          {(mod.items || []).map((it, i) => (
-            <div key={i} style={{ marginBottom: 8, border: "1px solid #e8d8c8", borderRadius: 6, padding: 8 }}>
-              <input placeholder="Question" value={it.title || ""} maxLength={200} onChange={e => { const items = [...mod.items]; items[i] = { ...it, title: e.target.value }; upd({ items }); }} style={aplusInput} />
-              <textarea placeholder="Answer" value={it.text || ""} rows={2} maxLength={1500} onChange={e => { const items = [...mod.items]; items[i] = { ...it, text: e.target.value }; upd({ items }); }} style={{ ...aplusInput, resize: "vertical", marginBottom: 4 }} />
-              <button onClick={() => upd({ items: mod.items.filter((_, j) => j !== i) })} style={{ ...aplusBtnSm, background: "#a2331f", color: "#fff" }}>Remove</button>
-            </div>
-          ))}
-          {(mod.items || []).length < 15 && <button style={aplusBtnGhost} onClick={() => upd({ items: [...(mod.items || []), { title: "", text: "" }] })}>+ Add FAQ item</button>}
-        </div>
-      )}
-      {mod.type === "comparison_chart" && (
-        <div style={{ marginTop: 6 }}>
-          <span style={{ fontSize: "0.82rem", color: "#7a5e66", display: "block", marginBottom: 4 }}>Columns (comma-separated)</span>
-          <input placeholder="Basic, Premium, Deluxe" value={(mod.columns || []).join(", ")} onChange={e => upd({ columns: e.target.value.split(",").map(c => c.trim()).filter(Boolean) })} style={aplusInput} />
-          <span style={{ fontSize: "0.82rem", color: "#7a5e66", display: "block", margin: "8px 0 4px" }}>Rows</span>
-          {(mod.rows || []).map((r, i) => (
-            <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, alignItems: "center" }}>
-              <input placeholder="Row label" value={r.label || ""} maxLength={80} onChange={e => { const rows = [...mod.rows]; rows[i] = { ...r, label: e.target.value }; upd({ rows }); }} style={{ ...aplusInput, flex: 1, margin: 0 }} />
-              <input placeholder="Values (comma-separated)" value={(r.values || []).join(", ")} onChange={e => { const rows = [...mod.rows]; rows[i] = { ...r, values: e.target.value.split(",").map(v => v.trim()) }; upd({ rows }); }} style={{ ...aplusInput, flex: 2, margin: 0 }} />
-              <button onClick={() => upd({ rows: mod.rows.filter((_, j) => j !== i) })} style={{ ...aplusBtnSm, background: "#a2331f", color: "#fff" }}>✕</button>
-            </div>
-          ))}
-          <button style={aplusBtnGhost} onClick={() => upd({ rows: [...(mod.rows || []), { label: "", values: [] }] })}>+ Add row</button>
-        </div>
-      )}
-    </div>
-  );
-}
+const aplusBtnSm = { padding: "5px 10px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: "0.82rem", background: "#e8d8c8", color: "#3b0f1e" };
 
 function Field({ label, hint, error, full, children, htmlFor }) {
   return (
@@ -134,6 +37,8 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
   const [lightbox, setLightbox] = useState(null); // start index into [main, ...gallery]
   const fileRef = useRef(null);
   const galRef = useRef(null);
+  const aplusRef = useRef(null);
+  const [aplusUploading, setAplusUploading] = useState(false);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const setRel = (k, v) => setForm((f) => ({ ...f, related: { ...f.related, [k]: v } }));
 
@@ -162,6 +67,33 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
       if (target === "main") set("image", url);
       else set("gallery", [...form.gallery, url].slice(0, 10));
     } catch (e) { setError(e); } finally { setUploading(false); }
+  };
+
+  const uploadAplus = async (files) => {
+    if (!files || files.length === 0) return;
+    setAplusUploading(true);
+    setError(null);
+    try {
+      const added = [];
+      const baseOrder = (form.aplusContent || []).length;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fd = new FormData();
+        fd.append("image", await optimizeImage(file));
+        const { url } = await api("/upload", { method: "POST", form: fd });
+        added.push({
+          type: "image",
+          layout: "full-width",
+          order: baseOrder + i,
+          image: url,
+        });
+      }
+      set("aplusContent", [...(form.aplusContent || []), ...added]);
+    } catch (e) {
+      setError(e);
+    } finally {
+      setAplusUploading(false);
+    }
   };
 
   const save = async () => {
@@ -318,30 +250,104 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
           <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} onClick={() => set("faqs", [...form.faqs, { q: "", a: "" }])}>+ Add FAQ</button>
           <div className={s.hint} style={{ marginTop: 4 }}>Quantity, fragrance, contents and shipping FAQs are generated automatically from the product data.</div>
 
-          <div className={s.sect}>A+ Content — Product Page Highlights</div>
-          <div style={{ fontSize: "0.82rem", color: "#7a5e66", marginBottom: 10 }}>
-            Add rich modules below the product tabs. Choose the module type, pick a layout, and use ↑↓ or the order number to reorder.
+          <div className={s.sect}>A+ Content (Infographic Banners)</div>
+          <div className={s.hint} style={{ margin: "-6px 0 12px" }}>
+            Upload designed A+ banner images (Amazon-style). Click &quot;Add A+ Images&quot; to select multiple images at once.
           </div>
-          {(form.aplusContent || []).map((mod, i) => (
-            <AplusModuleEditor
-              key={i} mod={mod} idx={i} total={(form.aplusContent || []).length}
-              onChange={updated => set("aplusContent", form.aplusContent.map((m, j) => j === i ? updated : m))}
-              onRemove={() => set("aplusContent", form.aplusContent.filter((_, j) => j !== i))}
-              onMove={(idx, dir) => {
-                const arr = [...form.aplusContent];
-                const swap = idx + dir;
-                if (swap < 0 || swap >= arr.length) return;
-                [arr[idx], arr[swap]] = [arr[swap], arr[idx]];
-                set("aplusContent", arr.map((m, j) => ({ ...m, order: j })));
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {(form.aplusContent || []).map((mod, i) => (
+              <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", background: "#fdf8f3", border: "1px solid #d8c8b8", borderRadius: 10, padding: 10, flexWrap: "wrap" }}>
+                <img
+                  src={imgUrl(mod.image)}
+                  alt={`A+ Banner ${i + 1}`}
+                  style={{ width: 110, height: 64, objectFit: "cover", borderRadius: 6, border: "1px solid #e0d0c0", cursor: "pointer" }}
+                  onClick={() => window.open(imgUrl(mod.image), "_blank")}
+                  title="Click to view full image"
+                />
+                <div style={{ flex: 1, minWidth: 180, display: "flex", flexDirection: "column", gap: 4 }}>
+                  <span style={{ fontSize: "0.88rem", fontWeight: 600, color: "#3b0f1e" }}>A+ Banner #{i + 1}</span>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <label style={{ fontSize: "0.8rem", color: "#6b5058" }}>Layout:</label>
+                    <select
+                      value={mod.layout || "full-width"}
+                      onChange={(e) => {
+                        const next = [...(form.aplusContent || [])];
+                        next[i] = { ...mod, layout: e.target.value };
+                        set("aplusContent", next);
+                      }}
+                      style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid #c9b8a8", fontSize: "0.82rem", background: "#fff" }}
+                    >
+                      <option value="full-width">Full Width Banner (100% wide)</option>
+                      <option value="contained">Contained / Boxed</option>
+                      <option value="2-col">2-Column Grid (Side-by-side)</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <button
+                    type="button"
+                    style={aplusBtnSm}
+                    disabled={i === 0}
+                    onClick={() => {
+                      const arr = [...form.aplusContent];
+                      [arr[i], arr[i - 1]] = [arr[i - 1], arr[i]];
+                      set("aplusContent", arr.map((m, j) => ({ ...m, order: j })));
+                    }}
+                    title="Move Up"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    style={aplusBtnSm}
+                    disabled={i === form.aplusContent.length - 1}
+                    onClick={() => {
+                      const arr = [...form.aplusContent];
+                      [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
+                      set("aplusContent", arr.map((m, j) => ({ ...m, order: j })));
+                    }}
+                    title="Move Down"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    style={{ ...aplusBtnSm, background: "#a2331f", color: "#fff" }}
+                    onClick={() => {
+                      set("aplusContent", form.aplusContent.filter((_, j) => j !== i));
+                    }}
+                    title="Remove Banner"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 12 }}>
+            <input
+              ref={aplusRef}
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              onChange={(e) => {
+                uploadAplus(e.target.files);
+                e.target.value = "";
               }}
             />
-          ))}
-          {(form.aplusContent || []).length < 20 && (
-            <button className={`${s.btn} ${s.btnGhost} ${s.btnSm}`}
-              onClick={() => set("aplusContent", [...(form.aplusContent || []), APLUS_EMPTY("hero_banner", (form.aplusContent || []).length)])}>
-              + Add A+ module
+            <button
+              type="button"
+              className={`${s.btn} ${s.btnGhost}`}
+              onClick={() => aplusRef.current?.click()}
+              disabled={aplusUploading || uploading}
+            >
+              {aplusUploading ? "Uploading A+ Images…" : "+ Add A+ Images"}
             </button>
-          )}
+            {aplusUploading && <span style={{ fontSize: "0.85rem", color: "#8a5a40" }}>Uploading to cloud…</span>}
+          </div>
 
           <div className={s.sect}>SEO</div>
           <div className={s.grid2}>

@@ -564,12 +564,13 @@ function ProductDetailInner({ slug }) {
           </div>
         </section>
 
-        {/* ── A+ Content ── */}
+        {/* ── A+ Content (Product Infographics & Banners) ── */}
         {product.aplusContent?.length > 0 && (
           <AplusContent modules={product.aplusContent} />
         )}
 
-        {/* ── You May Also Like ── */}        {alsoLike.length > 0 && (
+        {/* ── You May Also Like ── */}
+        {alsoLike.length > 0 && (
           <section className={styles.similarSection} aria-labelledby="also-like-title">
             <div className={styles.similarHeader}>
               <span className={styles.similarKicker}>Sacred Pairings</span>

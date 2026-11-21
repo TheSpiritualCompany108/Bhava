@@ -4,6 +4,21 @@ import ResponsiveImg from "../components/ResponsiveImg";
 
 /* ─── Individual module renderers ─────────────────────────────────────── */
 
+function ImageBanner({ mod }) {
+  const layout = mod.layout || "full-width";
+  const cls = [styles.imageBanner, styles[`img_${layout.replace("-", "_")}`] || styles.img_full_width].join(" ");
+  return (
+    <div className={cls}>
+      <img
+        src={mod.image}
+        alt={mod.headline || "A+ Content Banner"}
+        className={styles.bannerImg}
+        loading="lazy"
+      />
+    </div>
+  );
+}
+
 function HeroBanner({ mod }) {
   const cls = [styles.heroBanner, styles[`hero_${mod.layout || "default"}`]].join(" ");
   return (
@@ -148,6 +163,8 @@ function FaqBlock({ mod }) {
 /* ─── Module dispatcher ───────────────────────────────────────────────── */
 
 const MODULE_MAP = {
+  image:            ImageBanner,
+  image_banner:     ImageBanner,
   hero_banner:      HeroBanner,
   text_image:       TextImage,
   feature_grid:     FeatureGrid,
@@ -165,7 +182,7 @@ export default function AplusContent({ modules }) {
   return (
     <section className={styles.aplusRoot} aria-label="Product highlights">
       {sorted.map((mod, i) => {
-        const Comp = MODULE_MAP[mod.type];
+        const Comp = MODULE_MAP[mod.type] || (mod.image ? ImageBanner : null);
         if (!Comp) return null;
         return (
           <div key={i} className={styles.modWrap}>
