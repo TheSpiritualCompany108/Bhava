@@ -178,18 +178,36 @@ const MODULE_MAP = {
 
 export default function AplusContent({ modules }) {
   if (!modules || modules.length === 0) return null;
+
   const sorted = [...modules].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const desktopModules = sorted.filter((m) => m.device !== "mobile");
+  const mobileModules = sorted.filter((m) => m.device === "mobile" || m.device === "all");
+
+  const renderModule = (mod, i) => {
+    const Comp = MODULE_MAP[mod.type] || (mod.image ? ImageBanner : null);
+    if (!Comp) return null;
+    return (
+      <div key={i} className={styles.modWrap}>
+        <Comp mod={mod} />
+      </div>
+    );
+  };
+
   return (
     <section className={styles.aplusRoot} aria-label="Product highlights">
-      {sorted.map((mod, i) => {
-        const Comp = MODULE_MAP[mod.type] || (mod.image ? ImageBanner : null);
-        if (!Comp) return null;
-        return (
-          <div key={i} className={styles.modWrap}>
-            <Comp mod={mod} />
-          </div>
-        );
-      })}
+      {/* 🖥️ Desktop Only Listing */}
+      {desktopModules.length > 0 && (
+        <div className={styles.desktopOnly}>
+          {desktopModules.map(renderModule)}
+        </div>
+      )}
+
+      {/* 📱 Mobile Only Listing */}
+      {mobileModules.length > 0 && (
+        <div className={styles.mobileOnly}>
+          {mobileModules.map(renderModule)}
+        </div>
+      )}
     </section>
   );
 }

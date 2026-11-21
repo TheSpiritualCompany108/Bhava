@@ -48,6 +48,7 @@ const catalogProductSchema = new mongoose.Schema(
           _id: false,
           type: { type: String, required: true },        // module type key
           layout: { type: String, default: "default" },  // layout variant (e.g. "image-left", "image-right", "3-col", "2-col")
+          device: { type: String, default: "desktop" },  // desktop | mobile | all
           order: { type: Number, default: 0 },           // controls render sequence
           // shared optional fields
           headline: { type: String, default: "" },
