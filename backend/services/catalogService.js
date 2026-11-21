@@ -230,8 +230,10 @@ export async function validateProductInput(input, { existing } = {}) {
   d.faqs = (Array.isArray(input.faqs) ? input.faqs : []).map((f) => ({ q: str(f.q, 200), a: str(f.a, 1500) })).filter((f) => f.q && f.a).slice(0, 15);
 
   // ── A+ Content ────────────────────────────────────────────────────────────
-  const APLUS_TYPES = ["hero_banner", "text_image", "feature_grid", "highlight_strip", "brand_story", "comparison_chart", "faq_block"];
+  const APLUS_TYPES = ["image", "image_banner", "hero_banner", "text_image", "feature_grid", "highlight_strip", "brand_story", "comparison_chart", "faq_block"];
   const APLUS_LAYOUTS = {
+    image:            ["full-width", "contained", "2-col"],
+    image_banner:     ["full-width", "contained", "2-col"],
     hero_banner:      ["default", "centered", "split"],
     text_image:       ["image-left", "image-right", "image-top"],
     feature_grid:     ["2-col", "3-col", "4-col"],
@@ -241,11 +243,12 @@ export async function validateProductInput(input, { existing } = {}) {
     faq_block:        ["default", "compact"],
   };
   d.aplusContent = (Array.isArray(input.aplusContent) ? input.aplusContent : [])
-    .slice(0, 20)
+    .slice(0, 30)
     .map((m, idx) => {
-      const type = str(m.type, 40);
+      let type = str(m.type, 40);
+      if (!type && m.image) type = "image";
       if (!APLUS_TYPES.includes(type)) return null;
-      const validLayouts = APLUS_LAYOUTS[type] || ["default"];
+      const validLayouts = APLUS_LAYOUTS[type] || ["full-width", "default"];
       const layout = validLayouts.includes(m.layout) ? m.layout : validLayouts[0];
       const mod = {
         type,
