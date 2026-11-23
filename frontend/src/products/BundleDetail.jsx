@@ -135,13 +135,13 @@ function BundleDetailInner({ slug }) {
         title={`${bundle.name} – Curated collection | Bhava:`}
         description={clipDesc(bundle.description, bundle.tagline)}
         canonical={`${origin}/collection/${bundle.slug}`}
-        image={origin + imgSrc(hero).replace(origin, "")}
+        image={(hero || "").startsWith("http") ? hero : `${origin}${imgSrc(hero || "")}`}
         type="product"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Product",
           name: bundle.name,
-          image: `${origin}${imgSrc(hero).replace(origin, "")}`,
+          image: (hero || "").startsWith("http") ? hero : `${origin}${imgSrc(hero || "")}`,
           description: bundle.description,
           offers: {
             "@type": "Offer",

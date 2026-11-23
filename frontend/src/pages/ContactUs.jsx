@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./ContactUs.module.css";
 
 const BASE = import.meta.env.VITE_API_URL || "";
@@ -122,6 +123,11 @@ function ContactUs() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Contact & Support | Bhava:"
+        description="We'd love to hear from you. Send us your inquiry or feedback and our team will respond with care."
+        canonical={`${siteOrigin()}/contact`}
+      />
       <div className={styles.card}>
 
         <button className={styles.backArrow} onClick={() => navigate(-1)}>

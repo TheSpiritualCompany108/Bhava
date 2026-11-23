@@ -39,6 +39,9 @@ export function ExpandingSearchDock({
   const openDock = () => {
     onOpen?.();
     setOpen(true);
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
   };
 
   const results = useMemo(() => {
@@ -105,7 +108,9 @@ export function ExpandingSearchDock({
 
   useEffect(() => {
     if (!open) return undefined;
-    const t = requestAnimationFrame(() => inputRef.current?.focus());
+    const t = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 40);
     const onKey = (e) => {
       if (e.key === "Escape") close();
     };
@@ -115,7 +120,7 @@ export function ExpandingSearchDock({
     document.addEventListener("keydown", onKey);
     document.addEventListener("mousedown", onPointer);
     return () => {
-      cancelAnimationFrame(t);
+      clearTimeout(t);
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("mousedown", onPointer);
     };
@@ -153,6 +158,7 @@ export function ExpandingSearchDock({
             <input
               ref={inputRef}
               type="search"
+              autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={onInputKeyDown}

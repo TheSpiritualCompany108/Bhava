@@ -10,6 +10,7 @@ import {
 import { playAddToCartAnimation, tweenSavingReveal, tweenTextIn, tweenTextSwap } from "../utils/cartAnimation";
 import { viewCart } from "../utils/analytics";
 import { loadAddressBook, syncAddressesFromServer } from "../account/addressBook";
+import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./CartPage.module.css";
 import x from "./CartLayout.module.css";
 
@@ -97,7 +98,7 @@ export default function CartPage() {
     });
     const related = new Set(ranked.map((r) => r.slug));
     // Cross-sell matrix picks come first; then the rest of the catalogue so the row is never sparse.
-    catalog.products.filter((p) => p.status !== "archived").forEach(push);
+    catalog.products.filter((p) => p.status !== "archived" && p.price > 0).forEach(push);
     ranked.sort((a, b) => {
       if (related.has(a.slug) !== related.has(b.slug)) return related.has(a.slug) ? -1 : 1;
       const byCat = catRank(a.category) - catRank(b.category);
@@ -336,6 +337,11 @@ export default function CartPage() {
 
   return (
     <div className={x.page}>
+      <Seo
+        title="Your Sacred Cart | Bhava:"
+        description="Review your selected sacred incense, beads, and ritual items before checkout."
+        canonical={`${siteOrigin()}/cart`}
+      />
       {/* Step indicator: BAG → ADDRESS → PAYMENT */}
       <nav className={x.stepsBar} aria-label="Checkout steps">
         <ol className={x.steps}>
@@ -366,7 +372,7 @@ export default function CartPage() {
               const sv = data?.lines?.[idx];
               const blocked = sv && !sv.ok;
               // quantity options stop at real stock (server-computed), never above the per-line cap
-              const lineMax = !sv ? MAX_LINE_QTY : sv.ok ? Math.min(MAX_LINE_QTY, sv.maxQty ?? MAX_LINE_QTY) : sv.available ?? 0;
+              const lineMax = !sv ? MAX_LINE_QTY : sv.ok ? Math.min(MAX_LINE_QTY, Math.max(10, sv.maxQty ?? MAX_LINE_QTY)) : sv.available ?? 0;
               const unit = sv?.unitPrice ?? item.priceNum;
               return (
                 <article key={item.productId} className={`${x.item} ${blocked ? x.itemBad : ""}`}>

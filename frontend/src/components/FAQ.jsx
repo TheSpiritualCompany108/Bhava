@@ -1,62 +1,65 @@
 import { InlineBack } from "./PageBack";
 import { useState } from "react";
+import Seo, { siteOrigin } from "./Seo";
 import styles from "./FAQ.module.css";
 
 const categories = [
   {
-    icon: "?",
+    icon: "✦",
     title: "About Bhava:",
-    desc: "Learn more about the company and get the overview of the app and FAQ",
-    count: 10,
+    desc: "Learn more about our spiritual philosophy, artisans and purity standards",
     faqs: [
-      { q: "Are your products temple-blessed and authentic?", a: "Yes. Every product in our collection is sourced directly from verified temple artisans and traditional manufacturers across India. We partner with over 500 temples and certified suppliers to ensure every item carries genuine spiritual intent and purity." },
-      { q: "Is Bhava: certified by regulatory bodies?", a: "Yes. Bhava: is registered under FSSAI for all applicable consumable products and complies with BIS standards for incense and dhoop. All certifications are available for review upon request." },
+      { q: "Are your products temple-blessed and authentic?", a: "Yes. Every product in our collection is sourced directly from verified temple artisans and traditional manufacturers across India. We partner with certified suppliers to ensure every item carries genuine spiritual intent and purity." },
+      { q: "Is Bhava: certified by regulatory bodies?", a: "Yes. Bhava: complies with applicable BIS standards for incense and dhoop, and all packaging details are transparently displayed." },
+      { q: "Are your incense sticks bamboo-less and charcoal-free?", a: "Yes. Our Sacred Notes discovery collection includes pure bamboo-less dhoop sticks made with natural herbs, resins, and botanical extracts without toxic burning chemicals or black charcoal." },
     ],
   },
   {
-    icon: "🛒",
+    icon: "📦",
     title: "Orders & Shipping",
     desc: "Track your orders, understand delivery timelines and shipping policies",
-    count: 8,
     faqs: [
-      { q: "How fast is delivery? Do you ship internationally?", a: "Within India, we deliver in 3–5 business days. Express 1–2 day delivery is available in metro cities. We ship internationally to USA, UK, Canada, Australia, Singapore and UAE in 7–14 business days." },
-      { q: "What's your return/refund policy?", a: "We offer a hassle-free 7-day return policy on non-consumable products. For consumable items, we accept returns only if the product is damaged or defective upon arrival." },
+      { q: "How fast is delivery across India?", a: "Within India, standard delivery takes 3–5 business days. Express delivery in metro cities typically arrives within 1–2 business days." },
+      { q: "What are your shipping charges?", a: "We offer FREE standard delivery on all prepaid and COD orders above ₹501. For orders below ₹501, a nominal shipping fee of ₹50 applies." },
+      { q: "How can I track my order?", a: "Once dispatched, you will receive a tracking link via email and SMS. You can also view real-time status in your Account under 'My Orders'." },
+      { q: "What is your return and refund policy?", a: "We offer a hassle-free 7-day return policy on non-consumable items (like sacred bead bracelets and brass burners). For incense and camphor, we replace any item damaged in transit immediately." },
     ],
   },
   {
     icon: "💳",
     title: "Payments & Pricing",
-    desc: "Everything about pricing, offers, payment methods and billing",
-    count: 6,
+    desc: "Everything about payment options, Cash on Delivery and security",
     faqs: [
-      { q: "How do your prices compare to retail incense/sambrani?", a: "Because we work directly with artisans and temple cooperatives, our prices are typically 30–45% lower than retail stores for equivalent quality." },
+      { q: "What payment methods do you accept?", a: "We accept all major UPI apps (Google Pay, PhonePe, Paytm), credit/debit cards (Visa, MasterCard, RuPay), Net Banking, and Cash on Delivery (COD) across serviceable Indian pincodes." },
+      { q: "Is Cash on Delivery (COD) available?", a: "Yes, Cash on Delivery is supported on most domestic orders. You can select Cash on Delivery at checkout." },
+      { q: "How do your prices compare to retail stores?", a: "Because we work directly with traditional artisans and craft cooperatives, our prices reflect authentic quality without excessive middleman markups." },
     ],
   },
   {
     icon: "📱",
     title: "Wellness App",
-    desc: "Learn about the Bhava: app features, launch dates and subscriptions",
-    count: 5,
+    desc: "Learn about the upcoming Bhava: app features and rituals",
     faqs: [
-      { q: "When is the Wellness App launching?", a: "The Bhava: Wellness App is currently in final beta and is set to launch in Q2 2025 on both iOS and Android. Join our waitlist for 3 months of premium access free at launch." },
+      { q: "When is the Bhava: App launching?", a: "The Bhava: Wellness App is currently in final private beta and is scheduled to launch on Google Play and the App Store. Early members will receive complimentary premium ritual guidance." },
+      { q: "What features will the app include?", a: "The app offers daily personalized Vedic rituals, mantra sadhana timer with mala counters, temple live darshan, and an interactive spiritual community." },
     ],
   },
   {
     icon: "🛕",
-    title: "Temple Partnerships",
-    desc: "Details about our verified temple network and sourcing process",
-    count: 7,
+    title: "Temple Traditions",
+    desc: "Details about our verified sacred heritage and natural sourcing",
     faqs: [
-      { q: "How do you verify temple partnerships?", a: "Every temple partner goes through a rigorous vetting process including documentation verification, on-site visits, and regular quality audits to ensure authenticity." },
+      { q: "How do you source your sacred resins and woods?", a: "We source our Guggal, Loban, and natural Sandalwood directly from traditional forest cooperatives and ethical sustainable harvesters in India." },
+      { q: "Are the sacred bead bracelets genuine gemstones?", a: "Yes, every bracelet uses authentic, untreated natural semi-precious stones (such as Tiger Eye, Amethyst, and Sandalwood) hand-knotted for durability and comfort." },
     ],
   },
   {
     icon: "🎁",
-    title: "Subscriptions & Boxes",
-    desc: "Monthly sacred boxes, subscription plans and gifting options",
-    count: 4,
+    title: "Gifting & Subscriptions",
+    desc: "Monthly sacred boxes, corporate gifting and custom ritual sets",
     faqs: [
-      { q: "What is included in the subscription box?", a: "Each monthly box includes temple-sourced incense, malas, oils and sacred items curated around a spiritual theme. Boxes are customizable based on your practice." },
+      { q: "Do you offer corporate or bulk spiritual gifting?", a: "Yes! We curate customized luxury ritual hampers for corporate gifting, weddings, housewarming (Griha Pravesh) and festive occasions. Reach out to us via our Contact page for corporate inquiries." },
+      { q: "Can I send a gift directly to a friend with a message?", a: "Yes, simply enter the recipient's shipping address during checkout and contact our support team if you would like a personalized blessing note included." },
     ],
   },
 ];
@@ -76,6 +79,11 @@ function FAQ() {
 
   return (
     <section className={styles.faqSection}>
+      <Seo
+        title="Frequently Asked Questions | Bhava:"
+        description="Find answers to common questions about orders, shipping, payment methods, returns and authentic temple products."
+        canonical={`${siteOrigin()}/faq`}
+      />
       <div style={{ marginBottom: 22 }}><InlineBack fallback="/" /></div>
       {/* Header */}
       <h1 className={styles.title}>Have Questions ? Let us Help!</h1>
@@ -101,7 +109,7 @@ function FAQ() {
               <div className={styles.cardIcon}>{cat.icon}</div>
               <h3 className={styles.cardTitle}>{cat.title}</h3>
               <p className={styles.cardDesc}>{cat.desc}</p>
-              <span className={styles.cardCount}>{cat.count} Articles</span>
+              <span className={styles.cardCount}>{cat.faqs.length} Article{cat.faqs.length !== 1 ? "s" : ""}</span>
             </div>
           ))}
         </div>

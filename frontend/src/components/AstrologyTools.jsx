@@ -21,6 +21,7 @@ const tools = [
     cta: "Match Now",
     image: "/kundli matching.png",
     theme: "orange",
+    route: "/kundli-generator",
   },
   {
     id: "astrology-calculator",
@@ -30,6 +31,7 @@ const tools = [
     cta: "Calculate Now",
     image: "/astrology calculator.png",
     theme: "orange",
+    route: "/daily-horoscope",
   },
   {
     id: "numerology-calculator",
@@ -39,6 +41,7 @@ const tools = [
     cta: "Calculate Now",
     image: "/numerelogy calcultor.png",
     theme: "maroon",
+    route: "/services",
   },
 ];
 
