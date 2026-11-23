@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./AboutUs.module.css";
 
 const corePillars = [
@@ -81,6 +82,11 @@ function AboutUs() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="About Us & Our Sacred Mission | Bhava:"
+        description="Learn about Bhava: by The Spiritual Company. Thoughtful ritual objects and ancient wisdom translated into everyday life."
+        canonical={`${siteOrigin()}/about`}
+      />
       {/* Belief + Our Story */}
       <section className={styles.heroSection} aria-labelledby="about-hero-title">
         <div className={styles.inner}>

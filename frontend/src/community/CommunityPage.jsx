@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./CommunityPage.module.css";
 
 const stats = [
@@ -163,6 +164,11 @@ function CommunityPage() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Devotee Community & Satsang | Bhava:"
+        description="Join a global community of devotees sharing wisdom, supporting daily sadhana, and celebrating the richness of Dharmic life."
+        canonical={`${siteOrigin()}/community`}
+      />
 
       {/* ── Hero ── */}
       <div className={styles.hero}>

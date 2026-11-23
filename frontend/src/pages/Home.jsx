@@ -19,7 +19,7 @@ function Home() {
     <>
       <Seo
         title="Bhava: by The Spiritual Company – Incense, Sambrani, Camphor & Sacred Bead Bracelets"
-        description={clipDesc("Shop Sacred Notes incense, Pure Ritual, Sacred Ember cones, Guggal Sambrani, ritual camphor and six intention bracelets from Bhava:.")}
+        description={clipDesc("Shop Sacred Notes incense, Pure Ritual, Sacred Ember cones, Guggal Sambrani, ritual camphor and five intention bracelets from Bhava:.")}
         canonical={`${siteOrigin()}/`}
       />
       <HomeMain />

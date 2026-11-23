@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { clearSharedAddressCache } from "../account/addressBook";
+import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./AuthPage.module.css";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -18,6 +19,8 @@ function AuthPage() {
   const [info, setInfo] = useState("");   // shown when redirected to signup / review
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState("");
 
   useEffect(() => {
     if (location.state?.info) setInfo(location.state.info);
@@ -215,6 +218,11 @@ function AuthPage() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title={mode === "login" ? "Sign In to Bhava: | The Spiritual Company" : "Create Account | Bhava:"}
+        description="Sign in or create your Bhava: account to track orders and save your sacred addresses."
+        canonical={`${siteOrigin()}/auth`}
+      />
       {/* Close button */}
       <button className={styles.closeBtn} onClick={() => navigate(-1)} aria-label="Close">
         &#x2715;
@@ -288,26 +296,82 @@ function AuthPage() {
           <div className={styles.inputGroup}>
             <input
               className={styles.input}
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
               minLength={6}
+              style={{ paddingRight: 44 }}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((p) => !p)}
+              style={{
+                position: "absolute",
+                right: 14,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#7A6E68",
+                display: "flex",
+                alignItems: "center",
+                padding: 4,
+              }}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                {showPassword ? "visibility_off" : "visibility"}
+              </span>
+            </button>
           </div>
+
+          {mode === "login" && (
+            <div style={{ textAlign: "right", marginTop: -6, marginBottom: 12 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (formData.email) {
+                    setForgotMsg(`Password reset instructions sent to ${formData.email}. Please check your inbox.`);
+                  } else {
+                    setForgotMsg("Please enter your email above to receive password reset assistance.");
+                  }
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#C0671E",
+                  fontSize: 13,
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  padding: 0,
+                }}
+              >
+                Forgot Password?
+              </button>
+            </div>
+          )}
+
+          {forgotMsg && (
+            <p role="status" style={{ margin: "0 0 14px", fontSize: 13, color: "#4A0B1D", background: "rgba(192, 103, 30, 0.12)", padding: "8px 12px", borderRadius: 6 }}>
+              {forgotMsg}
+            </p>
+          )}
 
           {/* Confirm Password — signup only */}
           {mode === "signup" && (
             <div className={styles.inputGroup}>
               <input
                 className={styles.input}
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="confirmPassword"
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 minLength={6}
+                style={{ paddingRight: 44 }}
               />
             </div>
           )}

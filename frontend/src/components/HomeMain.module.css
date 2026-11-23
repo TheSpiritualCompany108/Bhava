@@ -106,6 +106,10 @@
 @media (max-width: 768px) {
   .stage { max-height: none; }
   .stagePortrait { aspect-ratio: 4 / 5; }
+  .stage:not(.stagePortrait) .bannerImg {
+    object-fit: contain;
+    background: #F4EFE6;
+  }
   .sliderControls { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 0 2px; }
   .navArrow { position: static; transform: none; width: 32px; height: 32px; flex: 0 0 auto; box-shadow: none; }
   .navArrow svg { width: 16px; height: 16px; }

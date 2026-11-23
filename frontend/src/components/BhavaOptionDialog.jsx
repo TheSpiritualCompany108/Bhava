@@ -70,7 +70,7 @@ function BhavaOptionDialog({ isOpen, onClose, onSelectChat, onSelectCall }) {
               <span className={styles.badgeLive}>Real-time Voice</span>
             </div>
             <h4 className={styles.cardTitle}>Call with Bhava:</h4>
-            <p className={styles.cardDesc}>Live low-latency voice call powered by speech recognition & Neural TTS.</p>
+            <p className={styles.cardDesc}>Speak naturally with our spiritual assistant for instant personal guidance.</p>
             <div className={styles.cardActionCall}>
               <span>Start Call</span>
               <span className="material-symbols-outlined">mic</span>

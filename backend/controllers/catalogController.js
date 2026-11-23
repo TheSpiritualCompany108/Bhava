@@ -58,7 +58,7 @@ export const getCatalog = wrap(async (req, res) => {
     shipping: SHIPPING,
     categories: ctx.categories.map((c) => ({ id: c.id, label: c.label, blurb: c.blurb })),
     fragrances: FRAGRANCES,
-    products: ctx.products.map(publicProduct),
+    products: ctx.products.filter((p) => p.price > 0).map(publicProduct),
     bundles,
     availability: availabilityFor(stock, ctx),
     shopFilters: settings.shopFilters,

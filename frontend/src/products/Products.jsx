@@ -179,8 +179,12 @@ export default function Products() {
 
   const items = useMemo(() => {
     if (!catalog) return { products: [], bundles: [] };
-    let products = catalog.products.map((p, i) => ({ p, i }));
-    let bundles = catalog.bundles.map((b, i) => ({ b, i }));
+    let products = catalog.products
+      .filter((p) => p.price > 0 && p.status !== "archived")
+      .map((p, i) => ({ p, i }));
+    let bundles = catalog.bundles
+      .filter((b) => b.price > 0)
+      .map((b, i) => ({ b, i }));
 
     if (tab === "curated-collections" || collection) products = [];
     else if (tab !== "all") products = products.filter(({ p }) => productMatchesCategoryTab(p, tab));
@@ -246,7 +250,7 @@ export default function Products() {
     <div className={styles.page}>
       <Seo
         title="Shop incense, Sambrani, camphor and sacred beads | Bhava:"
-        description={clipDesc("Sacred Notes incense, Pure Ritual, Sacred Ember, Sambrani, camphor and six intention bracelets from Bhava: by The Spiritual Company.")}
+        description={clipDesc("Sacred Notes incense, Pure Ritual, Sacred Ember, Sambrani, camphor and five intention bracelets from Bhava: by The Spiritual Company.")}
         canonical={`${siteOrigin()}/products`}
       />
       {toast && (

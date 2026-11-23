@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./Services.module.css";
 import ServiceBookingModal from "./ServiceBookingModal";
 
@@ -130,6 +131,11 @@ function Services() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Spiritual Services & Vedic Consultations | Bhava:"
+        description="Authentic Vedic services connecting you to temples, priests and teachers across India — from your home or in person."
+        canonical={`${siteOrigin()}/services`}
+      />
       <div className={styles.hero}>
         <p className={styles.eyebrow}>BHAVA: SACRED SERVICES</p>
         <h1 className={styles.heroTitle}>
@@ -236,7 +242,14 @@ function Services() {
             <button
               type="button"
               className={styles.ctaSecondary}
-              onClick={() => gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              onClick={() => {
+                if (gridRef.current) {
+                  const y = gridRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
+                  window.scrollTo({ top: y, behavior: "smooth" });
+                } else {
+                  window.scrollTo({ top: 400, behavior: "smooth" });
+                }
+              }}
             >
               Browse All Services
             </button>

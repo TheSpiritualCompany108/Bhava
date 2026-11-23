@@ -28,6 +28,7 @@ const AdminPage = lazy(() => import("./admin/AdminPage"));
 const ProductDetail = lazy(() => import("./products/ProductDetail"));
 const BundleDetail = lazy(() => import("./products/BundleDetail"));
 const PolicyPage = lazy(() => import("./pages/PolicyPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 function App() {
   return (
@@ -71,6 +72,7 @@ function App() {
             <Route path="/about"      element={<AboutUs />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
         </Suspense>

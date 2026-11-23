@@ -104,7 +104,7 @@ function ProductDetailInner({ slug }) {
     if (product.related?.upsellAlt) push(getProduct(catalog, product.related.upsellAlt));
     // … then top up to a full row of 4 with other in-stock products
     catalog.products
-      .filter((p) => p.status !== "archived" && productInStock(catalog, p))
+      .filter((p) => p.status !== "archived" && p.price > 0 && productInStock(catalog, p))
       .forEach(push);
     return out;
   }, [catalog, product]);
@@ -170,6 +170,9 @@ function ProductDetailInner({ slug }) {
   const origin = siteOrigin();
   const seoDesc = clipDesc(product.seoDescription || product.description, product.tagline || product.pack);
   const seoTitle = product.seoTitle || `${product.name}${product.pack ? ` – ${product.pack}` : ""} | Bhava:`;
+  const heroImgUrl = (product.image || "").startsWith("http")
+    ? product.image
+    : `${origin}${imgSrc(product.image || "")}`;
 
   return (
     <div className={styles.page}>
@@ -177,13 +180,13 @@ function ProductDetailInner({ slug }) {
         title={seoTitle}
         description={seoDesc}
         canonical={`${origin}/product/${product.slug}`}
-        image={origin + imgSrc(product.image).replace(origin, "")}
+        image={heroImgUrl}
         type="product"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Product",
           name: product.name,
-          image: `${origin}${product.image || ""}`,
+          image: heroImgUrl,
           description: seoDesc,
           sku: product.slug,
           offers: {

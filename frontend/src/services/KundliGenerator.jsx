@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./KundliGenerator.module.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -175,10 +176,10 @@ function KundliGenerator() {
   const [useTimeRange, setUseTimeRange] = useState(false);
   const [form, setForm] = useState({
     fullName: "",
-    dob: "2000-08-15",
-    time: "10:30",
+    dob: "",
+    time: "",
     ampm: "AM",
-    pob: "New Delhi, India",
+    pob: "",
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -292,6 +293,11 @@ function KundliGenerator() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Vedic Kundli Generator & Birth Chart | Bhava:"
+        description="Generate your authentic Vedic birth chart (Kundli) with planetary positions, lagna chart, and detailed life readings."
+        canonical={`${siteOrigin()}/kundli-generator`}
+      />
       <div className={styles.bgTemple} />
 
       <header className={styles.header}>

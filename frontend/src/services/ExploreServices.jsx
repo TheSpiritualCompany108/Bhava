@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./ExploreServices.module.css";
 
 const promoBands = [
@@ -9,7 +10,7 @@ const promoBands = [
     title: "Corporate Gifting",
     subtitle: "Meaningful gifts for teams and occasions",
     cta: "Explore Corporate Gifting",
-    route: "/products",
+    route: "/contact?subject=Corporate+Gifting",
   },
   {
     id: "luxury-collection",
@@ -17,7 +18,7 @@ const promoBands = [
     title: "Luxury Collection",
     subtitle: "Curated pieces for your sacred space",
     cta: "Explore Collection",
-    route: "/products",
+    route: "/collection/the-complete-home-ritual-set",
   },
 ];
 
@@ -30,7 +31,7 @@ const serviceCards = [
     color: "#4A0B1D",
     description:
       "Learn and explore India's sacred knowledge through courses, workshops and well-structured learning experiences.",
-    route: "/services",
+    route: "/knowledge",
   },
   {
     id: "retreats",
@@ -40,7 +41,7 @@ const serviceCards = [
     color: "#8A2642",
     description:
       "Step away from the everyday and reconnect within. Join immersive spiritual retreats and mindful experiences.",
-    route: "/services",
+    route: "/contact?subject=Spiritual+Retreats",
   },
   {
     id: "creators",
@@ -50,7 +51,7 @@ const serviceCards = [
     color: "#C0671E",
     description:
       "Discover creators who share knowledge, practices, stories and experiences inspired by the Bhava: way.",
-    route: "/services",
+    route: "/community",
   },
 ];
 
@@ -103,6 +104,11 @@ function ExploreServices() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Explore Spiritual Services & Experiences | Bhava:"
+        description="Explore sacred education, retreats, corporate gifting and mindful experiences designed to enrich your spiritual journey."
+        canonical={`${siteOrigin()}/explore-services`}
+      />
       <PromoBand band={promoBands[0]} navigate={navigate} />
 
       <section className={styles.servicesSection}>

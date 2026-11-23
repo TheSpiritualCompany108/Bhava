@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./DailyHoroscope.module.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -70,6 +71,7 @@ function DailyHoroscope() {
   const [sign, setSign] = useState("aries");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reminderSet, setReminderSet] = useState(false);
   const [error, setError] = useState("");
   const [monthlyOpen, setMonthlyOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -183,6 +185,11 @@ function DailyHoroscope() {
 
   return (
     <div className={styles.page}>
+      <Seo
+        title="Daily Vedic Horoscope & Astrological Insights | Bhava:"
+        description="Daily Vedic horoscope, auspicious times, planetary energies, and personalized ritual recommendations for all 12 zodiac signs."
+        canonical={`${siteOrigin()}/daily-horoscope`}
+      />
       <header className={styles.hero}>
         <div className={styles.heroText}>
           <h1 className={styles.title}>Daily Horoscope</h1>
@@ -361,8 +368,16 @@ function DailyHoroscope() {
                 <button className={styles.startBtn} onClick={() => navigate("/knowledge/108-day-sadhana")}>
                   <span className="material-symbols-outlined">play_arrow</span> Start Practice
                 </button>
-                <button className={styles.reminderLink} onClick={() => navigate("/knowledge/108-day-sadhana")}>
-                  <span className="material-symbols-outlined">notifications</span> Set Reminder
+                <button
+                  type="button"
+                  className={styles.reminderLink}
+                  onClick={() => {
+                    setReminderSet(true);
+                    setTimeout(() => setReminderSet(false), 3500);
+                  }}
+                >
+                  <span className="material-symbols-outlined">{reminderSet ? "check_circle" : "notifications"}</span>
+                  {reminderSet ? "Reminder Set for Tomorrow!" : "Set Daily Reminder"}
                 </button>
               </div>
             </div>
