@@ -46,6 +46,15 @@ function ProductDetailInner({ slug }) {
   const [reviewSummary, setReviewSummary] = useState(null);
   const [stickyBuy, setStickyBuy] = useState(false);
   const actionsRef = useRef(null);
+  const thumbRowRef = useRef(null);
+  // Keep the selected thumbnail in view inside the (horizontally scrolling) thumbnail strip
+  useEffect(() => {
+    const row = thumbRowRef.current;
+    const el = row?.children[activeImg];
+    if (!row || !el) return;
+    const left = el.offsetLeft - (row.clientWidth - el.offsetWidth) / 2;
+    row.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+  }, [activeImg]);
   const onReviewSummary = useCallback((s) => setReviewSummary(s), []);
 
   useEffect(() => {
@@ -281,7 +290,7 @@ function ProductDetailInner({ slug }) {
               )}
             </div>
             {gallery.length > 1 && (
-              <div className={styles.thumbnailRow}>
+              <div className={styles.thumbnailRow} ref={thumbRowRef}>
                 {gallery.map((g, i) => (
                   <button key={g + i} type="button" className={`${styles.thumbnailBtn} ${i === activeImg ? styles.thumbnailActive : ""}`} onClick={() => goToImg(i, gallery.length)} aria-label={`Show image ${i + 1}`}>
                     <img src={imgSrc(g)} alt={`${product.name} view ${i + 1}`} className={styles.thumbnailImg} loading="lazy" width={96} height={96} />

@@ -153,14 +153,27 @@
   backdrop-filter: blur(4px);
 }
 
+/* One row of thumbnails that scrolls sideways (instead of wrapping onto a second line) */
 .thumbnailRow {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
   gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px 8px; /* room for the hover lift and the active glow */
+  margin: -4px -2px 0;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74, 11, 29, 0.3) transparent;
+  -webkit-overflow-scrolling: touch;
 }
+.thumbnailRow::-webkit-scrollbar { height: 6px; }
+.thumbnailRow::-webkit-scrollbar-thumb { background: rgba(74, 11, 29, 0.25); border-radius: 999px; }
+.thumbnailRow::-webkit-scrollbar-track { background: transparent; }
 
 .thumbnailBtn {
-  width: 100%;
+  flex: 0 0 calc((100% - 48px) / 5); /* five visible, the rest scroll */
+  scroll-snap-align: start;
+  width: auto;
   aspect-ratio: 1 / 1;
   border-radius: 10px;
   border: 2px solid #ebe4d8;
