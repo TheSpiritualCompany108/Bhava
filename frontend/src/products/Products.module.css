@@ -118,43 +118,41 @@
   z-index: 1;
 }
 
+/* Same look as the homepage hero slider dots: soft pill, small grey dots, long saffron active dot */
 .bannerDots {
   position: absolute;
   left: 50%;
   bottom: 14px;
   transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(248, 245, 240, 0.7);
 }
 
 .bannerDot {
-  width: 44px;
-  height: 44px;
+  position: relative;
+  width: 8px;
+  height: 8px;
   padding: 0;
   border: none;
-  border-radius: 50%;
-  background: transparent;
+  border-radius: 999px;
+  background: rgba(74, 11, 29, 0.3);
   cursor: pointer;
-  transition: transform 0.15s, background 0.15s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  transition: width 0.25s ease, background 0.25s ease;
 }
+.bannerDot:hover { background: rgba(74, 11, 29, 0.55); }
+.bannerDotOn,
+.bannerDotOn:hover { width: 22px; background: #E07B39; }
+/* bigger touch target without changing the look */
+.bannerDot::after { content: ""; position: absolute; inset: -10px -4px; }
+.bannerDot:focus-visible { outline: 2px solid #4A0B1D; outline-offset: 3px; }
 
-.bannerDot::after {
-  content: "";
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.55);
-}
-
-.bannerDotOn::after {
-  background: #E07B39;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55);
-  transform: scale(1.15);
+@media (max-width: 768px) {
+  .bannerDots { bottom: 10px; }
 }
 
 /* ── Collection Headings & Search Outside Box, Above Categories ── */

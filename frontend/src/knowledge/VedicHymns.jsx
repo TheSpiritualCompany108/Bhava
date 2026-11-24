@@ -238,8 +238,8 @@ function VedicHymns() {
                   "linear-gradient(to right, #1a3a4a 0%, #1a3a4a99 18%, transparent 50%)",
               }}
             />
-            <img
-              src="/Daily%20Practices/Vedic%20Hymns.png"
+            <img loading="lazy" decoding="async"
+              src="/Daily%20Practices/Vedic%20Hymns.webp"
               alt="Vedic Hymns"
               className={styles.heroImage}
             />

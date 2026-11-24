@@ -46,7 +46,7 @@ const tiles = [
       "Tiger Eye Power — Concentration, discipline & focused action",
       "Civilizational Renewal — Beyond wellness, toward cultural transformation",
     ],
-    image: "/Temple Blessed.png",
+    image: "/Temple Blessed.webp",
     color: "#4A0B1D",
     description:
       "108 is not just a number — it is the universe's blueprint encoded in sacred geometry, planetary cycles, and ancient yogic science.",
@@ -73,7 +73,7 @@ const tiles = [
       "Power (Tiger Eye) — Courage, protection & focused action",
       "Daily Integration — 108-second ritual for nervous system reset",
     ],
-    image: "/108-Day Mantra Sadhana.png",
+    image: "/108-Day Mantra Sadhana.webp",
     color: "#4A0B1D",
     description:
       "108 encodes cosmic order and completion, while Tiger Eye carries grounded courage and protection. Together they become a daily system that anchors modern life in Dharma.",
@@ -100,7 +100,7 @@ const tiles = [
       "Power (Tiger Eye): courage, protection & grounded focus",
       "Daily 108-Second Ritual: stillness, breath & anchor stone",
     ],
-    image: "/Premium Quality.png",
+    image: "/Premium Quality.webp",
     color: "#4A0B1D",
     description:
       "In Hindu civilization, 108 appears again and again as a signal of wholeness — in malas, temple canons, sacred name-garlands, and cosmic mappings.",
@@ -188,7 +188,7 @@ function TigerEyeSection() {
               </div>
 
               <div className={styles.cardRight} style={{ backgroundColor: tile.color }}>
-                <img
+                <img loading="lazy" decoding="async"
                   src={tile.image}
                   alt={tile.title}
                   className={styles.cardImage}

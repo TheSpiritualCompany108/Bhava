@@ -156,7 +156,7 @@ function BhagavadGitaJourney() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Learning%20Paths/Bhagvat%20Gita%20Journey.png" alt="Bhagavad Gita Journey" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Learning%20Paths/Bhagvat%20Gita%20Journey.webp" alt="Bhagavad Gita Journey" className={styles.heroImage} />
           </div>
         </div>
       </section>

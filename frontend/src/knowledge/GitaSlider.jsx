@@ -119,7 +119,7 @@ async function buildShareImage(quoteText, refText) {
 
   // BHAVA: logo area (word + orange colon)
   const logoY = refY + refH;
-  const logoImg = await loadImage("/logo(3).png");
+  const logoImg = await loadImage("/logo(3).webp");
   const logoSize = 36;
   // measure text widths to center the whole row
   ctx.font = `800 22px "Arial Black", "Arial", sans-serif`;
@@ -296,7 +296,7 @@ function GitaSlider() {
             </div>
 
             {previewUrl && (
-              <img src={previewUrl} alt="Quote preview" className={styles.sharePreviewImage} />
+              <img loading="lazy" decoding="async" src={previewUrl} alt="Quote preview" className={styles.sharePreviewImage} />
             )}
 
             <div className={styles.shareOptions}>

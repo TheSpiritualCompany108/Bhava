@@ -6,7 +6,7 @@ import styles from "./ExploreServices.module.css";
 const promoBands = [
   {
     id: "corporate-gifting",
-    image: "/corporate gifting.png",
+    image: "/corporate gifting.webp",
     title: "Corporate Gifting",
     subtitle: "Meaningful gifts for teams and occasions",
     cta: "Explore Corporate Gifting",
@@ -14,7 +14,7 @@ const promoBands = [
   },
   {
     id: "luxury-collection",
-    image: "/luxury collection.png",
+    image: "/luxury collection.webp",
     title: "Luxury Collection",
     subtitle: "Curated pieces for your sacred space",
     cta: "Explore Collection",
@@ -25,7 +25,7 @@ const promoBands = [
 const serviceCards = [
   {
     id: "sacred-education",
-    image: "/sacred education.png",
+    image: "/sacred education.webp",
     icon: "auto_stories",
     title: "Sacred Education",
     color: "#4A0B1D",
@@ -35,7 +35,7 @@ const serviceCards = [
   },
   {
     id: "retreats",
-    image: "/retreats.png",
+    image: "/retreats.webp",
     icon: "self_improvement",
     title: "Retreats",
     color: "#8A2642",
@@ -45,7 +45,7 @@ const serviceCards = [
   },
   {
     id: "creators",
-    image: "/creators.png",
+    image: "/creators.webp",
     icon: "podcasts",
     title: "Creators",
     color: "#C0671E",
@@ -58,7 +58,7 @@ const serviceCards = [
 function PromoBand({ band, navigate }) {
   return (
     <div className={styles.promoBand}>
-      <img src={band.image} alt={band.title} className={styles.promoImage} />
+      <img loading="lazy" decoding="async" src={band.image} alt={band.title} className={styles.promoImage} />
       <div className={styles.promoContent}>
         <h3 className={styles.promoTitle}>{band.title}</h3>
         <p className={styles.promoSubtitle}>{band.subtitle}</p>
@@ -129,7 +129,7 @@ function ExploreServices() {
             {serviceCards.map((card) => (
               <div key={card.id} className={styles.card}>
                 <div className={styles.cardImageWrap}>
-                  <img src={card.image} alt={card.title} className={styles.cardImage} />
+                  <img loading="lazy" decoding="async" src={card.image} alt={card.title} className={styles.cardImage} />
                   <span className={styles.cardIconBadge} style={{ color: card.color }}>
                     <span className="material-symbols-outlined">{card.icon}</span>
                   </span>

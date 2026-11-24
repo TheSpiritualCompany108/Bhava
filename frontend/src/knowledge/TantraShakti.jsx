@@ -169,7 +169,7 @@ function TantraShakti() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Learning%20Paths/Tantra%20%26%20Shakti.png" alt="Tantra and Shakti" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Learning%20Paths/Tantra%20%26%20Shakti.png" alt="Tantra and Shakti" className={styles.heroImage} />
           </div>
         </div>
       </section>

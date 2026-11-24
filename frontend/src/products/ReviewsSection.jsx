@@ -347,7 +347,7 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
             <div className={styles.photoRow}>
               {photos.map((p, i) => (
                 <div key={p.preview} className={styles.photoThumb}>
-                  <img src={p.preview} alt={`Upload preview ${i + 1}`} />
+                  <img loading="lazy" decoding="async" src={p.preview} alt={`Upload preview ${i + 1}`} />
                   <button type="button" className={styles.photoRemove} onClick={() => removePhoto(i)} aria-label="Remove photo">
                     ×
                   </button>
@@ -465,7 +465,7 @@ export default function ReviewsSection({ productId, productTitle, onSummary }) {
           <button type="button" className={styles.lightboxClose} aria-label="Close" onClick={() => setLightbox("")}>
             ×
           </button>
-          <img src={lightbox} alt="Review photo" onClick={(e) => e.stopPropagation()} />
+          <img loading="lazy" decoding="async" src={lightbox} alt="Review photo" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </section>

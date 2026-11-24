@@ -265,7 +265,7 @@ function Meditation() {
               className={styles.heroImageOverlay}
               style={{ background: "linear-gradient(to right, #1a0a2e 0%, #1a0a2e99 18%, transparent 50%)" }}
             />
-            <img src="/Daily%20Practices/Meditation.png" alt="Meditation" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Daily%20Practices/Meditation.webp" alt="Meditation" className={styles.heroImage} />
           </div>
         </div>
       </section>

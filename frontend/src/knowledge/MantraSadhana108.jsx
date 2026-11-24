@@ -440,8 +440,8 @@ function MantraSadhana108() {
                 <div className={styles.progressFill} />
               </div>
             </div>
-            <img
-              src="../108-Day Mantra Sadhana.png"
+            <img loading="lazy" decoding="async"
+              src="../108-Day Mantra Sadhana.webp"
               alt="108-Day Mantra Sādhana"
               className={styles.heroImg}
             />

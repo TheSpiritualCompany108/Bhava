@@ -20,7 +20,7 @@ const discussions = [
     location: "Pune",
     replies: 84,
     likes: 210,
-    img: "/Daily Practices/Meditation.png",
+    img: "/Daily Practices/Meditation.webp",
   },
   {
     id: 1,
@@ -31,7 +31,7 @@ const discussions = [
     location: "Vrindavan",
     replies: 136,
     likes: 389,
-    img: "/Daily Practices/Mantra Chanting.png",
+    img: "/Daily Practices/Mantra Chanting.webp",
   },
   {
     id: 2,
@@ -42,7 +42,7 @@ const discussions = [
     location: "Bengaluru",
     replies: 97,
     likes: 274,
-    img: "/Daily Practices/Gita Reading.png",
+    img: "/Daily Practices/Gita Reading.webp",
   },
   {
     id: 3,
@@ -53,7 +53,7 @@ const discussions = [
     location: "Singapore",
     replies: 61,
     likes: 193,
-    img: "/Explore Sacred Wisdom/Puja Rituals.png",
+    img: "/Explore Sacred Wisdom/Puja Rituals.webp",
   },
   {
     id: 4,
@@ -64,7 +64,7 @@ const discussions = [
     location: "Chennai",
     replies: 72,
     likes: 241,
-    img: "/Daily Practices/Kurya Namaskar.png",
+    img: "/Daily Practices/Kurya Namaskar.webp",
   },
   {
     id: 5,
@@ -75,7 +75,7 @@ const discussions = [
     location: "Toronto",
     replies: 115,
     likes: 302,
-    img: "/Daily Practices/Vedic Hymns.png",
+    img: "/Daily Practices/Vedic Hymns.webp",
   },
 ];
 
@@ -125,7 +125,7 @@ const events = [
     title: "Mahashivaratri Community Satsang",
     desc: "An all-night virtual celebration with guided meditation, Shiva stotras and community chanting.",
     type: "VIRTUAL",
-    img: "/Temple Blessed.png",
+    img: "/Temple Blessed.webp",
   },
   {
     date: "MAR 15",
@@ -133,7 +133,7 @@ const events = [
     title: "Bhagavad Gita Study Circle — Ch. 12",
     desc: "Weekly deep-dive into the Bhakti Yoga chapter with Q&A moderated by a Vedanta scholar.",
     type: "VIRTUAL",
-    img: "/Daily Practices/Gita Reading.png",
+    img: "/Daily Practices/Gita Reading.webp",
   },
   {
     date: "APR 05",
@@ -141,7 +141,7 @@ const events = [
     title: "Vrindavan Pilgrimage Yatra",
     desc: "Join 40 seekers on a guided 5-day pilgrimage to Vrindavan, Mathura and Govardhan.",
     type: "IN-PERSON",
-    img: "/Explore Sacred Wisdom/Temple Traditions.png",
+    img: "/Explore Sacred Wisdom/Temple Traditions.webp",
   },
   {
     date: "APR 13",
@@ -149,7 +149,7 @@ const events = [
     title: "Ugadi Celebrations & Vedic New Year",
     desc: "Cultural programmes, community feast, panchanga shravanam and collective prayer for the new year.",
     type: "HYBRID",
-    img: "/Explore Sacred Wisdom/Festivals & Celebrations.png",
+    img: "/Explore Sacred Wisdom/Festivals & Celebrations.webp",
   },
 ];
 
@@ -226,7 +226,7 @@ function CommunityPage() {
             {discussions.map((d) => (
               <div key={d.id} className={styles.discussCard}>
                 <div className={styles.discussImg}>
-                  <img src={d.img} alt={d.title} />
+                  <img loading="lazy" decoding="async" src={d.img} alt={d.title} />
                   <span className={styles.discussTag}>{d.tag}</span>
                 </div>
                 <div className={styles.discussBody}>
@@ -288,7 +288,7 @@ function CommunityPage() {
             {events.map((e, i) => (
               <div key={i} className={styles.eventCard}>
                 <div className={styles.eventImg}>
-                  <img src={e.img} alt={e.title} />
+                  <img loading="lazy" decoding="async" src={e.img} alt={e.title} />
                   <span className={`${styles.eventType} ${e.type === "IN-PERSON" ? styles.typeInPerson : e.type === "HYBRID" ? styles.typeHybrid : styles.typeVirtual}`}>
                     {e.type}
                   </span>

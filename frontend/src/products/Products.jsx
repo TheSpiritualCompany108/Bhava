@@ -101,7 +101,7 @@ export default function Products() {
     if (fromSlides.length) return fromSlides;
     const legacy = bannerData?.bannerImage || bannerData?.image || bannerData?.items?.banner?.image;
     if (legacy) return [{ id: "banner", image: legacy }];
-    return [{ id: "default", image: "/Slide 02.png" }];
+    return [{ id: "default", image: "/Slide 02.webp" }];
   }, [bannerData]);
   const [bannerIndex, setBannerIndex] = useState(0);
   // Phones (≤768px) get the slide's separate mobile banner when the admin uploaded one.
@@ -110,8 +110,8 @@ export default function Products() {
     () =>
       bannerSlides.map((s) => {
         if (isMobile && s.mobileImage) return resolveHomepageImageUrl(s.mobileImage);
-        const raw = s.image || "/Slide 02.png";
-        if (!raw || raw === "/Slide 02.png" || raw.startsWith("/Slide") || raw.startsWith("/Products")) return raw;
+        const raw = s.image || "/Slide 02.webp";
+        if (!raw || raw === "/Slide 02.webp" || raw.startsWith("/Slide") || raw.startsWith("/Products")) return raw;
         return resolveHomepageImageUrl(raw);
       }),
     [bannerSlides, isMobile],
@@ -122,7 +122,7 @@ export default function Products() {
   const title = bannerData?.title || "Shop Bhava:";
   const subtitle =
     bannerData?.subtitle ||
-    "Sacred Beads, incense, Sambrani and camphor — chosen with care for a more considered daily ritual.";
+    "Incense Sticks, Bamboo-less Incense, Sambrani, Camphor and Sacred Beads — chosen with care for a more considered daily ritual.";
 
   const shopFilters = { ...DEFAULT_FILTERS, ...(catalog?.shopFilters || {}) };
 

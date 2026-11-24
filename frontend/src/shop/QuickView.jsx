@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext";
 import { QuantityDecrease, QuantityValue, QuantityIncrease } from "../components/Quantity";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { FOOTNOTE_PRICE } from "./content";
-import { inr, imgSrc, variantInStock, productInStock, productMaxQty, productLine } from "./shopUtils";
+import { inr, imgSrc, variantInStock, productInStock, productMaxQty, productMaxQtyAny, productLine } from "./shopUtils";
 import { addToCartEvent } from "../utils/analytics";
 
 /** Quick View: pick fragrance / pair + qty, add to cart without leaving the listing. */
@@ -25,7 +25,7 @@ export default function QuickView({ product: p, catalog, onClose, onAdded }) {
   const variant = p.variants.find((v) => v.key === variantKey);
   const inCart = variant ? cartItems.find((i) => i.productId === `product:${p.slug}:${variant.key}`) : null;
   const inStock = variant ? variantInStock(catalog, p.slug, variant.key) : productInStock(catalog, p);
-  const maxQty = variant ? Math.max(0, productMaxQty(catalog, p.slug, variant.key) - (inCart?.quantity || 0)) : 20;
+  const maxQty = variant ? Math.max(0, productMaxQty(catalog, p.slug, variant.key) - (inCart?.quantity || 0)) : productMaxQtyAny(catalog, p, cartItems);
   const qtyEff = Math.max(1, Math.min(qty, maxQty || 1));
   const needsChoice = p.variants.length > 1 && !variant;
   const canAdd = inStock && !needsChoice && maxQty > 0;
@@ -117,7 +117,7 @@ export default function QuickView({ product: p, catalog, onClose, onAdded }) {
         <button type="button" className={s.qvClose} onClick={requestClose} aria-label="Close">✕</button>
 
         <div className={s.qvImg}>
-          <img src={imgSrc(p.image)} alt={p.name} />
+          <img loading="lazy" decoding="async" src={imgSrc(p.image)} alt={p.name} />
         </div>
 
         <div className={s.qvBody}>

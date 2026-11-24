@@ -22,14 +22,14 @@ export const dailyPracticeRoutes = [
 ];
 
 const practices = [
-  { img: "/Daily%20Practices/Daily%20Puja.png",      title: "Morning Puja",      sub: "Begin the day in devotion and gratitude.",       detail: "15–28 min",       color: "#5a2a1a", route: "/knowledge/daily-puja" },
-  { img: "/Daily%20Practices/Mantra%20Chanting.png", title: "Mantra Chanting",   sub: "Sacred sound that steadies the mind",          detail: "108 repetitions", color: "#2a1a5a", route: "/knowledge/mantra-chanting" },
-  { img: "/Daily%20Practices/Vedic%20Hymns.png",     title: "Vedic Hymns",       sub: "Ancient verses that invoke the divine.",        detail: "7 min",           color: "#1a3a4a", route: "/knowledge/vedic-hymns" },
-  { img: "/Daily%20Practices/Kurya%20Namaskar.png",  title: "Surya Namaskar",    sub: "Salute the rising sun and awaken the body.",        detail: "12 rounds",       color: "#5a1a2a", route: "/knowledge/surya-namaskar" },
-  { img: "/Daily%20Practices/Gita%20Reading.png",    title: "Gita Reflection",   sub: "Daily wisdom from the Bhagavad Gita.",           detail: "5 min",           color: "#1a4a3a", route: "/knowledge/gita-reading" },
-  { img: "/Daily%20Practices/Aarti.png",             title: "Sacred Aarti",      sub: "Offer light in gratitude at day’s end.", detail: "10 min",          color: "#4a2a0a", route: "/knowledge/aarti" },
-  { img: "/Daily%20Practices/Meditation.png",        title: "Dhyana Meditation",  sub: "Enter the stillness within.",       detail: "20 min",          color: "#2a1a4a", route: "/knowledge/meditation" },
-  { img: "/Daily%20Practices/Japa%20Mala.png",       title: "Japa Mala",         sub: "Repetition that deepens devotion.",       detail: "108 beads",       color: "#0a3a3a", route: "/knowledge/japa-mala" },
+  { img: "/Daily%20Practices/Daily%20Puja.webp",      title: "Morning Puja",      sub: "Begin the day in devotion and gratitude.",       detail: "15–28 min",       color: "#5a2a1a", route: "/knowledge/daily-puja" },
+  { img: "/Daily%20Practices/Mantra%20Chanting.webp", title: "Mantra Chanting",   sub: "Sacred sound that steadies the mind",          detail: "108 repetitions", color: "#2a1a5a", route: "/knowledge/mantra-chanting" },
+  { img: "/Daily%20Practices/Vedic%20Hymns.webp",     title: "Vedic Hymns",       sub: "Ancient verses that invoke the divine.",        detail: "7 min",           color: "#1a3a4a", route: "/knowledge/vedic-hymns" },
+  { img: "/Daily%20Practices/Kurya%20Namaskar.webp",  title: "Surya Namaskar",    sub: "Salute the rising sun and awaken the body.",        detail: "12 rounds",       color: "#5a1a2a", route: "/knowledge/surya-namaskar" },
+  { img: "/Daily%20Practices/Gita%20Reading.webp",    title: "Gita Reflection",   sub: "Daily wisdom from the Bhagavad Gita.",           detail: "5 min",           color: "#1a4a3a", route: "/knowledge/gita-reading" },
+  { img: "/Daily%20Practices/Aarti.webp",             title: "Sacred Aarti",      sub: "Offer light in gratitude at day’s end.", detail: "10 min",          color: "#4a2a0a", route: "/knowledge/aarti" },
+  { img: "/Daily%20Practices/Meditation.webp",        title: "Dhyana Meditation",  sub: "Enter the stillness within.",       detail: "20 min",          color: "#2a1a4a", route: "/knowledge/meditation" },
+  { img: "/Daily%20Practices/Japa%20Mala.webp",       title: "Japa Mala",         sub: "Repetition that deepens devotion.",       detail: "108 beads",       color: "#0a3a3a", route: "/knowledge/japa-mala" },
 ];
 
 const CATEGORY = "Daily Sacred";
@@ -138,7 +138,7 @@ function DailyPractices() {
               style={{ cursor: p.route ? 'pointer' : 'default' }}
             >
               <div className={styles.cardThumb}>
-                <img
+                <img loading="lazy" decoding="async"
                   src={p.img}
                   alt={p.title}
                   className={styles.thumbImg}

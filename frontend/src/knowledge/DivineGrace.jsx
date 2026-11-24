@@ -169,7 +169,7 @@ function DivineGrace() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Latest%20Teachings/Divine%20Grace.png" alt="Divine Grace" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Latest%20Teachings/Divine%20Grace.webp" alt="Divine Grace" className={styles.heroImage} />
           </div>
         </div>
       </section>

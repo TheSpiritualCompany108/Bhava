@@ -15,7 +15,7 @@ function KnowledgeHero() {
         </div>
       </div>
       <div className={styles.heroesRight}>
-        <img src="/Bhakti .png" alt="Bhakti" className={styles.heroesBhaktiImg} />
+        <img src="/Bhakti .webp" alt="Bhakti" className={styles.heroesBhaktiImg} />
       </div>
     </div>
   );

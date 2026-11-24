@@ -272,7 +272,7 @@ function JapaMala() {
               className={styles.heroImageOverlay}
               style={{ background: "linear-gradient(to right, #051a1a 0%, #051a1a99 18%, transparent 50%)" }}
             />
-            <img src="/Daily%20Practices/Japa%20Mala.png" alt="Japa Mala" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Daily%20Practices/Japa%20Mala.webp" alt="Japa Mala" className={styles.heroImage} />
           </div>
         </div>
       </section>

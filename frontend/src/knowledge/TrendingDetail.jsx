@@ -86,7 +86,7 @@ const TrendingDetail = () => {
 
             {/* Image */}
             {imageUrl && (
-              <img src={imageUrl} alt={tile.title} className={styles.heroImg} />
+              <img loading="lazy" decoding="async" src={imageUrl} alt={tile.title} className={styles.heroImg} />
             )}
 
             {/* Controls */}

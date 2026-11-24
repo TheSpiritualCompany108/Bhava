@@ -224,8 +224,8 @@ function DhyanChallenge21() {
                 <div className={styles.progressFill} />
               </div>
             </div>
-            <img
-              src="../21 Dhyan Challenge.png"
+            <img loading="lazy" decoding="async"
+              src="../21 Dhyan Challenge.webp"
               alt="21-Day Dhyān Challenge"
               className={styles.heroImg}
             />

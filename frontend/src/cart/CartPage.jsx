@@ -377,7 +377,7 @@ export default function CartPage() {
               return (
                 <article key={item.productId} className={`${x.item} ${blocked ? x.itemBad : ""}`}>
                   <Link to={item.kind === "bundle" ? `/collection/${item.slug}` : `/product/${item.slug}`} className={x.thumb}>
-                    <img src={imgSrc(item.image)} alt={item.title} />
+                    <img loading="lazy" decoding="async" src={imgSrc(item.image)} alt={item.title} />
                   </Link>
 
                   <div className={x.info}>

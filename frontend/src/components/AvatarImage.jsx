@@ -9,7 +9,7 @@ export default function AvatarImage({ src, alt, className, fallback }) {
   const [failedSrc, setFailedSrc] = useState("");
   if (!src || failedSrc === src) return fallback;
   return (
-    <img
+    <img loading="lazy" decoding="async"
       src={src}
       alt={alt}
       className={className}

@@ -161,7 +161,7 @@ function YogaPhilosophy() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Learning%20Paths/Yoga%20Philosophy.png" alt="Yoga Philosophy" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Learning%20Paths/Yoga%20Philosophy.webp" alt="Yoga Philosophy" className={styles.heroImage} />
           </div>
         </div>
       </section>

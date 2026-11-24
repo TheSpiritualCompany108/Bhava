@@ -166,7 +166,7 @@ function SacredTraditions() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Latest%20Teachings/Sacred%20Traditions.png" alt="Sacred Traditions" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Latest%20Teachings/Sacred%20Traditions.webp" alt="Sacred Traditions" className={styles.heroImage} />
           </div>
         </div>
       </section>

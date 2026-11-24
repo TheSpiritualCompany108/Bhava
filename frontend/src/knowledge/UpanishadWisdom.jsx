@@ -170,7 +170,7 @@ function UpanishadWisdom() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Learning%20Paths/Upanishad%20Wisdom.png" alt="Upanishad Wisdom" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Learning%20Paths/Upanishad%20Wisdom.webp" alt="Upanishad Wisdom" className={styles.heroImage} />
           </div>
         </div>
       </section>

@@ -91,7 +91,7 @@ const TileDetail = () => {
                 </div>
 
                 {tile.imageUrl && (
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={tile.imageUrl.startsWith('http') ? tile.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${tile.imageUrl}`}
                     alt={tile.title}
                     className={styles.cardImage}

@@ -93,7 +93,7 @@ function NotSureWhereToStart() {
 
           {/* Right image */}
           <div className={styles.cardRight}>
-            <img
+            <img loading="lazy" decoding="async"
               src={plan.image}
               alt={plan.title}
               className={styles.cardImg}

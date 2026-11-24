@@ -459,7 +459,7 @@
   animation: toastIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .toast .material-symbols-outlined { font-size: 22px; flex: 0 0 auto; }
-.toastSuccess { background: #2f6b3f; }
+.toastSuccess { background: #4A0B1D; box-shadow: 0 12px 32px rgba(74, 11, 29, 0.35), inset 4px 0 0 #E07B39; }
 .toastError { background: #a8321f; }
 .toastClose {
   margin-left: 4px;

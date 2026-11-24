@@ -160,7 +160,7 @@ function VedicChanting() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Learning%20Paths/Vedic%20Chanting.png" alt="Vedic Chanting" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Learning%20Paths/Vedic%20Chanting.webp" alt="Vedic Chanting" className={styles.heroImage} />
           </div>
         </div>
       </section>

@@ -8,7 +8,7 @@ export const shippingCopy = (shipping) =>
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 // Images uploaded from Admin live on the API host (/uploads/…); bundled assets (/Products/…) are served by the site itself.
 export const imgSrc = (url) => {
-  if (!url) return "/Products/Home Page Incense.png";
+  if (!url) return "/Products/Home Page Incense.webp";
   if (/^https?:\/\//.test(url)) return url;
   return url.startsWith("/uploads") || url.startsWith("uploads") ? `${API_BASE}${url.startsWith("/") ? "" : "/"}${url}` : url;
 };
@@ -236,7 +236,7 @@ export function liveBundlePrice(catalog, b, selection) {
 export const bundleLine = (b, selection, quantity = 1, unitPrice) => ({
   productId: `bundle:${b.slug}:${selection.fragrance || ""}|${selection.camphor || ""}|${selection.pair || ""}|${[...(selection.bracelets || [])].sort().join("+")}`,
   kind: "bundle", slug: b.slug, selection, quantity,
-  title: b.name, priceNum: unitPrice ?? b.price, image: b.image || "/Products/Home Page Incense.png",
+  title: b.name, priceNum: unitPrice ?? b.price, image: b.image || "/Products/Home Page Incense.webp",
   variantLabel: [selection.fragrance && cap(selection.fragrance), selection.pair && selection.pair.split("-").map(cap).join(" + "), selection.camphor && `Camphor: ${cap(selection.camphor)}`].filter(Boolean).join(" · "),
 });
 
@@ -423,7 +423,7 @@ export function includeMetaLine({ pack, via, fragranceLabel }) {
  * Prefers admin-uploaded `b.image`; otherwise format / home lifestyle art.
  */
 export function bundleThumbImage(_catalog, b) {
-  if (!b) return "/Products/Home Page Incense.png";
+  if (!b) return "/Products/Home Page Incense.webp";
   if (b.image) return b.image;
 
   const comps = b.components || [];
@@ -448,13 +448,13 @@ export function bundleThumbImage(_catalog, b) {
 
   // Multi-category / bracelet + ritual → devotion-box lifestyle (reads as a set)
   if (hasBracelet && (hasSticks || hasBamboo || hasCones || hasSmoke || group.includes("+"))) {
-    return "/Products/Home Page Devotion Box.png";
+    return "/Products/Home Page Devotion Box.webp";
   }
   if (group.includes("bracelet collection") || (hasBracelet && !hasSticks && !hasBamboo && !hasCones && !hasSmoke)) {
-    return "/Products/Home Page mala.png";
+    return "/Products/Home Page mala.webp";
   }
   if (hasSmoke && !hasSticks && !hasBamboo && !hasCones) {
-    return "/Products/Home Page Sambrani.png";
+    return "/Products/Home Page Sambrani.webp";
   }
   if (hasCones && !hasSticks && !hasBamboo) {
     return "/Products/Format Incense Cones.jpg";
@@ -467,15 +467,27 @@ export function bundleThumbImage(_catalog, b) {
     return "/Products/Format Incense Sticks.jpg";
   }
   if (hasSticks || group.includes("incense") || group.includes("ritual")) {
-    return "/Products/Home Page Incense.png";
+    return "/Products/Home Page Incense.webp";
   }
-  return "/Products/Home Page Devotion Box.png";
+  return "/Products/Home Page Devotion Box.webp";
 }
 
 
 // ── Quantity limits (real stock, capped at MAX_LINE_QTY) ──
 export const productMaxQty = (catalog, slug, variantKey) =>
   catalog?.availability?.limits?.products?.[slug]?.[variantKey] ?? 0;
+
+// Before a fragrance/pair is chosen: the most that could still be added for ANY option (real stock minus what is already in the cart)
+export const productMaxQtyAny = (catalog, product, cartItems = []) =>
+  Math.max(
+    0,
+    ...product.variants
+      .filter((v) => v.active !== false)
+      .map((v) => {
+        const have = cartItems.find((i) => i.productId === `product:${product.slug}:${v.key}`)?.quantity || 0;
+        return Math.max(0, productMaxQty(catalog, product.slug, v.key) - have);
+      }),
+  );
 
 // Bundle max = lowest limit among the selected options and fixed components
 export const bundleMaxQty = (catalog, slug, sel) => {

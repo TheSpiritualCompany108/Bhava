@@ -239,8 +239,8 @@ function MantraChanting() {
                   "linear-gradient(to right, #2a1a5a 0%, #2a1a5a99 18%, transparent 50%)",
               }}
             />
-            <img
-              src="/Daily%20Practices/Mantra%20Chanting.png"
+            <img loading="lazy" decoding="async"
+              src="/Daily%20Practices/Mantra%20Chanting.webp"
               alt="Mantra Chanting"
               className={styles.heroImage}
             />

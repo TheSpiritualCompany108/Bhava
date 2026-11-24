@@ -219,6 +219,27 @@
 .secWhite { background: #fff; }
 .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 .head { text-align: center; max-width: 720px; margin: 0 auto 36px; }
+
+/* ── Home shop placeholder (shown until the catalogue arrives) ── */
+.skelA, .skelB, .skelC { box-sizing: border-box; }
+@media (min-width: 900px) {
+  .skelA { min-height: 572px; }
+  .skelB { min-height: 519px; }
+  .skelC { min-height: 705px; }
+}
+.homeSkelHead, .homeSkelTile, .homeSkelCard, .homeSkelCardWide {
+  background: linear-gradient(100deg, #efe6da 30%, #f8f1e8 50%, #efe6da 70%);
+  background-size: 200% 100%;
+  animation: homeSkelShimmer 1.4s linear infinite;
+  border-radius: 12px;
+}
+.homeSkelHead { width: min(320px, 70%); height: 28px; margin: 0 auto 28px; }
+.homeSkelRow { display: flex; justify-content: center; gap: 16px; margin: 0; flex-wrap: wrap; }
+.homeSkelTile { width: 180px; height: 240px; }
+.homeSkelCard { width: 280px; height: 340px; }
+.homeSkelCardWide { width: 380px; height: 200px; }
+@keyframes homeSkelShimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .homeSkelHead, .homeSkelTile, .homeSkelCard, .homeSkelCardWide { animation: none; } }
 .kicker { display: block; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #C0671E; margin-bottom: 10px; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
 .h2 { font-family: 'Canela', serif; font-size: 38px; line-height: 1.15; color: #4A0B1D; margin: 0 0 12px; font-weight: 500; }
 .sub { font-size: 16px; line-height: 1.6; color: #5c4a4f; margin: 0; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }

@@ -8,7 +8,7 @@ import { QuantityDecrease, QuantityValue, QuantityIncrease } from "../components
 import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { ProductCard } from "../shop/Cards";
 import { faqsFor, PENDING_USE_SAFETY, PENDING_RETURNS, FOOTNOTE_PRICE } from "../shop/content";
-import { inr, imgSrc, shippingCopy, bundleContentLines, bundleThumbImage, productMaxQty, getProduct, getBundle, variantInStock, productInStock, productLine } from "../shop/shopUtils";
+import { inr, imgSrc, shippingCopy, bundleContentLines, bundleThumbImage, productMaxQty, productMaxQtyAny, getProduct, getBundle, variantInStock, productInStock, productLine } from "../shop/shopUtils";
 import BundleQuickView from "../shop/BundleQuickView";
 import { RETURNS_POLICY_LIVE } from "../shop/storeFlags";
 import { viewItem, selectItem, addToCartEvent } from "../utils/analytics";
@@ -87,7 +87,8 @@ function ProductDetailInner({ slug }) {
   const inCart = cartItems.find((i) => i.productId === lineId);
   const inStock = product ? (variant ? variantInStock(catalog, product.slug, variant.key) : productInStock(catalog, product)) : false;
   // Quantity can never exceed what is actually in stock (minus what this line already has in the cart)
-  const maxQty = product && variant ? Math.max(0, productMaxQty(catalog, product.slug, variant.key) - (inCart?.quantity || 0)) : 20;
+  // No option chosen yet -> cap at the best stock any option has (never an unlimited 20)
+  const maxQty = !product ? 20 : variant ? Math.max(0, productMaxQty(catalog, product.slug, variant.key) - (inCart?.quantity || 0)) : productMaxQtyAny(catalog, product, cartItems);
   const qtyEff = Math.max(1, Math.min(qty, maxQty || 1));
   const atStockLimit = !!variant && inStock && maxQty < 20 && qtyEff >= maxQty;
   const gallery = product ? [product.image, ...(product.gallery || [])].filter(Boolean) : [];
@@ -655,7 +656,7 @@ function ProductDetailInner({ slug }) {
           <div className={styles.ritualGrid}>
             {[
               {
-                src: "/Daily%20Practices/Daily%20Puja.png",
+                src: "/Daily%20Practices/Daily%20Puja.webp",
                 alt: "Daily puja ritual with soft lamp light",
                 caption: "Morning offering",
                 note: "A calm start to the day",
@@ -667,7 +668,7 @@ function ProductDetailInner({ slug }) {
                 note: "Let the smoke settle the mind",
               },
               {
-                src: "/Daily%20Practices/Aarti.png",
+                src: "/Daily%20Practices/Aarti.webp",
                 alt: "Aarti flame during devotion",
                 caption: "Evening aarti",
                 note: "Warm light for evening prayer",

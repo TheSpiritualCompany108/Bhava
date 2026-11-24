@@ -51,7 +51,7 @@ function FlipCard({ card, width, onAddToCart }) {
   };
 
   // Construct full image URL
-  const imageUrl = card.imageUrl ? (card.imageUrl.startsWith('http') ? card.imageUrl : `${API_BASE}${card.imageUrl}`) : "./Products/Home Page Incense.png";
+  const imageUrl = card.imageUrl ? (card.imageUrl.startsWith('http') ? card.imageUrl : `${API_BASE}${card.imageUrl}`) : "./Products/Home Page Incense.webp";
 
   return (
     <div
@@ -68,7 +68,7 @@ function FlipCard({ card, width, onAddToCart }) {
       >
         {/* BACK — image face (default) */}
         <div className={styles.cardBack}>
-          <img
+          <img loading="lazy" decoding="async"
             src={imageUrl}
             alt={card.title}
             className={styles.cardBackImg}

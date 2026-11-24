@@ -85,8 +85,8 @@ function AppPage() {
 
         {/* ── Right: phone mockups ── */}
         <div className={styles.visual}>
-          <img
-            src="/App mockups.png"
+          <img loading="lazy" decoding="async"
+            src="/App mockups.webp"
             alt="Bhava: App Mockup"
             className={styles.mockupImg}
           />

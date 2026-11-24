@@ -31,7 +31,32 @@ function Head({ kicker, title, sub }) {
 
 export default function HomeShop() {
   const { catalog } = useCatalog();
-  if (!catalog) return null; // never block the rest of the homepage
+  // Never block the rest of the homepage — but hold the space (shimmering placeholders) so nothing below jumps when the shop data arrives.
+  if (!catalog) {
+    return (
+      <div aria-busy="true" aria-label="Loading shop">
+        {/* Same section shells (colours + heights) as the real first three sections, so nothing moves when the data arrives. */}
+        <section className={`${s.sec} ${s.secAlt} ${s.skelA}`}>
+          <div className={s.wrap}>
+            <div className={s.homeSkelHead} />
+            <div className={s.homeSkelRow}>{[0, 1, 2, 3, 4].map((i) => <div key={i} className={s.homeSkelTile} />)}</div>
+          </div>
+        </section>
+        <section className={`${s.sec} ${s.skelB}`}>
+          <div className={s.wrap}>
+            <div className={s.homeSkelHead} />
+            <div className={s.homeSkelRow}>{[0, 1, 2].map((i) => <div key={i} className={s.homeSkelCardWide} />)}</div>
+          </div>
+        </section>
+        <section className={`${s.sec} ${s.secWhite} ${s.skelC}`}>
+          <div className={s.wrap}>
+            <div className={s.homeSkelHead} />
+            <div className={s.homeSkelRow}>{[0, 1, 2, 3].map((i) => <div key={i} className={s.homeSkelCard} />)}</div>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   const starters = [
     "sacred-notes-discovery",
