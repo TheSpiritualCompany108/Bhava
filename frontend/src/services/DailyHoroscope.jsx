@@ -5,6 +5,33 @@ import styles from "./DailyHoroscope.module.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+// Downloads a repeating 6:00 AM calendar event, so the reminder really exists on the user's phone/calendar.
+function downloadDailyReminder() {
+  const pad = (n) => String(n).padStart(2, "0");
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  const day = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+  const ics = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Bhava//Daily Reminder//EN", "BEGIN:VEVENT",
+    `UID:bhava-daily-practice-${day}@bhavaglobal.com`,
+    `DTSTAMP:${day}T000000Z`,
+    `DTSTART:${day}T060000`, `DTEND:${day}T061500`,
+    "RRULE:FREQ=DAILY",
+    "SUMMARY:Bhava: daily practice",
+    "DESCRIPTION:Time for your daily sadhana. Open https://www.bhavaglobal.com/knowledge",
+    "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:Bhava: daily practice", "END:VALARM",
+    "END:VEVENT", "END:VCALENDAR",
+  ].join("\r\n");
+  const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "bhava-daily-practice.ics";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 const ZODIAC_SIGNS = [
   { key: "aries", name: "Aries", symbol: "♈" },
   { key: "taurus", name: "Taurus", symbol: "♉" },
@@ -372,12 +399,13 @@ function DailyHoroscope() {
                   type="button"
                   className={styles.reminderLink}
                   onClick={() => {
+                    downloadDailyReminder();
                     setReminderSet(true);
                     setTimeout(() => setReminderSet(false), 3500);
                   }}
                 >
                   <span className="material-symbols-outlined">{reminderSet ? "check_circle" : "notifications"}</span>
-                  {reminderSet ? "Reminder Set for Tomorrow!" : "Set Daily Reminder"}
+                  {reminderSet ? "Added to your calendar (6:00 AM daily)" : "Set Daily Reminder"}
                 </button>
               </div>
             </div>

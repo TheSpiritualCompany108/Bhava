@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./CommunityPage.module.css";
 
@@ -156,6 +157,23 @@ function CommunityPage() {
   const discussionsRef = useRef(null);
   const joinRef = useRef(null);
   const emailRef = useRef(null);
+  const navigate = useNavigate();
+  const [joinError, setJoinError] = useState("");
+
+  // No sign-up/RSVP backend exists yet, so both actions hand the visitor to the contact form (pre-filled),
+  // where the request reaches the team. Previously these buttons had no handler at all.
+  const handleJoin = (e) => {
+    e.preventDefault();
+    const email = emailRef.current?.value.trim() || "";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      setJoinError("Please enter a valid email address.");
+      emailRef.current?.focus();
+      return;
+    }
+    setJoinError("");
+    navigate(`/contact?subject=${encodeURIComponent("Join the Bhava: community")}&email=${encodeURIComponent(email)}`);
+  };
+  const handleRsvp = (title) => navigate(`/contact?subject=${encodeURIComponent(`RSVP - ${title}`)}`);
 
   const scrollTo = (ref, focus) => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -282,7 +300,7 @@ function CommunityPage() {
                   </div>
                   <h3 className={styles.eventTitle}>{e.title}</h3>
                   <p className={styles.eventDesc}>{e.desc}</p>
-                  <button className={styles.rsvpBtn}>RSVP Free</button>
+                  <button type="button" className={styles.rsvpBtn} onClick={() => handleRsvp(e.title)}>RSVP Free</button>
                 </div>
               </div>
             ))}
@@ -299,15 +317,19 @@ function CommunityPage() {
             Join 50,000+ seekers from 120+ countries. Membership is free —
             your first satsang awaits.
           </p>
-          <div className={styles.ctaInputRow}>
+          <form className={styles.ctaInputRow} onSubmit={handleJoin} noValidate>
             <input
               ref={emailRef}
               type="email"
               placeholder="Enter your email address"
+              aria-label="Email address"
+              aria-invalid={!!joinError}
               className={styles.ctaInput}
+              onChange={() => joinError && setJoinError("")}
             />
-            <button className={styles.ctaJoinBtn}>Join Free</button>
-          </div>
+            <button type="submit" className={styles.ctaJoinBtn}>Join Free</button>
+          </form>
+          {joinError && <p role="alert" style={{ color: "#ffd9d9", margin: "8px 0 0", fontSize: 14 }}>{joinError}</p>}
           <p className={styles.ctaNote}>No spam · Leave anytime · Instant access</p>
         </div>
       </div>

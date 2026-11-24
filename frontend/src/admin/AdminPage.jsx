@@ -14,6 +14,32 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const resolveImageUrl = (url) => (!url ? "" : url.startsWith("http") ? url : API_BASE + url);
 
 // Resilient thumbnail component with auto-resetting error state
+// Shows the real pixel size of an uploaded/selected banner image, and whether it matches the recommended size's shape.
+function ImageSizeInfo({ src, recommended }) {
+  const [dims, setDims] = useState(null);
+  useEffect(() => {
+    if (!src) return undefined;
+    let alive = true;
+    const img = new Image();
+    img.onload = () => { if (alive) setDims([img.naturalWidth, img.naturalHeight]); };
+    img.onerror = () => { if (alive) setDims(null); };
+    img.src = src;
+    return () => { alive = false; };
+  }, [src]);
+  if (!src || !dims) return null;
+  const [w, h] = dims;
+  const [rw, rh] = recommended;
+  const shapeOk = Math.abs(w / h - rw / rh) / (rw / rh) <= 0.03;
+  return (
+    <p style={{ margin: "6px 0 0", fontSize: 12, color: "#6f6064" }}>
+      Original size of this image: <strong style={{ color: "#4A0B1D" }}>{w} × {h} px</strong>{" "}
+      {shapeOk
+        ? <span style={{ color: "#1e7a3a", fontWeight: 600 }}>✓ matches the recommended shape</span>
+        : <span style={{ color: "#c0671e", fontWeight: 600 }}>⚠ different shape from {rw} × {rh} px — it will be cropped to fit</span>}
+    </p>
+  );
+}
+
 function CardThumbnail({ src, alt }) {
   const [hasError, setHasError] = useState(false);
 
@@ -1424,8 +1450,12 @@ export default function AdminPage() {
                                 ● New image selected (Save Changes to publish)
                               </p>
                             )}
+                            <ImageSizeInfo src={displayImg} recommended={[1897, 620]} />
                           </div>
 
+                          <p style={{ margin: "0 0 8px", fontSize: 12, color: "#6f6064" }}>
+                            🖥️ <strong style={{ color: "#4A0B1D" }}>Desktop banner — recommended size: 1897 × 620 px</strong>
+                          </p>
                           <label style={{ padding: "8px 14px", background: "#4A0B1D", color: "#fff", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}>
                             📸 {displayImg ? "Replace Image" : "Upload Image"}
                             <input
@@ -1436,7 +1466,7 @@ export default function AdminPage() {
                             />
                           </label>
 
-                          {isHeroBanner && (() => {
+                          {(() => {
                             const mobileKey = `${s.id}__mobile`;
                             const mobilePreview = homepageImagePreviews[mobileKey];
                             const mobileImg = mobilePreview || (s.mobileImage ? resolveImageUrl(s.mobileImage) : "");
@@ -1444,12 +1474,12 @@ export default function AdminPage() {
                               <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px dashed #E0D0C0" }}>
                                 <strong style={{ color: "#4A0B1D", fontSize: 13 }}>📱 Mobile banner (optional)</strong>
                                 <p style={{ margin: "4px 0 10px", fontSize: 12, color: "#6f6064" }}>
-                                  Phones (screens up to 768px wide) show this image instead of the desktop one. Best size: 1080 × 1350 px (4:5 portrait). If you skip it, phones show the desktop banner above.
+                                  Phones (screens up to 768px wide) show this image instead of the desktop one. <strong style={{ color: "#4A0B1D" }}>Recommended size: 375 × 400 px</strong> (use 750 × 800 px for a sharper image on retina phones — same shape). If you skip it, phones show the desktop banner above.
                                 </p>
                                 <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
                                   <div style={{ width: 120, flex: "0 0 auto", border: "1px dashed #E0D0C0", borderRadius: 8, padding: 4, background: "#fff", textAlign: "center" }}>
                                     {mobileImg ? (
-                                      <img src={mobileImg} alt={`Slide ${idx + 1} mobile`} style={{ width: "100%", aspectRatio: "4 / 5", objectFit: "cover", borderRadius: 5, display: "block" }} />
+                                      <img src={mobileImg} alt={`Slide ${idx + 1} mobile`} style={{ width: "100%", aspectRatio: "375 / 400", objectFit: "cover", borderRadius: 5, display: "block" }} />
                                     ) : (
                                       <p style={{ margin: "34px 0", fontSize: 11, color: "#8a7a7e" }}>No mobile image</p>
                                     )}
@@ -1467,6 +1497,7 @@ export default function AdminPage() {
                                     {mobilePreview && (
                                       <span style={{ fontSize: 12, color: "#E07B39", fontWeight: 600 }}>● New image selected (Save Changes to publish)</span>
                                     )}
+                                    <ImageSizeInfo src={mobileImg} recommended={[375, 400]} />
                                     {mobileImg && (
                                       <button
                                         type="button"

@@ -105,7 +105,7 @@
 /* Mobile: the banner is short, so arrows + dots sit in a row below it instead of covering its text */
 @media (max-width: 768px) {
   .stage { max-height: none; }
-  .stagePortrait { aspect-ratio: 4 / 5; }
+  .stagePortrait { aspect-ratio: 375 / 400; } /* matches the 375 × 400 mobile banner size shown in Admin */
   .stage:not(.stagePortrait) .bannerImg {
     object-fit: contain;
     background: #F4EFE6;
@@ -116,4 +116,6 @@
   .slideDots { position: static; transform: none; background: none; padding: 0; gap: 7px; }
   .dot, .dotActive { width: 7px; height: 7px; }
   .dotActive { width: 20px; }
+  .slideDots { gap: 12px; }
+  .dot::after, .dotActive::after { inset: -18px -5px; } /* ~44px tap height */
 }

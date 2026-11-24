@@ -51,6 +51,11 @@
   overflow: hidden;
 }
 
+/* Desktop full-width banners: cap the height so a wide photo doesn't fill the whole screen (centre is kept, edges crop) */
+@media (min-width: 769px) {
+  .img_full_width .bannerImg { max-height: 520px; object-position: center; }
+}
+
 .img_contained {
   max-width: 960px;
   margin: 0 auto;
@@ -61,8 +66,16 @@
 
 .img_2_col {
   width: 100%;
+  height: 100%;
   border-radius: 10px;
   overflow: hidden;
+}
+/* two "2-Column Grid" banners side by side (an odd last one takes half the row) */
+.twoColRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
 }
 
 /* ── Shared typography ──────────────────────────────────────────────────── */

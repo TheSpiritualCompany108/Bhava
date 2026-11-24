@@ -37,7 +37,7 @@ function upsertJsonLd(id, data) {
   el.textContent = JSON.stringify(data);
 }
 
-export default function Seo({ title, description, canonical, image, jsonLd, type = "website" }) {
+export default function Seo({ title, description, canonical, image, jsonLd, type = "website", noindex = false }) {
   const json = jsonLd ? JSON.stringify(jsonLd) : "";
   useEffect(() => {
     const prev = document.title;
@@ -54,14 +54,22 @@ export default function Seo({ title, description, canonical, image, jsonLd, type
     upsertMeta("name", "twitter:image", image);
     upsertLink("canonical", canonical);
     upsertJsonLd("bhava-jsonld", json ? JSON.parse(json) : null);
+    // The app is a SPA, so unknown URLs answer HTTP 200; noindex stops them being indexed as soft-404s.
+    if (noindex) upsertMeta("name", "robots", "noindex, follow");
     return () => {
       document.title = prev;
+      if (noindex) document.head.querySelector('meta[name="robots"]')?.remove();
     };
-  }, [title, description, canonical, image, json, type]);
+  }, [title, description, canonical, image, json, type, noindex]);
   return null;
 }
 
-export const siteOrigin = () => (typeof window !== "undefined" ? window.location.origin : "https://bhavaglobal.com");
+// One canonical host everywhere (matches robots.txt, sitemap and the JSON-LD in index.html); falls back to the current origin on localhost.
+export const siteOrigin = () => {
+  const fixed = import.meta.env.VITE_SITE_URL;
+  if (fixed) return String(fixed).replace(/\/+$/, "");
+  return typeof window !== "undefined" ? window.location.origin : "https://www.bhavaglobal.com";
+};
 
 export function clipDesc(text, fallback) {
   const raw = String(text || fallback || "").replace(/\s+/g, " ").trim();

@@ -9,6 +9,7 @@ import {
   putAddresses,
   deleteAddress,
 } from "../controllers/authController.js";
+import { forgotPassword, verifyResetOtp, resetPassword } from "../controllers/passwordResetController.js";
 import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -16,6 +17,9 @@ const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/google", googleLogin);
+router.post("/forgot-password", forgotPassword);
+router.post("/verify-reset-otp", verifyResetOtp);
+router.post("/reset-password", resetPassword);
 router.get("/me", protect, getMe);
 router.patch("/me", protect, updateMe);
 router.get("/addresses", protect, getAddresses);

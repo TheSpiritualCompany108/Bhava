@@ -19,10 +19,10 @@ const categories = [
     title: "Orders & Shipping",
     desc: "Track your orders, understand delivery timelines and shipping policies",
     faqs: [
-      { q: "How fast is delivery across India?", a: "Within India, standard delivery takes 3–5 business days. Express delivery in metro cities typically arrives within 1–2 business days." },
-      { q: "What are your shipping charges?", a: "We offer FREE standard delivery on all prepaid and COD orders above ₹501. For orders below ₹501, a nominal shipping fee of ₹50 applies." },
-      { q: "How can I track my order?", a: "Once dispatched, you will receive a tracking link via email and SMS. You can also view real-time status in your Account under 'My Orders'." },
-      { q: "What is your return and refund policy?", a: "We offer a hassle-free 7-day return policy on non-consumable items (like sacred bead bracelets and brass burners). For incense and camphor, we replace any item damaged in transit immediately." },
+      { q: "How fast is delivery across India?", a: "Delivery time depends on your location and the courier partner, so we do not promise a fixed date. We currently deliver within India, and you can follow your order status any time from My Orders after signing in." },
+      { q: "What are your shipping charges?", a: "Orders of ₹501 and above ship free. Below ₹501 a flat ₹50 shipping charge applies, shown in your cart and again at checkout." },
+      { q: "How can I track my order?", a: "Sign in and open My Orders to see the current status of every order you have placed." },
+      { q: "What is your return and refund policy?", a: "If an item arrives damaged, defective or different from what you ordered, email us with your order details and photographs and we will arrange a replacement or refund. Opened or used incense and camphor cannot be returned unless they arrived damaged. Please read our Returns & Refund Policy for details." },
     ],
   },
   {
@@ -30,8 +30,8 @@ const categories = [
     title: "Payments & Pricing",
     desc: "Everything about payment options, Cash on Delivery and security",
     faqs: [
-      { q: "What payment methods do you accept?", a: "We accept all major UPI apps (Google Pay, PhonePe, Paytm), credit/debit cards (Visa, MasterCard, RuPay), Net Banking, and Cash on Delivery (COD) across serviceable Indian pincodes." },
-      { q: "Is Cash on Delivery (COD) available?", a: "Yes, Cash on Delivery is supported on most domestic orders. You can select Cash on Delivery at checkout." },
+      { q: "What payment methods do you accept?", a: "Right now orders are paid by Cash on Delivery (COD). Online payment (UPI, cards, net banking) is not available yet." },
+      { q: "Is Cash on Delivery (COD) available?", a: "Yes. Cash on Delivery is the payment option at checkout for orders delivered within India." },
       { q: "How do your prices compare to retail stores?", a: "Because we work directly with traditional artisans and craft cooperatives, our prices reflect authentic quality without excessive middleman markups." },
     ],
   },

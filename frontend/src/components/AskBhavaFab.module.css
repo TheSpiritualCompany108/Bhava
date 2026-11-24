@@ -167,3 +167,8 @@
 
 /* Chat panel open: the panel owns the bottom-right corner (its Send button sits exactly there) */
 :global(body[data-guru-chat]) .fab { opacity: 0; visibility: hidden; pointer-events: none; transform: scale(0.8); }
+
+/* Product page (mobile): sit above the sticky "View Cart" bar instead of covering its right end */
+@media (max-width: 860px) {
+  :global(body):has([aria-label="Quick add to cart"]) .fab { bottom: 92px; }
+}

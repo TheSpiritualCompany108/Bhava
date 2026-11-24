@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import QuickView from "./QuickView";
 import BundleQuickView from "./BundleQuickView";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,6 +11,73 @@ import ResponsiveImg from "../components/ResponsiveImg";
 
 const FRAG_ORDER = ["guggal", "oud", "sandalwood"];
 
+// ── Myntra-style hover slideshow for card images ──
+// Mouse hover only: after a short pause the card slides through its gallery, leaving resets to the first image.
+// Touch devices and reduced-motion users keep the static first image.
+const SLIDE_FIRST_MS = 350;
+const SLIDE_EVERY_MS = 1300;
+const MAX_SLIDES = 6;
+
+const cardImages = (main, gallery) => [...new Set([main, ...(gallery || [])].filter(Boolean))].slice(0, MAX_SLIDES);
+
+function useHoverSlides(count) {
+  const [idx, setIdx] = useState(0);
+  const [armed, setArmed] = useState(false); // other slides are only mounted (and loaded) after the first hover
+  const timers = useRef({ first: 0, loop: 0 });
+  const stop = () => {
+    clearTimeout(timers.current.first);
+    clearInterval(timers.current.loop);
+  };
+  useEffect(() => stop, []);
+  const start = (e) => {
+    if (count < 2 || e.pointerType !== "mouse") return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    stop();
+    setArmed(true);
+    timers.current.first = setTimeout(() => {
+      setIdx(1);
+      // idx may reach `count`: that is a clone of the first image, so the loop keeps sliding forward (see SlideTrack)
+      timers.current.loop = setInterval(() => setIdx((i) => (i >= count ? 1 : i + 1)), SLIDE_EVERY_MS);
+    }, SLIDE_FIRST_MS);
+  };
+  const end = () => {
+    stop();
+    setIdx(0);
+  };
+  return { idx, setIdx, armed, bind: { onPointerEnter: start, onPointerLeave: end } };
+}
+
+function SlideTrack({ images, idx, setIdx, armed, alt, width, height, sizes }) {
+  const [snap, setSnap] = useState(false); // true = jump without animation
+  const shown = armed ? [...images, images[0]] : images.slice(0, 1); // trailing clone of the first image = seamless loop
+  const onEnd = (e) => {
+    if (e.target !== e.currentTarget || idx < images.length) return;
+    setSnap(true);
+    setIdx(0);
+    requestAnimationFrame(() => requestAnimationFrame(() => setSnap(false)));
+  };
+  return (
+    <>
+      <div
+        className={styles.slideTrack}
+        style={{ transform: `translateX(-${idx * 100}%)`, transition: snap ? "none" : undefined }}
+        onTransitionEnd={onEnd}
+      >
+        {shown.map((src, i) => (
+          <div className={styles.slide} key={i}>
+            <ResponsiveImg src={src} alt={i === 0 ? alt : ""} loading={i === 0 ? "lazy" : "eager"} width={width} height={height} sizes={sizes} />
+          </div>
+        ))}
+      </div>
+      {images.length > 1 && (
+        <div className={styles.slideDots} aria-hidden="true">
+          {images.map((src, i) => <span key={src} className={`${styles.slideDot} ${i === idx % images.length ? styles.slideDotOn : ""}`} />)}
+        </div>
+      )}
+    </>
+  );
+}
+
 export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
   const { addToCart, cartItems } = useCart();
   const navigate = useNavigate();
@@ -20,6 +87,8 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
   const multiFrag = p.mode === "single" || p.mode === "camphor";
   const offered = FRAG_ORDER.filter((f) => p.variants.some((v) => v.fragrances.includes(f)));
   const showFrags = !dense && p.mode !== "none";
+  const images = cardImages(p.image, p.gallery);
+  const slides = useHoverSlides(images.length);
 
   const singleLineId = single ? `product:${p.slug}:${p.variants[0].key}` : null;
   const inCartLine = singleLineId ? cartItems.find((i) => i.productId === singleLineId) : null;
@@ -40,13 +109,15 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
   };
 
   return (
-    <article className={`${styles.card} ${dense ? styles.cardDense : ""} ${inStock ? "" : styles.cardDim}`}>
+    <article className={`${styles.card} ${dense ? styles.cardDense : ""} ${inStock ? "" : styles.cardDim}`} {...slides.bind}>
       <div className={styles.cardImg}>
         <Link to={`/product/${p.slug}`} tabIndex={-1} aria-hidden="true" className={styles.imgLink}>
-          <ResponsiveImg
-            src={p.image}
+          <SlideTrack
+            images={images}
+            idx={slides.idx}
+            setIdx={slides.setIdx}
+            armed={slides.armed}
             alt={p.name}
-            loading="lazy"
             width={640}
             height={640}
             sizes="(max-width: 480px) 50vw, (max-width: 900px) 33vw, 280px"
@@ -109,6 +180,8 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
 export function BundleCard({ bundle: b, catalog }) {
   const inStock = bundleInStock(catalog, b.slug);
   const thumb = bundleThumbImage(catalog, b);
+  const images = cardImages(thumb, b.gallery);
+  const slides = useHoverSlides(images.length);
   const [quickOpen, setQuickOpen] = useState(false);
   // "Choose & add" opens the popup; the rest of the card still opens the collection page
   const onCardClick = (e) => {
@@ -119,12 +192,14 @@ export function BundleCard({ bundle: b, catalog }) {
   };
   return (
     <>
-    <Link to={`/collection/${b.slug}`} onClick={onCardClick} className={`${styles.bundleCard} ${inStock ? "" : styles.cardDim}`}>
+    <Link to={`/collection/${b.slug}`} onClick={onCardClick} className={`${styles.bundleCard} ${inStock ? "" : styles.cardDim}`} {...slides.bind}>
       <div className={styles.bundleImg}>
-        <ResponsiveImg
-          src={thumb}
+        <SlideTrack
+          images={images}
+          idx={slides.idx}
+          setIdx={slides.setIdx}
+          armed={slides.armed}
           alt={b.name}
-          loading="lazy"
           width={640}
           height={480}
           sizes="(max-width: 600px) 90vw, 320px"

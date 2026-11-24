@@ -134,6 +134,8 @@ function TigerEye108() {
       description: "Authentic 108-bead Tiger Eye mala, hand-knotted with red thread. Each bead is 8mm, natural stone. Comes with a ritual activation guide and silk pouch.",
       benefit: "For the seeker who commits to daily japa and sadhana.",
       price: "Sacred Investment",
+      to: `/contact?subject=${encodeURIComponent("Tiger Eye Mala - 108 Beads")}`,
+      cta: "Enquire Now",
     },
     {
       name: "Tiger Eye Bracelet — 27 Beads",
@@ -141,6 +143,8 @@ function TigerEye108() {
       description: "27-bead Tiger Eye bracelet (27 × 4 = 108). Wearable throughout the day as a constant reminder of your sankalpa and dharmic intention.",
       benefit: "For the modern devotee — office, travel, everywhere.",
       price: "Daily Anchor",
+      to: "/product/tiger-eye-bracelet",
+      cta: "Explore This Tool",
     },
     {
       name: "108 Ritual Starter Kit",
@@ -148,6 +152,8 @@ function TigerEye108() {
       description: "Includes: Tiger Eye pocket stone, 108-page guided sadhana journal, incense set (108 sticks), ritual activation card, and The Spiritual Company seal.",
       benefit: "For the seeker beginning the path of structured devotion.",
       price: "Complete System",
+      to: `/contact?subject=${encodeURIComponent("108 Ritual Starter Kit")}`,
+      cta: "Enquire Now",
     },
   ];
 
@@ -434,7 +440,7 @@ function TigerEye108() {
                   <h3 className={styles.productName}>{product.name}</h3>
                   <p className={styles.productDesc}>{product.description}</p>
                   <p className={styles.productBenefit}>{product.benefit}</p>
-                  <button className={styles.productBtn}>Explore This Tool</button>
+                  <button type="button" className={styles.productBtn} onClick={() => navigate(product.to)}>{product.cta}</button>
                 </div>
               </div>
             ))}

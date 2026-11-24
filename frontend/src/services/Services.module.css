@@ -140,8 +140,8 @@
 }
 
 .sliderDot {
-  width: 14px;
-  height: 14px;
+  width: 32px; /* tap target; the visible dot is the 7px ::after */
+  height: 32px;
   padding: 0;
   border: none;
   border-radius: 50%;

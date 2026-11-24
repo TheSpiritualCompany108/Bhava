@@ -19,6 +19,10 @@ export const POLICIES = {
         ],
       },
       {
+        h: "Payment",
+        p: ["Orders are currently paid by Cash on Delivery (COD) when the parcel is delivered. Online payment is not available yet; we will update this page when it is."],
+      },
+      {
         h: "Where we deliver",
         p: ["We currently deliver to addresses in India. Please enter a complete address and a valid 6-digit pincode at checkout so the order can reach you without delay."],
       },

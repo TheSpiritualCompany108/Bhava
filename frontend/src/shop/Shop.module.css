@@ -26,6 +26,19 @@
 .cardLink { color: inherit; text-decoration: none; display: flex; flex-direction: column; flex: 1; }
 .cardImg { aspect-ratio: 1 / 1; background: #f5f0e6; overflow: hidden; position: relative; flex-shrink: 0; }
 .cardImg picture { display: block; width: 100%; height: 100%; }
+/* hover slideshow: a sliding track of images + dots (Myntra style) */
+.slideTrack { display: flex; width: 100%; height: 100%; transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+.slide { flex: 0 0 100%; width: 100%; height: 100%; overflow: hidden; }
+.slideDots {
+  position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 5px;
+  opacity: 0; transition: opacity 0.25s ease; pointer-events: none;
+}
+.slideDot { width: 6px; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.65); box-shadow: 0 0 0 1px rgba(74, 11, 29, 0.18); transition: width 0.3s ease, background 0.3s ease; }
+.slideDotOn { width: 16px; background: #E07B39; }
+@media (hover: hover) {
+  .card:hover .slideDots, .bundleCard:hover .slideDots { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .slideTrack { transition: none; } }
 .cardImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cardBody { padding: 14px 14px 4px; display: flex; flex-direction: column; flex: 1; gap: 2px; }
 .cardDense .cardBody { padding: 12px 14px 4px; gap: 2px; }
@@ -260,7 +273,7 @@
 .fragGo { font-weight: 700; font-size: 14px; color: #E07B39; }
 .bundleCard { background: #fff; border-radius: 16px; padding: 0 0 18px; border: 1px solid rgba(74, 11, 29, 0.08); display: flex; flex-direction: column; gap: 6px; transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; color: inherit; min-width: 0; overflow: hidden; }
 .bundleCard:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(74, 11, 29, 0.1); }
-.bundleImg { aspect-ratio: 4 / 3; background: #f5f0e6; overflow: hidden; }
+.bundleImg { aspect-ratio: 4 / 3; background: #f5f0e6; overflow: hidden; position: relative; }
 .bundleImg picture { display: block; width: 100%; height: 100%; }
 .bundleImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .bundleCard .cardType,

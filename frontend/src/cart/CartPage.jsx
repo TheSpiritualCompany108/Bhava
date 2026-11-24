@@ -372,7 +372,7 @@ export default function CartPage() {
               const sv = data?.lines?.[idx];
               const blocked = sv && !sv.ok;
               // quantity options stop at real stock (server-computed), never above the per-line cap
-              const lineMax = !sv ? MAX_LINE_QTY : sv.ok ? Math.min(MAX_LINE_QTY, Math.max(10, sv.maxQty ?? MAX_LINE_QTY)) : sv.available ?? 0;
+              const lineMax = !sv ? MAX_LINE_QTY : sv.ok ? Math.min(MAX_LINE_QTY, sv.maxQty ?? MAX_LINE_QTY) : sv.available ?? 0;
               const unit = sv?.unitPrice ?? item.priceNum;
               return (
                 <article key={item.productId} className={`${x.item} ${blocked ? x.itemBad : ""}`}>
@@ -432,7 +432,7 @@ export default function CartPage() {
                         )}
                       </p>
                     )}
-                    {sv?.ok && item.quantity >= lineMax && lineMax < MAX_LINE_QTY && <p className={x.note}>Maximum available quantity.</p>}
+                    {sv?.ok && item.quantity >= lineMax && lineMax < MAX_LINE_QTY && <p className={x.note}>Only {lineMax} in stock.</p>}
                   </div>
 
                   <button className={x.remove} onClick={() => removeFromCart(item.productId)} aria-label={`Remove ${item.title}`}>✕</button>

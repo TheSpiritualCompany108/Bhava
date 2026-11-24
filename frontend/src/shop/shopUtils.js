@@ -474,13 +474,8 @@ export function bundleThumbImage(_catalog, b) {
 
 
 // ── Quantity limits (real stock, capped at MAX_LINE_QTY) ──
-export const productMaxQty = (catalog, slug, variantKey) => {
-  const lim = catalog?.availability?.limits?.products?.[slug]?.[variantKey];
-  if (lim == null) return MAX_LINE_QTY;
-  // If the product is marked in stock, allow buying up to MAX_LINE_QTY so shoppers are never stuck at 1
-  if (lim <= 1 && variantInStock(catalog, slug, variantKey)) return MAX_LINE_QTY;
-  return lim > 0 ? lim : 0;
-};
+export const productMaxQty = (catalog, slug, variantKey) =>
+  catalog?.availability?.limits?.products?.[slug]?.[variantKey] ?? 0;
 
 // Bundle max = lowest limit among the selected options and fixed components
 export const bundleMaxQty = (catalog, slug, sel) => {

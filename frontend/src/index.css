@@ -12,7 +12,11 @@
 }
 
 /* ── Base ────────────────────────────────────────────────── */
+/* No sideways page drag / swipe-back animation on phones, and nothing may widen the page (clip keeps sticky working).
+   Vertical overscroll (pull-down at the top) is left at the browser default. */
+html, body { overscroll-behavior-x: none; overscroll-behavior-y: auto; }
 body {
+  overflow-x: clip;
   font-family: var(--font-secondary);
   background-color: #F4EFE6;
   color: #4A0B1D; /* brand maroon — replaces the browser's default black for any text without its own colour */
