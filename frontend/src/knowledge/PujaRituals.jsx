@@ -426,7 +426,7 @@ function PujaRituals() {
               Through puja, everyday moments become sacred acts of devotion.
             </p>
             <div className={styles.ctaButtons}>
-              <button className={styles.btnPrimary}>
+              <button className={styles.btnPrimary} onClick={() => navigate("/products")}>
                 Start Your Daily Puja
               </button>
               <button

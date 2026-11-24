@@ -303,6 +303,7 @@ function Footer() {
                   href={social.href}
                   className={styles.socialIcon}
                   title={social.name}
+                  aria-label={social.name}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

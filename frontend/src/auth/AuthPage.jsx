@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { clearSharedAddressCache } from "../account/addressBook";
 import Seo, { siteOrigin } from "../components/Seo";
+import ForgotPassword from "./ForgotPassword";
 import styles from "./AuthPage.module.css";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -13,14 +14,21 @@ function AuthPage() {
   // Where to go after auth (e.g. back to /cart when coming from checkout)
   const redirectTo = location.state?.from || "/";
   const googleBtnRef = useRef(null);
-  const [mode, setMode] = useState("login"); // "login" | "signup"
+  const [mode, setMode] = useState("login"); // "login" | "signup" | "forgot"
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");   // shown when redirected to signup / review
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [forgotMsg, setForgotMsg] = useState("");
+  const [toast, setToast] = useState(null); // { type: "success" | "error", message, id }
+  const notify = (type, message) => setToast({ type, message, id: Date.now() });
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const t = setTimeout(() => setToast(null), 4200);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   useEffect(() => {
     if (location.state?.info) setInfo(location.state.info);
@@ -223,6 +231,13 @@ function AuthPage() {
         description="Sign in or create your Bhava: account to track orders and save your sacred addresses."
         canonical={`${siteOrigin()}/auth`}
       />
+      {toast && (
+        <div key={toast.id} className={`${styles.toast} ${toast.type === "error" ? styles.toastError : styles.toastSuccess}`} role={toast.type === "error" ? "alert" : "status"}>
+          <span className="material-symbols-outlined" aria-hidden="true">{toast.type === "error" ? "error" : "check_circle"}</span>
+          <span>{toast.message}</span>
+          <button type="button" className={styles.toastClose} onClick={() => setToast(null)} aria-label="Dismiss">&#x2715;</button>
+        </div>
+      )}
       {/* Close button */}
       <button className={styles.closeBtn} onClick={() => navigate(-1)} aria-label="Close">
         &#x2715;
@@ -233,15 +248,35 @@ function AuthPage() {
         <img src="/bhava-icon.webp" alt="Bhava:" className={styles.logoMark} />
         <h2 className={styles.heading}>BHAVA:</h2>
 
-        <h1 className={styles.title}>
-          {mode === "login" ? "Swagatam" : "Create Account"}
-        </h1>
-        <p className={styles.subtitle}>
-          {mode === "login"
-            ? "We'll check if you have an account, and help create one if you don't."
-            : "Fill in the details below to begin your sacred journey."}
-        </p>
+        {mode !== "forgot" && (
+          <>
+            <h1 className={styles.title}>
+              {mode === "login" ? "Swagatam" : "Create Account"}
+            </h1>
+            <p className={styles.subtitle}>
+              {mode === "login"
+                ? "We'll check if you have an account, and help create one if you don't."
+                : "Fill in the details below to begin your sacred journey."}
+            </p>
+          </>
+        )}
 
+        {mode === "forgot" ? (
+          <ForgotPassword
+            initialEmail={formData.email}
+            notify={notify}
+            onBack={() => switchMode("login")}
+            onDone={(email, message) => {
+              setMode("login");
+              setError("");
+              setInfo("");
+              setSuccess(message);
+              notify("success", "Password reset successfully. Please sign in.");
+              setFormData((prev) => ({ ...prev, email, password: "", confirmPassword: "" }));
+            }}
+          />
+        ) : (
+        <>
         {/* Sign In / Sign Up toggle */}
         <div className={styles.tabRow} style={{ width: "100%" }}>
           <button
@@ -332,13 +367,7 @@ function AuthPage() {
             <div style={{ textAlign: "right", marginTop: -6, marginBottom: 12 }}>
               <button
                 type="button"
-                onClick={() => {
-                  if (formData.email) {
-                    setForgotMsg(`Password reset instructions sent to ${formData.email}. Please check your inbox.`);
-                  } else {
-                    setForgotMsg("Please enter your email above to receive password reset assistance.");
-                  }
-                }}
+                onClick={() => switchMode("forgot")}
                 style={{
                   background: "none",
                   border: "none",
@@ -352,12 +381,6 @@ function AuthPage() {
                 Forgot Password?
               </button>
             </div>
-          )}
-
-          {forgotMsg && (
-            <p role="status" style={{ margin: "0 0 14px", fontSize: 13, color: "#4A0B1D", background: "rgba(192, 103, 30, 0.12)", padding: "8px 12px", borderRadius: 6 }}>
-              {forgotMsg}
-            </p>
           )}
 
           {/* Confirm Password — signup only */}
@@ -430,9 +453,11 @@ function AuthPage() {
 
         <p className={styles.termsText}>
           By clicking on Continue, you accept our{" "}
-          <span className={styles.termsLink}>Terms of Service</span> and{" "}
-          <span className={styles.termsLink}>Privacy Policy</span>
+          <Link to="/terms" className={styles.termsLink}>Terms of Service</Link> and{" "}
+          <Link to="/privacy-policy" className={styles.termsLink}>Privacy Policy</Link>
         </p>
+        </>
+        )}
       </div>
     </div>
   );

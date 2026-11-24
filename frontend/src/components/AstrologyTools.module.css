@@ -359,3 +359,11 @@
 .cardTitle, .cardDescription { max-width: none; padding: 0 20px; }
 .cardDescription { margin-bottom: 10px; flex: 1; }
 .cardLink { margin: 0 20px 12px; align-self: flex-start; }
+
+/* Tools that are not built yet: visible but clearly not clickable */
+.cardLinkSoon,
+.cardLinkSoon:hover {
+  cursor: default;
+  opacity: 0.6;
+  pointer-events: none;
+}

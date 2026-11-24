@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useSyncExternalStore } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./Products.module.css";
 import shop from "../shop/Shop.module.css";
@@ -35,6 +35,14 @@ const DEFAULT_FILTERS = {
   category: true, collection: true, fragrance: true, format: true, price: true, intention: true, availability: true,
 };
 
+const MOBILE_QUERY = "(max-width: 768px)";
+const subscribeMobile = (cb) => {
+  const mq = window.matchMedia(MOBILE_QUERY);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
+const getIsMobile = () => window.matchMedia(MOBILE_QUERY).matches;
+
 export default function Products() {
   const { itemCount } = useCart();
   const navigate = useNavigate();
@@ -46,6 +54,8 @@ export default function Products() {
   const tab = tabs.some((t) => t.id === rawCategory) || rawCategory === "sambrani-camphor"
     ? (rawCategory || "all")
     : "all";
+  // Each category URL in the sitemap gets its own title/description/canonical instead of sharing the shop's.
+  const tabLabel = tab !== "all" ? tabs.find((t) => t.id === tab)?.label || "" : "";
   const [showMore, setShowMore] = useState(false);
   const format = FORMAT_FILTERS.some((f) => f.id === params.get("format")) ? params.get("format") : "";
   const allowedFragrances = fragranceFilterIds({ category: tab, format });
@@ -84,7 +94,7 @@ export default function Products() {
       ? bannerData.slides
           .map((s) => {
             const img = s?.image || bannerData?.items?.[s?.id]?.image || "";
-            return img ? { id: s.id || img, image: img } : null;
+            return img ? { id: s.id || img, image: img, mobileImage: s.mobileImage || "" } : null;
           })
           .filter(Boolean)
       : [];
@@ -94,15 +104,20 @@ export default function Products() {
     return [{ id: "default", image: "/Slide 02.png" }];
   }, [bannerData]);
   const [bannerIndex, setBannerIndex] = useState(0);
+  // Phones (≤768px) get the slide's separate mobile banner when the admin uploaded one.
+  const isMobile = useSyncExternalStore(subscribeMobile, getIsMobile, () => false);
   const bannerSrcs = useMemo(
     () =>
       bannerSlides.map((s) => {
+        if (isMobile && s.mobileImage) return resolveHomepageImageUrl(s.mobileImage);
         const raw = s.image || "/Slide 02.png";
         if (!raw || raw === "/Slide 02.png" || raw.startsWith("/Slide") || raw.startsWith("/Products")) return raw;
         return resolveHomepageImageUrl(raw);
       }),
-    [bannerSlides],
+    [bannerSlides, isMobile],
   );
+  // The phone artwork is 375 x 400, so the banner gets taller while such a slide is showing
+  const bannerPortrait = isMobile && !!bannerSlides[bannerIndex]?.mobileImage;
   const kicker = bannerData?.kicker || "The Spiritual Company";
   const title = bannerData?.title || "Shop Bhava:";
   const subtitle =
@@ -249,9 +264,11 @@ export default function Products() {
   return (
     <div className={styles.page}>
       <Seo
-        title="Shop incense, Sambrani, camphor and sacred beads | Bhava:"
-        description={clipDesc("Sacred Notes incense, Pure Ritual, Sacred Ember, Sambrani, camphor and five intention bracelets from Bhava: by The Spiritual Company.")}
-        canonical={`${siteOrigin()}/products`}
+        title={tabLabel ? `${tabLabel} | Shop Bhava: by The Spiritual Company` : "Shop incense, Sambrani, camphor and sacred beads | Bhava:"}
+        description={clipDesc(tabLabel
+          ? `Shop ${tabLabel.toLowerCase()} from Bhava: by The Spiritual Company — sacred ritual essentials crafted for daily practice.`
+          : "Sacred Notes incense, Pure Ritual, Sacred Ember, Sambrani, camphor and five intention bracelets from Bhava: by The Spiritual Company.")}
+        canonical={`${siteOrigin()}/products${tabLabel ? `?category=${tab}` : ""}`}
       />
       {toast && (
         <div className={styles.toast} role="status">
@@ -263,7 +280,7 @@ export default function Products() {
       )}
 
       <section className={styles.bannerSection}>
-        <div className={styles.bannerContainer} style={{ visibility: bannerLoaded ? "visible" : "hidden" }}>
+        <div className={`${styles.bannerContainer} ${bannerPortrait ? styles.bannerPortrait : ""}`} style={{ visibility: bannerLoaded ? "visible" : "hidden" }}>
           {bannerSrcs.map((src, i) => (
             <img
               key={bannerSlides[i]?.id || src}

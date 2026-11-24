@@ -63,6 +63,7 @@
 }
 
 .mainImageWrapper {
+  touch-action: pan-y pinch-zoom; /* horizontal swipes belong to the slider, not to the page */
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -74,6 +75,50 @@
   justify-content: center;
   border: 1px solid #ebe4d8;
 }
+
+/* gallery slider: slides sit side by side and the track slides on a transform */
+.mainTrack {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+.mainSlide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.galleryArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #4A0B1D;
+  box-shadow: 0 2px 10px rgba(74, 11, 29, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s;
+}
+.galleryArrowPrev { left: 12px; }
+.galleryArrowNext { right: 12px; }
+.mainImageWrapper:hover .galleryArrow,
+.mainImageWrapper:focus-within .galleryArrow { opacity: 1; }
+.galleryArrow:hover:not(:disabled) { background: #fff; transform: translateY(-50%) scale(1.08); }
+.galleryArrow:disabled { opacity: 0 !important; pointer-events: none; }
+@media (hover: none) {
+  .galleryArrow { display: none; } /* touch: swipe + dots */
+}
+@media (prefers-reduced-motion: reduce) { .mainTrack { transition: none; } }
 
 .mainImageWrapper picture {
   display: block;
@@ -123,16 +168,10 @@
   cursor: pointer;
   background: #f7f3ed;
   overflow: hidden;
-  opacity: 0.75;
   transition: all 0.2s;
 }
 
-.thumbnailBtn:hover {
-  opacity: 1;
-}
-
 .thumbnailActive {
-  opacity: 1;
   border-color: #E07B39;
   box-shadow: 0 2px 8px rgba(224, 123, 57, 0.3);
 }
@@ -147,13 +186,13 @@
   display: none;
   justify-content: center;
   align-items: center;
-  gap: 4px;
-  margin-top: 4px;
+  gap: 0;
+  margin-top: 2px;
 }
 
 .galleryDot {
-  width: 44px;
-  height: 44px;
+  width: 26px;
+  height: 32px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -992,8 +1031,7 @@
     border-radius: 14px;
   }
   .mainImageWrapper {
-    max-height: 55vw;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1 / 1; /* show the whole photo, not a cropped strip */
     border-radius: 12px;
   }
   .thumbnailRow {
@@ -1001,6 +1039,7 @@
   }
   .galleryDots {
     display: flex;
+    margin-top: -8px; /* the column gap (16px) already separates it from the image */
   }
   .actionsRow {
     flex-direction: column;
@@ -1289,7 +1328,8 @@
   /* page title is already the heading right below — keep the trail short: Home / Shop / Category */
   .breadcrumb > span:nth-last-child(2),
   .breadcrumbCurrent { display: none; }
-  .backRow { margin: 0 0 14px -4px; }
+  .backRow { margin: 0 0 6px -4px; }
+  .backRow > button { margin-bottom: 0; }
 }
 
 /* Mobile: smaller badge + category tag */

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Seo, { siteOrigin } from "../components/Seo";
+import Seo from "../components/Seo";
 import styles from "./NotFoundPage.module.css";
 
 export default function NotFoundPage() {
@@ -9,7 +9,7 @@ export default function NotFoundPage() {
       <Seo
         title="Page Not Found (404) | Bhava:"
         description="The sacred path you are looking for does not exist or may have moved."
-        canonical={`${siteOrigin()}/404`}
+        noindex
       />
       <div className={styles.box}>
         <span className={`material-symbols-outlined ${styles.lotus}`}>spa</span>

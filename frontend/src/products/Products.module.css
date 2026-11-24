@@ -93,6 +93,13 @@
   background: #f3ebe3;
 }
 
+/* phone banner (375 × 400) uploaded in Admin → Products Banner → Mobile banner */
+.bannerPortrait {
+  height: auto;
+  aspect-ratio: 375 / 400;
+  max-height: 85vh;
+}
+
 .bannerImg {
   position: absolute;
   inset: 0;

@@ -8,10 +8,10 @@ function SacredJourney() {
   return (
     <section className={styles.sacredJourneySection}>
       <div className={styles.sacredContent}>
-        <h1 className={styles.sacredTitle}>
+        <h2 className={styles.sacredTitle}>
           <span className={styles.titleBegin}>Begin Your </span>
           <span className={styles.titleSacred}>Sacred Journey</span>
-        </h1>
+        </h2>
 
         <p className={styles.sacredDescription}>
           Most days pass without pause. A simple ritual creates clarity.

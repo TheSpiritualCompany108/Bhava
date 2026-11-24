@@ -38,6 +38,10 @@ function ProductDetailInner({ slug }) {
   const [addedQty, setAddedQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const goToImg = (i, count) => {
+    setZoomed(false);
+    setActiveImg(Math.max(0, Math.min(count - 1, i)));
+  };
   const [bundleQuick, setBundleQuick] = useState(false);
   const [reviewSummary, setReviewSummary] = useState(null);
   const [stickyBuy, setStickyBuy] = useState(false);
@@ -222,28 +226,63 @@ function ProductDetailInner({ slug }) {
               onTouchEnd={(e) => {
                 const start = Number(e.currentTarget.dataset.x || 0);
                 const dx = e.changedTouches[0].clientX - start;
-                if (dx > 40) setActiveImg((i) => Math.max(0, i - 1));
-                if (dx < -40) setActiveImg((i) => Math.min(gallery.length - 1, i + 1));
+                if (dx > 40) goToImg(activeImg - 1, gallery.length);
+                if (dx < -40) goToImg(activeImg + 1, gallery.length);
               }}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowLeft") goToImg(activeImg - 1, gallery.length);
+                if (e.key === "ArrowRight") goToImg(activeImg + 1, gallery.length);
+              }}
+              tabIndex={gallery.length > 1 ? 0 : undefined}
               style={zoomed ? { cursor: "zoom-out" } : { cursor: "zoom-in" }}
-              role="img"
-              aria-label={`${product.name} product image`}
+              role="group"
+              aria-roledescription="carousel"
+              aria-label={`${product.name} product images`}
             >
-              <ResponsiveImg
-                src={gallery[Math.min(activeImg, gallery.length - 1)]}
-                alt={`${product.name}${product.pack ? ` – ${product.pack}` : ""}`}
-                className={styles.mainImage}
-                width={720}
-                height={720}
-                loading="eager"
-                sizes="(max-width: 600px) 55vw, (max-width: 900px) 80vw, 480px"
-                style={zoomed ? { transform: "scale(1.45)" } : undefined}
-              />
+              {/* sliding track: every gallery image is a slide, moved with a CSS transform */}
+              <div className={styles.mainTrack} style={{ transform: `translateX(-${Math.min(activeImg, gallery.length - 1) * 100}%)` }}>
+                {gallery.map((g, i) => (
+                  <div className={styles.mainSlide} key={g + i} aria-hidden={i !== Math.min(activeImg, gallery.length - 1)}>
+                    <ResponsiveImg
+                      src={g}
+                      alt={`${product.name}${product.pack ? ` – ${product.pack}` : ""}${gallery.length > 1 ? ` (${i + 1} of ${gallery.length})` : ""}`}
+                      className={styles.mainImage}
+                      width={720}
+                      height={720}
+                      loading={i === 0 ? "eager" : "lazy"}
+                      sizes="(max-width: 600px) 55vw, (max-width: 900px) 80vw, 480px"
+                      style={zoomed && i === activeImg ? { transform: "scale(1.45)" } : undefined}
+                    />
+                  </div>
+                ))}
+              </div>
+              {gallery.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    className={`${styles.galleryArrow} ${styles.galleryArrowPrev}`}
+                    aria-label="Previous image"
+                    disabled={activeImg <= 0}
+                    onClick={(e) => { e.stopPropagation(); goToImg(activeImg - 1, gallery.length); }}
+                  >
+                    <span className="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.galleryArrow} ${styles.galleryArrowNext}`}
+                    aria-label="Next image"
+                    disabled={activeImg >= gallery.length - 1}
+                    onClick={(e) => { e.stopPropagation(); goToImg(activeImg + 1, gallery.length); }}
+                  >
+                    <span className="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                  </button>
+                </>
+              )}
             </div>
             {gallery.length > 1 && (
               <div className={styles.thumbnailRow}>
                 {gallery.map((g, i) => (
-                  <button key={g + i} type="button" className={`${styles.thumbnailBtn} ${i === activeImg ? styles.thumbnailActive : ""}`} onClick={() => setActiveImg(i)} aria-label={`Show image ${i + 1}`}>
+                  <button key={g + i} type="button" className={`${styles.thumbnailBtn} ${i === activeImg ? styles.thumbnailActive : ""}`} onClick={() => goToImg(i, gallery.length)} aria-label={`Show image ${i + 1}`}>
                     <img src={imgSrc(g)} alt={`${product.name} view ${i + 1}`} className={styles.thumbnailImg} loading="lazy" width={96} height={96} />
                   </button>
                 ))}
@@ -258,7 +297,7 @@ function ProductDetailInner({ slug }) {
                     role="tab"
                     aria-selected={i === activeImg}
                     className={`${styles.galleryDot} ${i === activeImg ? styles.galleryDotOn : ""}`}
-                    onClick={() => setActiveImg(i)}
+                    onClick={() => goToImg(i, gallery.length)}
                     aria-label={`Image ${i + 1} of ${gallery.length}`}
                   />
                 ))}
@@ -370,7 +409,7 @@ function ProductDetailInner({ slug }) {
             </div>
             {atStockLimit && (
               <p className={shop.note} role="status" style={{ margin: "-4px 0 12px", textAlign: "right" }}>
-                {inCart ? "You already have the maximum available quantity in your cart." : "Maximum available quantity selected."}
+                {inCart ? "You already have all available stock in your cart." : `Only ${qtyEff} in stock.`}
               </p>
             )}
 

@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./AplusContent.module.css";
 import ResponsiveImg from "../components/ResponsiveImg";
+import { imgSrc } from "../shop/shopUtils";
 
 /* ─── Individual module renderers ─────────────────────────────────────── */
 
@@ -10,7 +11,7 @@ function ImageBanner({ mod }) {
   return (
     <div className={cls}>
       <img
-        src={mod.image}
+        src={imgSrc(mod.image)}
         alt={mod.headline || "A+ Content Banner"}
         className={styles.bannerImg}
         loading="lazy"
@@ -65,7 +66,7 @@ function FeatureGrid({ mod }) {
       <div className={styles.featureGrid} style={{ "--fg-cols": col }}>
         {(mod.items || []).map((it, i) => (
           <div key={i} className={styles.featureCard}>
-            {it.image && <img src={it.image} alt={it.title || ""} className={styles.featureImg} loading="lazy" />}
+            {it.image && <img src={imgSrc(it.image)} alt={it.title || ""} className={styles.featureImg} loading="lazy" />}
             {it.icon  && !it.image && <span className={styles.featureIcon}>{it.icon}</span>}
             {it.title && <strong className={styles.featureTitle}>{it.title}</strong>}
             {it.text  && <p className={styles.featureText}>{it.text}</p>}
@@ -193,19 +194,40 @@ export default function AplusContent({ modules }) {
     );
   };
 
+  // Image banners set to "2-Column Grid" sit side by side: consecutive 2-col images are placed in one two-column row.
+  const isTwoCol = (m) => (m.type === "image" || m.type === "image_banner") && m.layout === "2-col";
+  const renderList = (list) => {
+    const out = [];
+    for (let i = 0; i < list.length; ) {
+      if (isTwoCol(list[i])) {
+        const row = [];
+        while (i < list.length && isTwoCol(list[i]) && row.length < 2) row.push(list[i++]);
+        out.push(
+          <div key={`row-${i}`} className={styles.twoColRow}>
+            {row.map((m, j) => <div key={j} className={styles.modWrap}><ImageBanner mod={m} /></div>)}
+          </div>
+        );
+      } else {
+        out.push(renderModule(list[i], i));
+        i++;
+      }
+    }
+    return out;
+  };
+
   return (
     <section className={styles.aplusRoot} aria-label="Product highlights">
       {/* 🖥️ Desktop Only Listing */}
       {desktopModules.length > 0 && (
         <div className={styles.desktopOnly}>
-          {desktopModules.map(renderModule)}
+          {renderList(desktopModules)}
         </div>
       )}
 
       {/* 📱 Mobile Only Listing */}
       {mobileModules.length > 0 && (
         <div className={styles.mobileOnly}>
-          {mobileModules.map(renderModule)}
+          {renderList(mobileModules)}
         </div>
       )}
     </section>

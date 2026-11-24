@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Seo, { siteOrigin } from "../components/Seo";
 import styles from "./ContactUs.module.css";
 
@@ -7,12 +7,16 @@ const BASE = import.meta.env.VITE_API_URL || "";
 
 function ContactUs() {
   const navigate = useNavigate();
+  // Deep links such as /contact?subject=Corporate+Gifting&email=a@b.com pre-fill the form so the enquiry keeps its context.
+  const [params] = useSearchParams();
+  const presetSubject = (params.get("subject") || "").slice(0, 120);
+  const presetEmail = (params.get("email") || "").slice(0, 120);
 
   const [form, setForm] = useState({
     name: "",
     mobile: "",
-    email: "",
-    description: "",
+    email: presetEmail,
+    description: presetSubject ? `Enquiry about: ${presetSubject}. ` : "",
   });
 
   const [files, setFiles] = useState([]);

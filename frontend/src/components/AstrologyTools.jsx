@@ -21,7 +21,7 @@ const tools = [
     cta: "Match Now",
     image: "/kundli matching.png",
     theme: "orange",
-    route: "/kundli-generator",
+    comingSoon: true,
   },
   {
     id: "astrology-calculator",
@@ -31,7 +31,7 @@ const tools = [
     cta: "Calculate Now",
     image: "/astrology calculator.png",
     theme: "orange",
-    route: "/daily-horoscope",
+    comingSoon: true,
   },
   {
     id: "numerology-calculator",
@@ -41,7 +41,7 @@ const tools = [
     cta: "Calculate Now",
     image: "/numerelogy calcultor.png",
     theme: "maroon",
-    route: "/services",
+    comingSoon: true,
   },
 ];
 
@@ -125,9 +125,15 @@ function AstrologyTools() {
                 width={360}
                 height={240}
               />
-              <button className={styles.cardLink} onClick={() => navigate(tool.route || "/services")}>
-                {o.cta || tool.cta} <span className="material-symbols-outlined">arrow_forward</span>
-              </button>
+              {tool.comingSoon ? (
+                <button type="button" className={`${styles.cardLink} ${styles.cardLinkSoon}`} disabled aria-disabled="true">
+                  Coming Soon
+                </button>
+              ) : (
+                <button className={styles.cardLink} onClick={() => navigate(tool.route || "/services")}>
+                  {o.cta || tool.cta} <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
+              )}
             </div>
           );
         })}
@@ -143,8 +149,8 @@ function AstrologyTools() {
             </div>
           </div>
         ))}
-        <button className={styles.exploreAllBtn} onClick={() => navigate("/services")}>
-          Explore All Tools <span className="material-symbols-outlined">arrow_forward</span>
+        <button className={styles.exploreAllBtn} onClick={() => navigate("/kundli-generator")}>
+          Open Kundli Generator <span className="material-symbols-outlined">arrow_forward</span>
         </button>
       </div>
     </section>
