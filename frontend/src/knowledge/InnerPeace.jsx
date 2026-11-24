@@ -166,7 +166,7 @@ function InnerPeace() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Latest%20Teachings/Inner%20Peace.png" alt="Inner Peace" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Latest%20Teachings/Inner%20Peace.webp" alt="Inner Peace" className={styles.heroImage} />
           </div>
         </div>
       </section>

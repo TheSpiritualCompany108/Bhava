@@ -239,8 +239,8 @@ function GitaReading() {
                   "linear-gradient(to right, #1a4a3a 0%, #1a4a3a99 18%, transparent 50%)",
               }}
             />
-            <img
-              src="/Daily%20Practices/Gita%20Reading.png"
+            <img loading="lazy" decoding="async"
+              src="/Daily%20Practices/Gita%20Reading.webp"
               alt="Gita Reading"
               className={styles.heroImage}
             />

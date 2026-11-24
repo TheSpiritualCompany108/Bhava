@@ -18,7 +18,7 @@ export default function AskBhavaFab() {
     >
       <span className={styles.ring} aria-hidden="true" />
       <span className={styles.logoWrap} aria-hidden="true">
-        <img src="/bhava-icon.webp" alt="" className={styles.logo} width={40} height={40} />
+        <img loading="lazy" decoding="async" src="/bhava-icon.webp" alt="" className={styles.logo} width={40} height={40} />
       </span>
       <span className={styles.label}>Ask Bhava:</span>
     </button>

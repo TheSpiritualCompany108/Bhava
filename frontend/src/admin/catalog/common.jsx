@@ -2,14 +2,9 @@ import React, { useEffect, useState } from "react";
 import s from "./AdminCatalog.module.css";
 import { imgUrl, downloadImage } from "./adminApi";
 
-export function Notice({ notice, onClose }) {
-  if (!notice) return null;
-  return (
-    <div className={`${s.notice} ${notice.type === "ok" ? s.nOk : s.nErr}`} role={notice.type === "ok" ? "status" : "alert"}>
-      <span>{notice.type === "ok" ? "✓ " : "⚠ "}{notice.text}</span>
-      <button className={s.nClose} onClick={onClose} aria-label="Dismiss">✕</button>
-    </div>
-  );
+// Success / error messages now appear as popup toasts (adminToast.jsx); the inline bar is no longer rendered.
+export function Notice() {
+  return null;
 }
 
 export function Modal({ title, onClose, children, footer, small }) {

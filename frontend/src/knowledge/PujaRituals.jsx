@@ -231,7 +231,7 @@ function PujaRituals() {
                   "linear-gradient(to right, #6E1B21 0%, #6E1B2199 18%, transparent 50%)",
               }}
             />
-            <img
+            <img loading="lazy" decoding="async"
               src="../pujaRituals.png"
               alt="Puja Rituals"
               className={styles.heroImage}

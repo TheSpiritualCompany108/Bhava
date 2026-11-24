@@ -113,7 +113,7 @@ function LatestArticles() {
               className={styles.cardThumb}
               style={{ background: a.fallback }}
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src={a.image}
                 alt={a.title}
                 className={styles.cardImg}

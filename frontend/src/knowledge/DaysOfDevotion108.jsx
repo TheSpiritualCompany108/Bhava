@@ -154,7 +154,7 @@ function DaysOfDevotion108() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Learning%20Paths/108%20Days%20of%20Devotion.png" alt="108 Days of Devotion" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Learning%20Paths/108%20Days%20of%20Devotion.webp" alt="108 Days of Devotion" className={styles.heroImage} />
           </div>
         </div>
       </section>

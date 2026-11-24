@@ -70,7 +70,7 @@ function SpiritualPracticePlans() {
         {practicePlans.map((item, i) => (
           <div key={i} className={`${styles.card} ${styles.cardTall}`}>
             <div className={styles.cardThumb} style={{ background: item.fallback }}>
-              <img src={item.image} alt={item.title} className={styles.cardImg}
+              <img loading="lazy" decoding="async" src={item.image} alt={item.title} className={styles.cardImg}
                 onError={(e) => { e.target.style.display = "none"; }} />
               <div className={styles.thumbGradient} />
               <button className={styles.startBtn}>Start</button>
@@ -112,7 +112,7 @@ function DeepenSadhana() {
         {deepenItems.map((item, i) => (
           <div key={i} className={`${styles.card} ${styles.cardSquare}`}>
             <div className={styles.cardThumb} style={{ background: item.fallback }}>
-              <img src={item.image} alt={item.title} className={styles.cardImg}
+              <img loading="lazy" decoding="async" src={item.image} alt={item.title} className={styles.cardImg}
                 onError={(e) => { e.target.style.display = "none"; }} />
               <div className={styles.thumbGradient} />
               <button className={styles.startBtn}>Start</button>
@@ -152,7 +152,7 @@ function PathToMoksha() {
         {mokshaPaths.map((item, i) => (
           <div key={i} className={`${styles.card} ${styles.cardBelow}`}>
             <div className={styles.cardThumb} style={{ background: item.fallback }}>
-              <img src={item.image} alt={item.title} className={styles.cardImg}
+              <img loading="lazy" decoding="async" src={item.image} alt={item.title} className={styles.cardImg}
                 onError={(e) => { e.target.style.display = "none"; }} />
               <div className={styles.thumbGradient} />
               <div className={styles.cardInnerBelow}>

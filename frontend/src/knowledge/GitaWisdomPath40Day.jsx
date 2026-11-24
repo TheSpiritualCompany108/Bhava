@@ -161,8 +161,8 @@ function GitaWisdomPath40Day() {
                 <div className={styles.progressFill} />
               </div>
             </div>
-            <img
-              src="../40 Day Gita Wisdom Path.png"
+            <img loading="lazy" decoding="async"
+              src="../40 Day Gita Wisdom Path.webp"
               alt="40-Day Gita Wisdom Path"
               className={styles.heroImg}
             />

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { toast } from "../toast";
 import s from "./AdminCatalog.module.css";
 import { api, imgUrl, slugify, optimizeImage } from "./adminApi";
 import { Modal, ErrorList, ImageLightbox } from "./common";
@@ -69,7 +70,7 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
       const { url } = await api("/upload", { method: "POST", form: fd });
       if (target === "main") set("image", url);
       else set("gallery", [...form.gallery, url].slice(0, 10));
-    } catch (e) { setError(e); } finally { setUploading(false); }
+    } catch (e) { setError(e); toast.error(e.message || "Could not upload the image."); } finally { setUploading(false); }
   };
 
   const uploadAplus = async (fileList, targetDevice = aplusTab) => {
@@ -98,6 +99,7 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
       set("aplusContent", [...(form.aplusContent || []), ...added]);
     } catch (e) {
       setError(e);
+      toast.error(e.message || "Could not upload the A+ images.");
     } finally {
       setAplusUploading(false);
       setAplusProgress(null);
@@ -117,6 +119,7 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
       onSaved(j.message);
     } catch (e) {
       setError(e);
+      toast.error(e.message || "Could not save the product.");
       setBusy(false);
       document.querySelector("[data-modal-top]")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }

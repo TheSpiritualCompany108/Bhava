@@ -162,7 +162,7 @@ function KarmaDharma() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Latest%20Teachings/Karma%20Dharma.png" alt="Karma and Dharma" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Latest%20Teachings/Karma%20Dharma.webp" alt="Karma and Dharma" className={styles.heroImage} />
           </div>
         </div>
       </section>

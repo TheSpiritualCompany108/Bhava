@@ -125,7 +125,7 @@ function TrendingTeachings() {
               onClick={() => { navigate(t.route); }}
             >
               <div className={styles.teachingThumb}>
-                <img
+                <img loading="lazy" decoding="async"
                   src={t.image}
                   alt={t.title}
                   className={styles.thumbImage}

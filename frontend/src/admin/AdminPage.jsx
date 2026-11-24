@@ -3,6 +3,8 @@ import BundlesPanel from "./catalog/BundlesPanel";
 import InventoryDashboard from "./catalog/InventoryDashboard";
 import EnquiriesPanel from "./catalog/EnquiriesPanel";
 import { optimizeImage } from "./catalog/adminApi";
+import { AdminToaster } from "./adminToast";
+import { toast } from "./toast";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { invalidateHomepageSection } from "../hooks/useHomepageSection";
@@ -128,7 +130,7 @@ const HOMEPAGE_TABS = [
     defaultKicker: "Sacred Vessels & Offerings",
     defaultTitle: "Our Sacred Collections",
     defaultSubtitle: "Authentic prayer malas, temple-grade incense, consecrated oils, and ritual thalis handcrafted to ground and elevate your daily devotion.",
-    defaultImage: "/Slide 02.png",
+    defaultImage: "/Slide 02.webp",
   },
   {
     key: "sacredKnowledge",
@@ -203,7 +205,7 @@ export default function AdminPage() {
   const [homepageLoading, setHomepageLoading] = useState(false);
   const [homepageError, setHomepageError] = useState("");
   const [homepageSaving, setHomepageSaving] = useState(false);
-  const [homepageSaved, setHomepageSaved] = useState(false);
+  const [, setHomepageSaved] = useState(false);
   const [homepageImages, setHomepageImages] = useState({});
   const [homepageImagePreviews, setHomepageImagePreviews] = useState({});
   const [quotes, setQuotes] = useState([]);
@@ -405,13 +407,16 @@ export default function AdminPage() {
         setHomepageImages({});
         setHomepageImagePreviews({});
         setHomepageSaved(true);
+        toast.success(`Saved — this change is now live on the ${(HOMEPAGE_TABS.find((t) => t.key === homepageTab)?.label || "homepage").replace(/^[^A-Za-z]+/, "")}.`);
         // Drop storefront cache so /products picks up the new banner without a hard refresh
         invalidateHomepageSection(homepageTab);
       } else {
         setHomepageError(json.message || `Error ${res.status}`);
+        toast.error(json.message || `Could not save (error ${res.status}).`);
       }
     } catch (err) {
       setHomepageError(err.message || "Network error");
+      toast.error(err.message || "Network error — nothing was saved.");
     } finally {
       setHomepageSaving(false);
     }
@@ -461,14 +466,17 @@ export default function AdminPage() {
       });
       const json = await res.json();
       if (res.ok && json.success) {
+        toast.success(editingQuoteId ? "Quote updated." : "Quote added.");
         resetQuoteForm();
         setShowQuoteForm(false);
         fetchQuotes();
       } else {
         setQuotesError(json.message || `Error ${res.status}`);
+        toast.error(json.message || `Could not save the quote (error ${res.status}).`);
       }
     } catch (err) {
       setQuotesError(err.message || "Network error");
+      toast.error(err.message || "Network error — the quote was not saved.");
     }
   };
 
@@ -483,7 +491,7 @@ export default function AdminPage() {
     const token = localStorage.getItem("bhava_admin_token");
     const res = await fetch(`${API_BASE}/api/admin/quotes/${id}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
     const json = await res.json();
-    if (json.success) fetchQuotes(); else alert(json.message || "Error");
+    if (json.success) { toast.success("Quote deleted."); fetchQuotes(); } else toast.error(json.message || "Could not delete the quote.");
   };
 
   const fetchMantraAudio = async () => {
@@ -530,11 +538,14 @@ export default function AdminPage() {
       const json = await res.json();
       if (res.ok && json.success) {
         setMantraAudioMap((prev) => ({ ...prev, [day]: json.data }));
+        toast.success(`Audio for Day ${day} uploaded.`);
       } else {
         setMantraAudioError(json.message || `Error ${res.status}`);
+        toast.error(json.message || `Could not upload the audio (error ${res.status}).`);
       }
     } catch (err) {
       setMantraAudioError(err.message || "Network error");
+      toast.error(err.message || "Network error — the audio was not uploaded.");
     } finally {
       setUploadingDay(null);
     }
@@ -547,8 +558,9 @@ export default function AdminPage() {
     const json = await res.json();
     if (json.success) {
       setMantraAudioMap((prev) => { const next = { ...prev }; delete next[day]; return next; });
+      toast.success(`Audio for Day ${day} deleted.`);
     } else {
-      alert(json.message || "Error");
+      toast.error(json.message || "Could not delete the audio.");
     }
   };
 
@@ -570,11 +582,14 @@ export default function AdminPage() {
       const json = await res.json();
       if (res.ok && json.success) {
         setMantraAudioMap((prev) => ({ ...prev, [day]: json.data }));
+        toast.success(`Day ${day} content saved.`);
       } else {
         setMantraAudioError(json.message || `Error ${res.status}`);
+        toast.error(json.message || `Could not save Day ${day} (error ${res.status}).`);
       }
     } catch (err) {
       setMantraAudioError(err.message || "Network error");
+      toast.error(err.message || "Network error — nothing was saved.");
     } finally {
       setSavingContentDay(null);
     }
@@ -624,11 +639,14 @@ export default function AdminPage() {
       const json = await res.json();
       if (res.ok && json.success) {
         setDhyanAudioMap((prev) => ({ ...prev, [day]: json.data }));
+        toast.success(`Audio for Day ${day} uploaded.`);
       } else {
         setDhyanAudioError(json.message || `Error ${res.status}`);
+        toast.error(json.message || `Could not upload the audio (error ${res.status}).`);
       }
     } catch (err) {
       setDhyanAudioError(err.message || "Network error");
+      toast.error(err.message || "Network error — the audio was not uploaded.");
     } finally {
       setUploadingDhyanDay(null);
     }
@@ -641,8 +659,9 @@ export default function AdminPage() {
     const json = await res.json();
     if (json.success) {
       setDhyanAudioMap((prev) => { const next = { ...prev }; delete next[day]; return next; });
+      toast.success(`Audio for Day ${day} deleted.`);
     } else {
-      alert(json.message || "Error");
+      toast.error(json.message || "Could not delete the audio.");
     }
   };
 
@@ -664,11 +683,14 @@ export default function AdminPage() {
       const json = await res.json();
       if (res.ok && json.success) {
         setDhyanAudioMap((prev) => ({ ...prev, [day]: json.data }));
+        toast.success(`Day ${day} content saved.`);
       } else {
         setDhyanAudioError(json.message || `Error ${res.status}`);
+        toast.error(json.message || `Could not save Day ${day} (error ${res.status}).`);
       }
     } catch (err) {
       setDhyanAudioError(err.message || "Network error");
+      toast.error(err.message || "Network error — nothing was saved.");
     } finally {
       setSavingDhyanContentDay(null);
     }
@@ -773,6 +795,7 @@ export default function AdminPage() {
       const json = await res.json();
       if (res.ok && json.success) {
         setSaveSuccess(true);
+        toast.success(editingId ? "Changes saved — live on the site." : "Created successfully.");
         setImage(null);
         setImagePreview(null);
         if (json.data) {
@@ -813,10 +836,12 @@ export default function AdminPage() {
         const msg = json.message || `Error ${res.status}`;
         console.error("Submit error:", msg, json);
         setSaveError(msg);
+        toast.error(msg);
       }
     } catch (err) {
       console.error("Submit exception:", err);
       setSaveError(err.message || "Network error");
+      toast.error(err.message || "Network error — nothing was saved.");
     } finally {
       setIsSubmitting(false);
     }
@@ -876,6 +901,7 @@ export default function AdminPage() {
       const json = await res.json();
       if (res.ok && json.success) {
         setSaveSuccess(true);
+        toast.success(nextStatus === "draft" ? "Moved to draft — hidden from the site." : "Published — now live on the site.");
         // update local tiles immediately
         setTiles((prev) =>
           prev.map((t) => (t._id === tile._id ? json.data : t))
@@ -886,17 +912,17 @@ export default function AdminPage() {
         }
         setTimeout(() => setSaveSuccess(false), 3000);
       } else {
-        alert(json.message || "Failed to update status");
+        toast.error(json.message || "Failed to update status.");
       }
     } catch (err) {
       console.error("Status toggle error:", err);
-      alert(err.message || "Network error");
+      toast.error(err.message || "Network error");
     }
   };
 
   const addLesson = () => {
     if (!newLesson.title || !newLesson.duration) {
-      alert("Please fill in lesson title and duration");
+      toast.error("Please fill in lesson title and duration.");
       return;
     }
     const num = (form.lessons?.length || 0) + 1;
@@ -936,7 +962,7 @@ export default function AdminPage() {
 
   const saveSession = () => {
     if (!currentSessionData.title || !currentSessionData.duration) {
-      alert("Please fill in session title and duration");
+      toast.error("Please fill in session title and duration.");
       return;
     }
 
@@ -971,7 +997,7 @@ export default function AdminPage() {
     const token = localStorage.getItem("bhava_admin_token");
     const res = await fetch(`${API_BASE}/api/admin/tiles/${id}`, { method: "DELETE", headers: token ? { Authorization: `Bearer ${token}` } : {} });
     const json = await res.json();
-    if (json.success) fetchTiles(); else alert(json.message || "Error");
+    if (json.success) { toast.success("Deleted."); fetchTiles(); } else toast.error(json.message || "Could not delete.");
   };
 
   const handleCsvImport = async (e) => {
@@ -1000,6 +1026,7 @@ export default function AdminPage() {
       const json = await res.json();
       if (res.ok && json.success) {
         setImportMessage(json.message);
+        toast.success(json.message || "CSV imported.");
         fetchTiles();
         setTimeout(() => {
           setShowImportModal(false);
@@ -1008,9 +1035,11 @@ export default function AdminPage() {
         }, 2200);
       } else {
         setImportError(json.message || `Error ${res.status}`);
+        toast.error(json.message || `Import failed (error ${res.status}).`);
       }
     } catch (err) {
       setImportError(err.message || "Network error while importing CSV");
+      toast.error(err.message || "Network error while importing CSV.");
     } finally {
       setImportLoading(false);
     }
@@ -1020,6 +1049,7 @@ export default function AdminPage() {
 
   return (
     <div className="adm-root" style={{ display: "flex", minHeight: "100vh", background: "#f7f4f0", color: "#4A0B1D" }}>
+      <AdminToaster />
       {/* Responsive admin shell: on phones the sidebar becomes a scrollable tab row (no horizontal page overflow) */}
       <style>{`
         .adm-root {
@@ -1339,11 +1369,6 @@ export default function AdminPage() {
 
         {homepageLoading && <div style={{ padding: 12, background: '#fffbe6', borderRadius: 6, marginBottom: 12 }}>Loading…</div>}
         {homepageError && <div style={{ padding: 12, background: '#ffe6e6', color: '#900', borderRadius: 6, marginBottom: 12 }}>{homepageError}</div>}
-        {homepageSaved && (
-          <div style={{ padding: 12, background: '#e8f7ec', color: '#1e7a3a', borderRadius: 6, marginBottom: 12, fontSize: 13, fontWeight: 600 }}>
-            ✓ Saved — this change is now live on the {HOMEPAGE_TABS.find((t) => t.key === homepageTab)?.label}.
-          </div>
-        )}
 
         <div style={{ background: "#fff", padding: 20, borderRadius: 8, border: "1px solid #eee", maxWidth: 760 }}>
           {(homepageTab === "productsBanner" || homepageTab === "heroBanner") && (() => {

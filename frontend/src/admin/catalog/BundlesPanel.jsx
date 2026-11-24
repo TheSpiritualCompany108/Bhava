@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "../toast";
 import s from "./AdminCatalog.module.css";
 import { api, money, imgUrl, useDebounced, useNotice, slugify, optimizeImage } from "./adminApi";
 import { Notice, Confirm, ErrorList, StatusBadge, Modal, ImageLightbox } from "./common";
@@ -106,7 +107,7 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
       };
       const j = editing ? await api(`/bundles/${slug}`, { method: "PUT", body }) : await api("/bundles", { method: "POST", body });
       onSaved(j.message);
-    } catch (e) { setError(e); setBusy(false); }
+    } catch (e) { setError(e); toast.error(e.message || "Could not save the collection."); setBusy(false); }
   };
 
   return (

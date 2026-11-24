@@ -240,8 +240,8 @@ function DailyPuja() {
                   "linear-gradient(to right, #5a2a1a 0%, #5a2a1a99 18%, transparent 50%)",
               }}
             />
-            <img
-              src="/Daily%20Practices/Daily%20Puja.png"
+            <img loading="lazy" decoding="async"
+              src="/Daily%20Practices/Daily%20Puja.webp"
               alt="Daily Puja"
               className={styles.heroImage}
             />

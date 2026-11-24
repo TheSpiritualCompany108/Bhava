@@ -12,7 +12,7 @@ const services = [
     description:
       "Schedule a traditional puja performed by verified temple priests. Choose from Ganesh Puja, Satyanarayan, Rudrabhishek, and 40+ more rituals performed live or on your behalf.",
     price: "Starting ₹999",
-    img: "/Explore Sacred Wisdom/Puja Rituals.png",
+    img: "/Explore Sacred Wisdom/Puja Rituals.webp",
     highlight: false,
   },
   {
@@ -23,7 +23,7 @@ const services = [
     description:
       "Experience live streaming from 200+ sacred temples across India — Tirupati, Kashi Vishwanath, Shirdi, and more. Get prasad delivered home after every darshan.",
     price: "Starting ₹199",
-    img: "/Temple Blessed.png",
+    img: "/Temple Blessed.webp",
     highlight: false,
   },
   {
@@ -34,7 +34,7 @@ const services = [
     description:
       "One-on-one sessions with expert Vedic astrologers. Get personalised kundali analysis, muhurta selection, remedies, gemstone advice and yearly guidance.",
     price: "Starting ₹1,499",
-    img: "/astrology calculator.png",
+    img: "/astrology calculator.webp",
     highlight: true,
   },
   {
@@ -45,7 +45,7 @@ const services = [
     description:
       "Weekly personal sessions with experienced spiritual teachers. Build a custom daily sadhana — pranayama, mantra, dhyana, and lifestyle aligned with your constitution.",
     price: "Starting ₹2,499",
-    img: "/Timeless Wisdom/Meditation Guide.png",
+    img: "/Timeless Wisdom/Meditation Guide.webp",
     highlight: false,
   },
   {
@@ -56,7 +56,7 @@ const services = [
     description:
       "Fully curated pilgrimage packages to Char Dham, Kashi, Vrindavan, Tirupati, and Ashtavinayak. Includes transport, stay, guide, and ritual access.",
     price: "Starting ₹8,999",
-    img: "/Explore Sacred Wisdom/Temple Traditions.png",
+    img: "/Explore Sacred Wisdom/Temple Traditions.webp",
     highlight: false,
   },
   {
@@ -67,7 +67,7 @@ const services = [
     description:
       "A curated box of 8–12 authentic spiritual products delivered monthly — incense, oils, malas, sacred texts, and seasonal items sourced from temple artisans.",
     price: "Starting ₹899/mo",
-    img: "/Learning Paths/Yoga Philosophy.png",
+    img: "/Learning Paths/Yoga Philosophy.webp",
     highlight: false,
   },
 ];
@@ -172,7 +172,7 @@ function Services() {
                 className={`${styles.card} ${s.highlight ? styles.cardHighlight : ""}`}
               >
                 <div className={styles.cardImg}>
-                  <img src={s.img} alt={s.title} />
+                  <img loading="lazy" decoding="async" src={s.img} alt={s.title} />
                   <span className={styles.cardTag}>{s.tag}</span>
                 </div>
                 <div className={styles.cardBody}>

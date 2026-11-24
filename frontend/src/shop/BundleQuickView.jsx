@@ -89,7 +89,7 @@ export default function BundleQuickView({ bundle, catalog, onClose }) {
         <button type="button" className={s.qvClose} onClick={requestClose} aria-label="Close">✕</button>
 
         <div className={s.qvImg}>
-          <img src={imgSrc(bundleThumbImage(catalog, bundle))} alt={bundle.name} />
+          <img loading="lazy" decoding="async" src={imgSrc(bundleThumbImage(catalog, bundle))} alt={bundle.name} />
         </div>
 
         <div className={s.qvBody}>

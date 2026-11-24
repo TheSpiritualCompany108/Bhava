@@ -167,7 +167,7 @@ function NonDualWisdom() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Latest%20Teachings/Non%20Dual%20Wisdom.png" alt="Non-Dual Wisdom" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Latest%20Teachings/Non%20Dual%20Wisdom.webp" alt="Non-Dual Wisdom" className={styles.heroImage} />
           </div>
         </div>
       </section>

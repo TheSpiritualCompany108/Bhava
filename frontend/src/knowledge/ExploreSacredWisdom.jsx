@@ -34,42 +34,42 @@ const knowledgeCategories = [
     title: "Puja Rituals",
     description: "Learn the sacred art of worship, traditional puja vidhi, and daily ritual practices.",
     route: "/knowledge/puja-rituals",
-    image: "./Explore Sacred Wisdom/Puja Rituals.png",
+    image: "./Explore Sacred Wisdom/Puja Rituals.webp",
   },
   {
     id: 2,
     title: "Vedic Scriptures",
     description: "Dive deep into the Vedas, Upanishads, and Puranas with expert commentary and translations.",
     route: "/knowledge/vedic-scriptures",
-    image: "./Explore Sacred Wisdom/Vedic Scriptures.png",
+    image: "./Explore Sacred Wisdom/Vedic Scriptures.webp",
   },
   {
     id: 3,
     title: "Temple Traditions",
     description: "Learn the sacred rituals, architectural significance, and spiritual practices of ancient temples.",
     route: "/knowledge/temple-traditions",
-    image: "./Explore Sacred Wisdom/Temple Traditions.png",
+    image: "./Explore Sacred Wisdom/Temple Traditions.webp",
   },
   {
     id: 4,
     title: "Mantras & Prayers",
     description: "Discover the power of sacred mantras with proper pronunciation, meanings, and benefits.",
     route: "/knowledge/mantras-prayers",
-    image: "./Explore Sacred Wisdom/Mantras & Prayers.png",
+    image: "./Explore Sacred Wisdom/Mantras & Prayers.webp",
   },
   {
     id: 5,
     title: "Meditation Practices",
     description: "Master ancient meditation techniques from yoga traditions and spiritual lineages.",
     route: "/knowledge/meditation-practices",
-    image: "./Explore Sacred Wisdom/Meditation Practices.png",
+    image: "./Explore Sacred Wisdom/Meditation Practices.webp",
   },
   {
     id: 6,
     title: "Festivals & Celebrations",
     description: "Understand the spiritual significance and traditional observances of Hindu festivals.",
     route: "/knowledge/festivals-celebrations",
-    image: "./Explore Sacred Wisdom/Festivals & Celebrations.png",
+    image: "./Explore Sacred Wisdom/Festivals & Celebrations.webp",
   },
 ];
 
@@ -101,7 +101,7 @@ function WisdomFlipCard({ category, width, navigate }) {
         style={{ transformStyle: "preserve-3d" }}
       >
         <div className={styles.wisdomCardBack}>
-          <img src={category.image} alt={category.title} className={styles.wisdomCardBackImg} />
+          <img loading="lazy" decoding="async" src={category.image} alt={category.title} className={styles.wisdomCardBackImg} />
           <div className={styles.wisdomCardBackOverlay}>
             <h3 className={styles.wisdomCardBackTitle}>{category.title}</h3>
           </div>

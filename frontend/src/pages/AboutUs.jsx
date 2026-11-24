@@ -109,7 +109,7 @@ function AboutUs() {
             </div>
 
             <div className={styles.beliefImageWrapper}>
-              <img src="/incense.jpeg" alt="Incense burning in a quiet corner" className={styles.beliefImage} />
+              <img loading="lazy" decoding="async" src="/incense.jpeg" alt="Incense burning in a quiet corner" className={styles.beliefImage} />
             </div>
 
             <div className={styles.beliefCol}>

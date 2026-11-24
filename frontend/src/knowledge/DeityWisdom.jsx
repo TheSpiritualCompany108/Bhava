@@ -159,7 +159,7 @@ function DeityWisdom() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Learning%20Paths/Deity%20Wisdom.png" alt="Deity Wisdom" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Learning%20Paths/Deity%20Wisdom.webp" alt="Deity Wisdom" className={styles.heroImage} />
           </div>
         </div>
       </section>

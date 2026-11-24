@@ -139,7 +139,7 @@ async function buildInvoiceHtml(order) {
     <div class="top">
       <div>
         <div class="brandRow">
-          <img class="brandLogo" src="${logoUrl}" alt="Bhava:"/>
+          <img loading="lazy" decoding="async" class="brandLogo" src="${logoUrl}" alt="Bhava:"/>
           <h1 class="brand">Bhava:</h1>
         </div>
         <p class="tag">Tax Invoice / Bill of Supply</p>
@@ -518,7 +518,7 @@ export default function OrdersPage() {
                             return (
                               <div key={i} className={styles.orderItem}>
                                 <div className={styles.orderItemImg}>
-                                  <img src={itemImage(item, catalog)} alt={item.title || "Product"} />
+                                  <img loading="lazy" decoding="async" src={itemImage(item, catalog)} alt={item.title || "Product"} />
                                 </div>
                                 <div className={styles.orderItemInfo}>
                                   {item.category ? (

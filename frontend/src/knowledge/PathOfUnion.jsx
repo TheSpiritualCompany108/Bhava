@@ -164,7 +164,7 @@ function PathOfUnion() {
           </div>
           <div className={styles.heroRight}>
             <div className={styles.heroImageOverlay} style={{ background: HERO_GRADIENT }} />
-            <img src="/Latest%20Teachings/Path%20of%20Union.png" alt="Path of Union" className={styles.heroImage} />
+            <img loading="lazy" decoding="async" src="/Latest%20Teachings/Path%20of%20Union.webp" alt="Path of Union" className={styles.heroImage} />
           </div>
         </div>
       </section>

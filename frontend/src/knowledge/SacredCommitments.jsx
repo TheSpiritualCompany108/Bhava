@@ -18,7 +18,7 @@ const commitments = [
     highlights: ["Discipline is built over time.", "A guided daily structure supports you.", "Commit to the practice with Bhava:"],
     buttonText: "Begin the 108-Day Practice",
     color: "#470017",
-    image: "/Sacred%20Commitments%20for%20the%20Disciplined%20Soul/108-Day%20Mantra%20Sadhana.png",
+    image: "/Sacred%20Commitments%20for%20the%20Disciplined%20Soul/108-Day%20Mantra%20Sadhana.webp",
     route: "/knowledge/108-day-sadhana",
   },
   {
@@ -26,7 +26,7 @@ const commitments = [
     highlights: ["Understanding takes time.", "A structured path brings clarity.", "Study a little each day with Bhava:"],
     buttonText: "Begin the 40-Day Path",
     color: "#2B6291",
-    image: "/Sacred%20Commitments%20for%20the%20Disciplined%20Soul/40%20Day%20Gita%20Wisdom%20Path.png",
+    image: "/Sacred%20Commitments%20for%20the%20Disciplined%20Soul/40%20Day%20Gita%20Wisdom%20Path.webp",
     route: "/knowledge/40-day-gita-wisdom",
   },
   {
@@ -34,7 +34,7 @@ const commitments = [
     highlights: ["The mind rarely stays still.", "A guided practice creates steadiness.", "Sit with it daily."],
     buttonText: "Begin the 21-Day Practice with Bhava:",
     color: "#351751",
-    image: "/Sacred%20Commitments%20for%20the%20Disciplined%20Soul/21%20Dhyan%20Challenge.png",
+    image: "/Sacred%20Commitments%20for%20the%20Disciplined%20Soul/21%20Dhyan%20Challenge.webp",
     route: "/knowledge/21-day-dhyan",
   },
 ];
@@ -113,7 +113,7 @@ function SacredCommitments() {
                 </div>
 
                 <div className={styles.commitCardRight} style={{ backgroundColor: item.color }}>
-                  <img src={item.image} alt={item.title} className={styles.commitCardImage} />
+                  <img loading="lazy" decoding="async" src={item.image} alt={item.title} className={styles.commitCardImage} />
                   <div
                     className={styles.commitCardImageOverlay}
                     style={{

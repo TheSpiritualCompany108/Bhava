@@ -240,8 +240,8 @@ function Aarti() {
                   "linear-gradient(to right, #4a2a0a 0%, #4a2a0a99 18%, transparent 50%)",
               }}
             />
-            <img
-              src="/Daily%20Practices/Aarti.png"
+            <img loading="lazy" decoding="async"
+              src="/Daily%20Practices/Aarti.webp"
               alt="Aarti"
               className={styles.heroImage}
             />

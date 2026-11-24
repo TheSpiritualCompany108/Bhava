@@ -119,7 +119,7 @@ function SpiritualChallenges() {
             </div>
             {ch.image && (
               <div className={styles.cardImage}>
-                <img src={ch.image} alt={ch.title} />
+                <img loading="lazy" decoding="async" src={ch.image} alt={ch.title} />
               </div>
             )}
           </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "../toast";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -19,7 +20,7 @@ export async function api(path, { method = "GET", body, form } = {}) {
 }
 
 export const money = (n) => (n === null || n === undefined ? "—" : `₹${Number(n).toLocaleString("en-IN")}`);
-export const imgUrl = (u) => (!u ? "/Products/Home Page Incense.png" : /^https?:/.test(u) ? u : u.startsWith("/uploads") ? API_BASE + u : u);
+export const imgUrl = (u) => (!u ? "/Products/Home Page Incense.webp" : /^https?:/.test(u) ? u : u.startsWith("/uploads") ? API_BASE + u : u);
 export const fmtDate = (d) => (d ? new Date(d).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—");
 export const slugify = (t) => String(t).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
@@ -39,7 +40,12 @@ export function useNotice() {
     const t = setTimeout(() => setNotice(null), 6000);
     return () => clearTimeout(t);
   }, [notice]);
-  return [notice, (type, text) => setNotice({ type, text }), () => setNotice(null)];
+  // Every notice is also shown as a popup toast at the top of the admin (see adminToast.jsx).
+  const say = (type, text) => {
+    setNotice({ type, text });
+    if (type === "ok") toast.success(text); else toast.error(text);
+  };
+  return [notice, say, () => setNotice(null)];
 }
 
 

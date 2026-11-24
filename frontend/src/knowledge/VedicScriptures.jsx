@@ -240,7 +240,7 @@ function VedicScriptures() {
                   "linear-gradient(to right, #6E1B21 0%, #6E1B2199 18%, transparent 50%)",
               }}
             />
-            <img
+            <img loading="lazy" decoding="async"
               src="../vedicScriptures.png"
               alt="Vedic Scriptures"
               className={styles.heroImage}

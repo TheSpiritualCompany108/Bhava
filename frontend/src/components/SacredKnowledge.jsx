@@ -9,7 +9,7 @@ const cards = [
     title: "Sacred Texts + Temples",
     description: "Explore timeless scriptures, sacred temples and profound teachings.",
     cta: "Explore",
-    image: "/ayodhya temple.png",
+    image: "/ayodhya temple.webp",
     theme: "maroon",
     route: "/knowledge",
   },
@@ -19,7 +19,7 @@ const cards = [
     title: "Stories (Mythology)",
     description: "Dive into inspiring stories from our rich heritage and ancient wisdom.",
     cta: "Explore",
-    image: "/lordram.png",
+    image: "/lordram.webp",
     theme: "orange",
     route: "/knowledge",
   },
@@ -29,7 +29,7 @@ const cards = [
     title: "Thought of the Day",
     description: "18 Gita reflections to guide and inspire your day with clarity and purpose.",
     cta: "Read Today's Thought",
-    image: "/ink.png",
+    image: "/ink.webp",
     theme: "maroon",
     route: "/knowledge",
   },
@@ -99,6 +99,7 @@ function SacredKnowledge() {
                 alt={`${title} illustration`}
                 className={styles.cardImage}
                 loading="lazy"
+                decoding="async"
                 width={420}
                 height={320}
               />

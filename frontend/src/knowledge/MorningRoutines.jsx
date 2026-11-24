@@ -115,7 +115,7 @@ function MorningRoutines() {
               className={styles.playlistThumb}
               style={{ background: p.fallbackColor }}
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src={p.image}
                 alt={p.title}
                 className={styles.playlistImg}

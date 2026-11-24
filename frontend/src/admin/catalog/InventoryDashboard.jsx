@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "../toast";
 import s from "./AdminCatalog.module.css";
 import { api, imgUrl, fmtDate, useDebounced, useNotice } from "./adminApi";
 import { Notice, Modal, ErrorList, ImageLightbox } from "./common";
@@ -25,6 +26,7 @@ function StockDialog({ row, onClose, onDone }) {
       onDone(j.message);
     } catch (e) {
       setError(e);
+      toast.error(e.message || "Could not update the stock.");
       setBusy(false);
     }
   };
@@ -85,6 +87,7 @@ function BulkStockDialog({ rows, onClose, onDone }) {
       onDone(j.message);
     } catch (e) {
       setError(e);
+      toast.error(e.message || "Could not update the stock.");
       setBusy(false);
     }
   };

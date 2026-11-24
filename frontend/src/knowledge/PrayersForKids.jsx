@@ -40,7 +40,7 @@ function PrayersForKids() {
         {kidsContent.map((item, i) => (
           <div key={i} className={styles.card}>
             <div className={styles.thumb} style={{ background: item.fallback }}>
-              <img src={item.image} alt={item.title} className={styles.img} onError={(e) => { e.target.style.display = "none"; }} />
+              <img loading="lazy" decoding="async" src={item.image} alt={item.title} className={styles.img} onError={(e) => { e.target.style.display = "none"; }} />
               <div className={styles.overlay} />
             </div>
             <h4 className={styles.cardTitle} style={{ color: item.gold ? "#f59e42" : "#ffffff" }}>{item.title}</h4>
@@ -72,7 +72,7 @@ function PrayersForKids() {
             </div>
           </div>
           <div className={styles.bannerRight}>
-            <img src="/kidsDevotion.png" alt="Kids Devotion" className={styles.bannerImg} onError={(e) => { e.target.style.display = "none"; }} />
+            <img loading="lazy" decoding="async" src="/kidsDevotion.png" alt="Kids Devotion" className={styles.bannerImg} onError={(e) => { e.target.style.display = "none"; }} />
           </div>
         </div>
       </div>

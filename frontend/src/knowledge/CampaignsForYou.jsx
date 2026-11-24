@@ -116,7 +116,7 @@ function CampaignsForYou() {
 
             {/* Right image */}
             <div className={styles.cardRight}>
-              <img
+              <img loading="lazy" decoding="async"
                 src={c.image}
                 alt={c.title}
                 className={styles.cardImg}

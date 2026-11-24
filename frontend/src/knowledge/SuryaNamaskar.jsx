@@ -238,8 +238,8 @@ function SuryaNamaskar() {
                   "linear-gradient(to right, #5a1a2a 0%, #5a1a2a99 18%, transparent 50%)",
               }}
             />
-            <img
-              src="/Daily%20Practices/Kurya%20Namaskar.png"
+            <img loading="lazy" decoding="async"
+              src="/Daily%20Practices/Kurya%20Namaskar.webp"
               alt="Surya Namaskar"
               className={styles.heroImage}
             />

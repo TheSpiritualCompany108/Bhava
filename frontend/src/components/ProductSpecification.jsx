@@ -6,19 +6,19 @@ function ProductSpecification() {
       id: 0,
       title: "Temple Blessed",
       description: "Most rituals feel disconnected today. Sourced from living temple traditions. Bring this into your daily ritual.",
-      image: "/Temple Blessed.png"
+      image: "/Temple Blessed.webp"
     },
     {
       id: 1,
       title: "100% Authentic",
       description: "Most rituals feel disconnected today. Sourced from living temple traditions. Bring this into your daily ritual.",
-      image: "/Authetic.png"
+      image: "/Authetic.webp"
     },
     {
       id: 2,
       title: "Premium Quality",
       description: "Ritual deserves consistency. Made with care and precision. Stay with the practice",
-      image: "/Premium Quality.png"
+      image: "/Premium Quality.webp"
     }
   ];
 
@@ -31,7 +31,7 @@ function ProductSpecification() {
             <div key={spec.id} className={styles.col}>
               <div className={styles.specCard}>
                 <div className={styles.specImageContainer}>
-                  <img src={spec.image} alt={spec.title} />
+                  <img loading="lazy" decoding="async" src={spec.image} alt={spec.title} />
                 </div>
                 <div className={styles.specContent}>
                   <h3 className={styles.specTitle}>{spec.title}</h3>

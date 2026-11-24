@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "../toast";
 import s from "./AdminCatalog.module.css";
 import { api, money, imgUrl, useDebounced, useNotice, slugify } from "./adminApi";
 import { Notice, Confirm, ErrorList, StatusBadge, Modal, ImageLightbox } from "./common";
@@ -20,19 +21,21 @@ function CategoriesDialog({ onClose, onChanged }) {
     try {
       const j = await api(`/categories/${c.id}`, { method: "PUT", body: { ...c, ...patch } });
       setMsg(j.message);
+      toast.success(j.message || "Category updated.");
       await load();
       onChanged();
-    } catch (e) { setError(e); }
+    } catch (e) { setError(e); toast.error(e.message || "Could not update the category."); }
   };
   const add = async () => {
     setError(null);
     try {
       const j = await api("/categories", { method: "POST", body: { id: slugify(draft.label), label: draft.label, blurb: draft.blurb, sortOrder: items.length + 1 } });
       setMsg(j.message);
+      toast.success(j.message || "Category added.");
       setDraft({ label: "", blurb: "" });
       await load();
       onChanged();
-    } catch (e) { setError(e); }
+    } catch (e) { setError(e); toast.error(e.message || "Could not add the category."); }
   };
   return (
     <Modal title="Categories" onClose={onClose}>
