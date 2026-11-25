@@ -49,7 +49,7 @@
 .cardType { font-size: 12px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #C0671E; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
 .cardTitle { font-family: 'Canela', serif; font-size: 19px; line-height: 1.25; color: #4A0B1D; margin: 2px 0 0; font-weight: 500; }
 .cardTagline { font-size: 13.5px; color: #5c4a4f; margin: 2px 0 0; line-height: 1.45; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
-.cardPack { font-size: 12.5px; color: #7a6a6e; margin: 4px 0 0; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
+.cardPack { display: none; font-size: 12.5px; color: #7a6a6e; margin: 4px 0 0; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
 .cardFoot { padding: 10px 14px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: auto; min-width: 0; box-sizing: border-box; }
 .cardDense .cardFoot { padding: 8px 14px 14px; }
 .cardFoot .btn { flex-shrink: 0; white-space: nowrap; max-width: 100%; box-sizing: border-box; }
@@ -92,7 +92,7 @@
 
 /* ── Selectors (fragrance / pair / bracelet) ── */
 .selBlock { margin: 18px 0; }
-.selLabel { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #4A0B1D; margin-bottom: 10px; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
+.selLabel { display: flex; flex-wrap: wrap; gap: 2px 12px; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #4A0B1D; margin-bottom: 10px; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
 .selLabel small { text-transform: none; letter-spacing: 0; font-weight: 500; color: #7a6a6e; font-size: 12.5px; }
 .chips { display: flex; flex-wrap: wrap; gap: 10px; }
 .chip {
@@ -300,11 +300,16 @@
 .bundleCard .cardType,
 .bundleCard .cardTitle,
 .bundleCard .cardTagline,
-.bundleCard .bundleList { padding-left: 22px; padding-right: 22px; }
+.bundleCard .bcDesc,
+.bundleCard .bcInside { padding-left: 22px; padding-right: 22px; }
 .bundleCard .cardType { margin-top: 14px; }
 .bundleCard .bundleFoot { padding: 8px 22px 0; }
-.bundleList { margin: 8px 0 0; padding: 0; list-style: none; font-size: 13.5px; color: #4a3a3f; line-height: 1.7; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
-.bundleList li::before { content: '✦ '; color: #E07B39; font-size: 11px; }
+.bcDesc { margin: 0; font-size: 13px; line-height: 1.45; color: #7f6c70; font-family: 'Neue Haas Grotesk', Inter, sans-serif; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.bcInside { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; margin-top: 8px; }
+.bcThumbs { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.bcThumb { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 9px; background: #F6F0E6; border: 1px solid #EEE4D7; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #C0671E; }
+.bcThumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bcViewAll { font-size: 12px; font-weight: 600; color: #4A0B1D; text-decoration: underline; text-underline-offset: 3px; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
 .bundleFoot { margin-top: auto; padding-top: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .trustRow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
 .trustTrack { display: contents; }
@@ -583,6 +588,71 @@
   .qvBody { padding: 16px 14px 24px; }
   .qvTitle { font-size: 20px; }
 }
+/* ── Bundle preview (BundleQuickView): what's inside, sticky price + add bar, bottom sheet on phones ── */
+.bqvHandle { display: none; }
+.bqvBody .cardType { padding-right: 48px; } /* keeps the label clear of the close button */
+.bqvDesc, .bqvBody .bqvDesc { margin: 2px 0 6px; font-size: 14px; line-height: 1.5; color: #7f6c70; }
+.bqvInsideLabel { margin: 10px 0 8px; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #8a7a7e; }
+.bqvItems { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
+.bqvItem { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; background: #faf6ee; border-radius: 12px; min-width: 0; }
+.bqvThumb { flex: 0 0 48px; width: 48px; height: 48px; border-radius: 10px; background: #F1E9DC; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.bqvThumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bqvThumbSlot { font-size: 20px; color: #C0671E; line-height: 1; }
+.bqvItemText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
+.bqvItemText strong { font-size: 14px; font-weight: 600; color: #4A0B1D; line-height: 1.3; }
+.bqvItemText small { font-size: 12px; color: #7a6a6e; line-height: 1.35; }
+.bqvQty { flex: 0 0 auto; font-size: 13px; font-weight: 700; color: #4A0B1D; }
+
+.bqvFoot {
+  position: sticky; bottom: 0; z-index: 3; margin: 12px -28px -26px; padding: 14px 28px 18px;
+  background: #fff; border-top: 1px solid #ECE3D8; box-shadow: 0 -8px 20px rgba(74, 11, 29, 0.06);
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 16px; row-gap: 6px;
+}
+.bqvTotal { display: flex; flex-direction: column; gap: 1px; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
+.bqvTotal span { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #8a7a7e; }
+.bqvTotal strong { font-size: 22px; font-weight: 800; color: #4A0B1D; line-height: 1.15; }
+.bqvTotal small { font-size: 11px; color: #8a7a7e; }
+.bqvAdd {
+  min-height: 48px; border: 0; border-radius: 12px; background: #4A0B1D; color: #fff; font: inherit; font-size: 14.5px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 14px; cursor: pointer; transition: background 0.2s ease, transform 0.12s ease;
+}
+.bqvAdd:hover:not(:disabled) { background: #661424; }
+.bqvAdd:active:not(:disabled) { transform: scale(0.98); }
+.bqvAdd:disabled { background: #d9cfc9; color: #6f5f63; cursor: not-allowed; }
+.bqvAdd:focus-visible { outline: 3px solid #E07B39; outline-offset: 2px; }
+.bqvStatus { grid-column: 1 / -1; margin: 0; font-size: 12.5px; text-align: center; color: #2f6b34; }
+.bqvStatus:empty { display: none; }
+
+/* Desktop: smaller modal — photo stays fixed on the left, only the right side scrolls */
+@media (min-width: 721px) {
+  .bqvCard { height: min(620px, 82vh); overflow: hidden; grid-template-rows: minmax(0, 1fr); }
+  .bqvCard .qvImg { height: 100%; min-height: 0; }
+  .bqvCard .qvImg img { height: 100%; object-fit: cover; }
+  .bqvCard .bqvBody { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .bqvCard .bqvBody { padding-bottom: 0; }
+  .bqvCard .bqvFoot { margin-bottom: 0; }
+}
+
+@keyframes bqvSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes bqvSheetDown { from { transform: translateY(0); } to { transform: translateY(100%); } }
+
+@media (max-width: 720px) {
+  .bqvCard { max-height: 90vh; max-height: 90dvh; animation: bqvSheetUp 0.34s cubic-bezier(0.22, 1, 0.36, 1); overscroll-behavior: contain; }
+  .bqvCard.qvCardOut { animation: bqvSheetDown 0.2s ease forwards; }
+  .bqvHandle { display: block; position: sticky; top: 0; z-index: 4; flex: 0 0 auto; width: 40px; height: 4px; margin: 8px auto -12px; border-radius: 999px; background: rgba(255, 255, 255, 0.92); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); }
+  .bqvCard .qvImg { aspect-ratio: 16 / 10; max-height: 26vh; max-height: 26dvh; }
+  .bqvCard .qvClose { top: 14px; right: 12px; }
+  .bqvFoot { margin: 12px -16px 0; padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)); column-gap: 12px; }
+  .bqvBody { padding-bottom: 0; }
+  .bqvTotal strong { font-size: 20px; }
+  .bqvAdd { font-size: 14px; padding: 0 10px; }
+}
+@media (max-width: 480px) {
+  .bqvFoot { margin: 12px -14px 0; padding-left: 14px; padding-right: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bqvCard, .bqvCard.qvCardOut, .bqvAdd { animation: none; transition: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   .qvBackdrop, .qvCard, .qvBackdropOut, .qvCardOut, .qvFragIn, .chipPulse, .qvAdded { animation: none; }
   .chip { transition: none; }
@@ -617,11 +687,83 @@
   .collSlider .bundleCard .cardType,
   .collSlider .bundleCard .cardTitle,
   .collSlider .bundleCard .cardTagline,
-  .collSlider .bundleCard .bundleList { padding-left: 16px; padding-right: 16px; }
+  .collSlider .bundleCard .bcDesc,
+  .collSlider .bundleCard .bcInside { padding-left: 16px; padding-right: 16px; }
   .collSlider .bundleCard .cardType { margin-top: 14px; font-size: 10.5px; }
   .collSlider .bundleCard .cardTitle { font-size: 19px; line-height: 1.2; margin: 2px 0 0; }
-  .collSlider .bundleList { margin: 8px 0 0; font-size: 13px; line-height: 1.55; }
   .collSlider .bundleCard .bundleFoot { padding: 14px 16px 0; margin-top: auto; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
   .collSlider .bundleFoot .price { font-size: 18px; }
   .collSlider .bundleFoot .btn { width: auto; min-height: 38px; padding: 8px 14px; font-size: 12.5px; }
 }
+
+.bcCount, .bcWhat { display: none; }
+
+/* Collection cards in the strict 2-column phone grid (shop page): compact. The home swipe row (.collSlider) keeps its own sizing. */
+@media (max-width: 600px) {
+  .grid3:not(.collSlider) { gap: 10px; }
+  .grid3:not(.collSlider) .bundleCard { padding-bottom: 8px; gap: 2px; border-radius: 10px; }
+  .grid3:not(.collSlider) .bundleImg { aspect-ratio: 1 / 1; }
+  .grid3:not(.collSlider) .bundleCard .cardType { display: none; }
+  .grid3:not(.collSlider) .bundleCard .bcCount { display: block; margin-top: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.9px; text-transform: uppercase; color: #B5672A; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
+  .grid3:not(.collSlider) .bundleCard .bcCount,
+  .grid3:not(.collSlider) .bundleCard .cardTitle,
+  .grid3:not(.collSlider) .bundleCard .bcDesc,
+  .grid3:not(.collSlider) .bundleCard .bcInside { padding-left: 8px; padding-right: 8px; }
+  .grid3:not(.collSlider) .bundleCard .cardTitle { font-size: 15px; line-height: 1.2; min-height: 2.4em; }
+  .grid3:not(.collSlider) .bundleCard .bcDesc { display: none; } /* the long description stays in the quick view */
+  .grid3:not(.collSlider) .bundleCard .bcInside { margin-top: 2px; gap: 0 8px; align-content: flex-start; min-height: 58px; }
+  .grid3:not(.collSlider) .bundleCard .bcThumb { width: 30px; height: 30px; flex-basis: 30px; border-radius: 8px; }
+  .grid3:not(.collSlider) .bundleCard .bcViewAll { display: none; }
+  .grid3:not(.collSlider) .bundleCard .bcWhat { display: inline-flex; align-items: center; flex-basis: 100%; min-height: 26px; font-size: 11.5px; font-weight: 600; color: #7a6a6e; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .grid3:not(.collSlider) .bundleCard .bundleFoot { flex-direction: column; align-items: stretch; gap: 6px; margin: 6px 8px 0; padding: 8px 0 0; border-top: 1px solid #EFE6DA; } /* narrow phones: price above the full-width button */
+  .grid3:not(.collSlider) .bundleCard .bundleFoot .price { font-size: 16px; white-space: nowrap; flex: 0 0 auto; }
+  .grid3:not(.collSlider) .bundleCard .bundleFoot .btn { flex: 0 0 auto; width: 100%; min-height: 36px; padding: 0 10px; font-size: 12.5px; text-align: center; white-space: nowrap; border-radius: 999px; background: #4A0B1D; border-color: #4A0B1D; color: #fff; }
+  .grid3:not(.collSlider) .bundleCard .bcArrow { display: none; }
+}
+
+/* 380px+ phones: price on the left, solid CTA on the right of the same row */
+@media (min-width: 380px) and (max-width: 600px) {
+  .grid3:not(.collSlider) .bundleCard .bundleFoot { flex-direction: row; align-items: center; justify-content: space-between; gap: 6px; }
+  .grid3:not(.collSlider) .bundleCard .bundleFoot .price { font-size: 15px; }
+  .grid3:not(.collSlider) .bundleCard .bundleFoot .btn { flex: 0 1 auto; width: auto; min-width: 0; padding: 0 8px; font-size: 11.5px; }
+}
+
+/* very narrow phones: names can wrap to 3 lines — reserve them so thumbnails, prices and buttons still line up */
+@media (max-width: 359px) {
+  .grid3:not(.collSlider) .bundleCard .cardTitle { min-height: 3.6em; }
+}
+
+/* Product cards on phones ("card with savings" layout): image, category, name, pack info, price, solid pill button.
+   No discount badge / strike-through / rating / heart: the catalogue has no compare-at price, rating or wishlist data. */
+@media (max-width: 600px) {
+  .card .cardBody { gap: 2px; }
+  .card .cardTagline { -webkit-line-clamp: 1; line-clamp: 1; min-height: 0; }
+  .card .cardPack { display: none; margin: 2px 0 0; font-size: 11.5px; line-height: 1.3; color: #7a6a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card .cardFoot { flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 8px; margin: 0; padding: 8px 10px 10px; border: 0; }
+  .card .cardFoot .price { width: auto; font-size: 17px; font-weight: 800; white-space: nowrap; }
+  .card .cardFoot .btn { width: 100%; min-height: 40px; padding: 0 10px; font-size: 12.5px; border-radius: 999px; text-align: center; white-space: nowrap; }
+  .card .cardFoot .btnGhost { background: #4A0B1D; border-color: #4A0B1D; color: #fff; }
+}
+
+.cardRating { margin: 3px 0 0; font-size: 12px; color: #7a6a6e; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
+.cardRating span:first-child { color: #E0A030; }
+.cardRating strong { color: #4A0B1D; }
+.btnIcon { vertical-align: -2px; }
+
+/* Wishlist heart on product cards */
+.heart { position: absolute; top: 8px; right: 8px; z-index: 3; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.92); color: #4A0B1D; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); transition: transform 0.15s ease, color 0.15s ease; }
+.heart:hover { transform: scale(1.08); }
+.heart:active { transform: scale(0.94); }
+.heartOn { color: #4A0B1D; }
+.heart:focus-visible { outline: 3px solid #E07B39; outline-offset: 2px; }
+
+/* Product cards, phones ≥380px: price left, compact pill button right, thin divider above (same as the collection cards) */
+@media (min-width: 380px) and (max-width: 600px) {
+  .card .cardFoot { flex-direction: row; align-items: center; justify-content: space-between; gap: 6px; margin: 4px 10px 0; padding: 8px 0 10px; border-top: 1px solid #EFE6DA; }
+  .card .cardFoot .price { font-size: 15px; }
+  .card .cardFoot .btn { width: auto; flex: 0 1 auto; min-height: 36px; padding: 0 10px; font-size: 11.5px; }
+}
+
+/* Quick view: heart sits at the top-right of the photo; on phones the close button is there, so it goes to the top-left */
+.qvImg .heart { top: 12px; right: 12px; left: auto; }
+@media (max-width: 720px) { .qvImg .heart { right: auto; left: 12px; } }

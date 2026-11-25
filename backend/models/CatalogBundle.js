@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { BUNDLE_STATUSES, HOME_MODULES } from "../data/catalogConstants.js";
+import { aplusContentField } from "./CatalogProduct.js";
 
 const componentSchema = new mongoose.Schema(
   {
@@ -23,6 +24,8 @@ const catalogBundleSchema = new mongoose.Schema(
     image: { type: String, default: "" },
     /** Extra collection images (cover is `image`). */
     gallery: { type: [String], default: [] },
+    /** A+ banners (desktop / mobile) shown under the collection page, same format as products. */
+    aplusContent: aplusContentField,
     components: { type: [componentSchema], default: [] },
     status: { type: String, enum: BUNDLE_STATUSES, default: "active", index: true },
     featured: { type: Boolean, default: false }, // the 8 priority launch bundles

@@ -1,6 +1,36 @@
 import mongoose from "mongoose";
 import { MODES, PRODUCT_STATUSES } from "../data/catalogConstants.js";
 
+/** A+ banner modules — shared by products and curated collections. */
+export const aplusContentField = {
+  type: [
+    {
+      _id: false,
+      type: { type: String, required: true },        // module type key
+      layout: { type: String, default: "default" },  // layout variant (e.g. "image-left", "image-right", "3-col", "2-col")
+      device: { type: String, default: "desktop" },  // desktop | mobile | all
+      order: { type: Number, default: 0 },           // controls render sequence
+      // shared optional fields
+      headline: { type: String, default: "" },
+      subheadline: { type: String, default: "" },
+      body: { type: String, default: "" },
+      image: { type: String, default: "" },
+      // feature_grid / highlight_strip items
+      items: {
+        type: [{ _id: false, icon: String, title: String, text: String, image: String }],
+        default: [],
+      },
+      // comparison_chart
+      columns: { type: [String], default: [] },
+      rows: {
+        type: [{ _id: false, label: String, values: [String] }],
+        default: [],
+      },
+    },
+  ],
+  default: [],
+};
+
 const variantSchema = new mongoose.Schema(
   {
     key: { type: String, required: true },
@@ -42,34 +72,7 @@ const catalogProductSchema = new mongoose.Schema(
     // ── A+ Content ──────────────────────────────────────────────────────────
     // Each module has: type, layout, order, and type-specific content fields.
     // Supported types: hero_banner | text_image | feature_grid | highlight_strip | brand_story | comparison_chart | faq_block
-    aplusContent: {
-      type: [
-        {
-          _id: false,
-          type: { type: String, required: true },        // module type key
-          layout: { type: String, default: "default" },  // layout variant (e.g. "image-left", "image-right", "3-col", "2-col")
-          device: { type: String, default: "desktop" },  // desktop | mobile | all
-          order: { type: Number, default: 0 },           // controls render sequence
-          // shared optional fields
-          headline: { type: String, default: "" },
-          subheadline: { type: String, default: "" },
-          body: { type: String, default: "" },
-          image: { type: String, default: "" },
-          // feature_grid / highlight_strip items
-          items: {
-            type: [{ _id: false, icon: String, title: String, text: String, image: String }],
-            default: [],
-          },
-          // comparison_chart
-          columns: { type: [String], default: [] },
-          rows: {
-            type: [{ _id: false, label: String, values: [String] }],
-            default: [],
-          },
-        },
-      ],
-      default: [],
-    },
+    aplusContent: aplusContentField,
 
     image: { type: String, default: "" },
     gallery: { type: [String], default: [] },

@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
+import { WishlistProvider } from "./context/WishlistContext";
 import Layout from "./components/Layout";
 import ScrollManager from "./components/ScrollManager";
 import Home from "./pages/Home";
@@ -19,6 +20,7 @@ const AuthPage = lazy(() => import("./auth/AuthPage"));
 const CartPage = lazy(() => import("./cart/CartPage"));
 const CheckoutPage = lazy(() => import("./cart/CheckoutPage"));
 const ProfilePage = lazy(() => import("./account/ProfilePage"));
+const WishlistPage = lazy(() => import("./account/WishlistPage"));
 const OrdersPage = lazy(() => import("./account/OrdersPage"));
 const AddressesPage = lazy(() => import("./account/AddressesPage"));
 const CareerPage = lazy(() => import("./pages/carrerpage"));
@@ -34,6 +36,7 @@ function App() {
   return (
     <BrowserRouter>
       <CartProvider>
+      <WishlistProvider>
         <ScrollManager />
         <Suspense fallback={null}>
         <Routes>
@@ -51,6 +54,7 @@ function App() {
 
             {/* Account pages */}
             <Route path="/account/profile"   element={<ProfilePage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/account/orders"    element={<OrdersPage />} />
             <Route path="/account/addresses" element={<AddressesPage />} />
 
@@ -76,6 +80,7 @@ function App() {
           </Route>
         </Routes>
         </Suspense>
+      </WishlistProvider>
       </CartProvider>
     </BrowserRouter>
   );

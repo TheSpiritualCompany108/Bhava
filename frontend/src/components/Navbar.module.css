@@ -803,3 +803,21 @@
   .cartIconBtn { width: 34px; }
   .topBar { gap: 4px; }
 }
+
+/* Phones: the wishlist icon joined search + cart, so the round icon buttons get a little narrower to keep everything on screen */
+@media (max-width: 480px) {
+  .cartIconBtn { width: 32px; }
+  .desktopOnlyCta { padding: 6px 10px; font-size: 12px; margin-left: 0; }
+}
+@media (max-width: 360px) {
+  .cartIconBtn { width: 29px; }
+  .desktopOnlyCta { padding: 5px 8px; font-size: 11px; }
+  .topBar { gap: 2px; }
+}
+@media (max-width: 330px) {
+  .container { padding: 0 8px; }
+  .hamburger { min-width: 30px; padding: 10px 4px; }
+  .cartIconBtn { width: 26px; }
+  .heading { font-size: 16px; }
+  .logo { height: 32px; }
+}

@@ -7,6 +7,7 @@ import { QuantityDecrease, QuantityValue, QuantityIncrease } from "../components
 import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { FOOTNOTE_PRICE } from "./content";
 import { inr, imgSrc, variantInStock, productInStock, productMaxQty, productMaxQtyAny, productLine } from "./shopUtils";
+import WishlistHeart from "./WishlistHeart";
 import { addToCartEvent } from "../utils/analytics";
 
 /** Quick View: pick fragrance / pair + qty, add to cart without leaving the listing. */
@@ -116,7 +117,8 @@ export default function QuickView({ product: p, catalog, onClose, onAdded }) {
       >
         <button type="button" className={s.qvClose} onClick={requestClose} aria-label="Close">✕</button>
 
-        <div className={s.qvImg}>
+        <div className={s.qvImg} style={{ position: "relative" }}>
+          <WishlistHeart product={p} style={{ width: 36, height: 36 }} />
           <img loading="lazy" decoding="async" src={imgSrc(p.image)} alt={p.name} />
         </div>
 
