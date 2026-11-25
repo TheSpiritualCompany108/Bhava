@@ -6,6 +6,7 @@ import CatalogSettings, { DEFAULT_SHOP_FILTERS } from "../models/CatalogSettings
 import Inventory from "../models/Inventory.js";
 import StockMovement from "../models/StockMovement.js";
 import Order from "../models/Order.js";
+import Coupon from "../models/Coupon.js";
 import {
   buildCtx, needsOf, bundlePrice, availabilityFor, allowedVariants, MODES, PRODUCT_STATUSES, BUNDLE_STATUSES, HOME_MODULES, LOW_STOCK_DEFAULT, CORE_FRAGRANCES,
 } from "../data/catalog.js";
@@ -224,6 +225,10 @@ export async function validateProductInput(input, { existing } = {}) {
 
   d.price = Number(input.price);
   if (!Number.isFinite(d.price) || d.price < 0 || !Number.isInteger(d.price)) err("price", "Price must be a whole number of rupees (≥ 0).");
+
+  d.mrp = input.mrp === undefined || input.mrp === null || input.mrp === "" ? 0 : Number(input.mrp);
+  if (!Number.isFinite(d.mrp) || d.mrp < 0 || !Number.isInteger(d.mrp)) err("mrp", "MRP must be a whole number of rupees (leave empty for no discount).");
+  else if (d.mrp > 0 && d.mrp <= d.price) d.mrp = 0; // MRP at/below the selling price = no discount
 
   d.mode = existing ? existing.mode : str(input.mode, 20);
   if (!MODES.includes(d.mode)) err("mode", "Choose a valid variant type.");
@@ -562,6 +567,9 @@ export async function cancelOrderAndRestock(orderId, { actor = "" } = {}) {
     docs.push({ sku, type: "restock", delta: qty, before: d.stock - qty, after: d.stock, reason: "Order cancelled", orderId, actor });
   }
   if (docs.length) await StockMovement.insertMany(docs, { ordered: false }).catch(() => {});
+  // a cancelled order no longer uses up its coupon
+  const code = claimed.pricing?.couponCode;
+  if (code) await Coupon.updateOne({ code, usedCount: { $gt: 0 } }, { $inc: { usedCount: -1 } }).catch(() => {});
   return { order: claimed, restored: need };
 }
 

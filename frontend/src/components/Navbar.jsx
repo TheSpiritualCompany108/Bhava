@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
+import OmIcon from "./OmIcon";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 import ExpandingSearchDock from "./ui/ExpandingSearchDock";
@@ -28,6 +29,52 @@ function Navbar() {
   const shopMenuRef = useRef(null);
   const { itemCount } = useCart();
   const wishCount = useWishlist().count;
+  const [wishPulse, setWishPulse] = useState(false);
+  const previousWishCount = useRef(wishCount);
+  const wishIconRef = useRef(null);
+  const cartIconRef = useRef(null);
+
+  useEffect(() => {
+    if (wishCount <= previousWishCount.current) {
+      previousWishCount.current = wishCount;
+      return undefined;
+    }
+
+    previousWishCount.current = wishCount;
+    setWishPulse(false);
+    const frame = window.requestAnimationFrame(() => setWishPulse(true));
+    const timer = window.setTimeout(() => setWishPulse(false), 650);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
+  }, [wishCount]);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+
+    let cancelled = false;
+    let gsap;
+    let om;
+    let cart;
+    import("gsap").then((module) => {
+      if (cancelled) return;
+      gsap = module.default || module.gsap;
+      om = gsap.timeline({ repeat: -1, repeatDelay: 1.1 })
+        .to(wishIconRef.current, { y: -1.5, scale: 1.1, rotation: -5, duration: 0.42, ease: "power1.out" })
+        .to(wishIconRef.current, { y: 0, scale: 1, rotation: 0, duration: 0.58, ease: "sine.inOut" });
+      cart = gsap.timeline({ repeat: -1, repeatDelay: 1.35, delay: 0.45 })
+        .to(cartIconRef.current, { y: -2, rotation: 4, duration: 0.36, ease: "power1.out" })
+        .to(cartIconRef.current, { y: 0, rotation: 0, duration: 0.52, ease: "sine.inOut" });
+    }).catch(() => {});
+
+    return () => {
+      cancelled = true;
+      om?.kill();
+      cart?.kill();
+      gsap?.set([wishIconRef.current, cartIconRef.current], { clearProps: "transform" });
+    };
+  }, []);
 
   useEffect(() => {
     // Drop stale admin JWT from the customer token key (shared-key bug).
@@ -252,16 +299,16 @@ function Navbar() {
 
             <button
               type="button"
-              className={styles.cartIconBtn}
+              className={`${styles.cartIconBtn} ${wishPulse ? styles.wishPulse : ""}`}
               onClick={() => {
                 dismissChat();
                 navigate("/wishlist");
               }}
               aria-label={`Wishlist${wishCount ? `, ${wishCount} saved` : ""}`}
             >
-              <svg className={styles.cartSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 21s-7-4.6-9.3-9.1C1.1 8.7 3 5 6.5 5c2 0 3.5 1.2 5.5 3.2C14 6.2 15.5 5 17.5 5 21 5 22.9 8.7 21.3 11.9 19 16.4 12 21 12 21z" />
-              </svg>
+              <span ref={wishIconRef} className={styles.iconMotion}>
+                <OmIcon className={`${styles.cartSvg} ${styles.wishSvg}`} size={22} filled />
+              </span>
               <span className={styles.cartBadge} data-empty={wishCount === 0 ? "1" : "0"} aria-hidden={wishCount === 0}>
                 {wishCount > 99 ? "99+" : wishCount}
               </span>
@@ -276,7 +323,7 @@ function Navbar() {
               }}
               aria-label="View cart"
             >
-              <svg className={styles.cartSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg ref={cartIconRef} className={styles.cartSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 0 1-8 0" />
@@ -354,7 +401,7 @@ function Navbar() {
 
                       <button type="button" className={styles.dropdownItem} onClick={() => { navigate("/wishlist"); setDropdownOpen(false); }}>
                         <span className={styles.dropdownItemIcon}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 21s-7-4.6-9.3-9.1C1.1 8.7 3 5 6.5 5c2 0 3.5 1.2 5.5 3.2C14 6.2 15.5 5 17.5 5 21 5 22.9 8.7 21.3 11.9 19 16.4 12 21 12 21z" /></svg>
+                          <OmIcon size={20} />
                         </span>
                         My Wishlist
                         {wishCount > 0 && <span className={styles.dropdownBadge}>{wishCount}</span>}

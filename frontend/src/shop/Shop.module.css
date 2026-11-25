@@ -721,13 +721,6 @@
   .grid3:not(.collSlider) .bundleCard .bcArrow { display: none; }
 }
 
-/* 380px+ phones: price on the left, solid CTA on the right of the same row */
-@media (min-width: 380px) and (max-width: 600px) {
-  .grid3:not(.collSlider) .bundleCard .bundleFoot { flex-direction: row; align-items: center; justify-content: space-between; gap: 6px; }
-  .grid3:not(.collSlider) .bundleCard .bundleFoot .price { font-size: 15px; }
-  .grid3:not(.collSlider) .bundleCard .bundleFoot .btn { flex: 0 1 auto; width: auto; min-width: 0; padding: 0 8px; font-size: 11.5px; }
-}
-
 /* very narrow phones: names can wrap to 3 lines — reserve them so thumbnails, prices and buttons still line up */
 @media (max-width: 359px) {
   .grid3:not(.collSlider) .bundleCard .cardTitle { min-height: 3.6em; }
@@ -754,16 +747,24 @@
 .heart { position: absolute; top: 8px; right: 8px; z-index: 3; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.92); color: #4A0B1D; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); transition: transform 0.15s ease, color 0.15s ease; }
 .heart:hover { transform: scale(1.08); }
 .heart:active { transform: scale(0.94); }
-.heartOn { color: #4A0B1D; }
+.heartOn { background: #4A0B1D; color: #fff; }
 .heart:focus-visible { outline: 3px solid #E07B39; outline-offset: 2px; }
-
-/* Product cards, phones ≥380px: price left, compact pill button right, thin divider above (same as the collection cards) */
-@media (min-width: 380px) and (max-width: 600px) {
-  .card .cardFoot { flex-direction: row; align-items: center; justify-content: space-between; gap: 6px; margin: 4px 10px 0; padding: 8px 0 10px; border-top: 1px solid #EFE6DA; }
-  .card .cardFoot .price { font-size: 15px; }
-  .card .cardFoot .btn { width: auto; flex: 0 1 auto; min-height: 36px; padding: 0 10px; font-size: 11.5px; }
-}
 
 /* Quick view: heart sits at the top-right of the photo; on phones the close button is there, so it goes to the top-left */
 .qvImg .heart { top: 12px; right: 12px; left: auto; }
 @media (max-width: 720px) { .qvImg .heart { right: auto; left: 12px; } }
+
+/* Dual / Triple Intention: preview switch, progress and chosen-bracelet chips */
+.viewTabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: #f3ede3; align-self: stretch; }
+.viewTabs button { flex: 1; min-height: 40px; border: 0; border-radius: 999px; background: transparent; color: #4A0B1D; font: 600 13px/1 'Neue Haas Grotesk', Inter, sans-serif; cursor: pointer; padding: 0 10px; white-space: nowrap; }
+.viewTabs button span { font-weight: 500; opacity: 0.7; margin-left: 4px; }
+.viewTabs button.viewTabOn { background: #4A0B1D; color: #fff; }
+.viewTabs button:focus-visible { outline: 3px solid #E07B39; outline-offset: 1px; }
+.progress { height: 6px; border-radius: 999px; background: #eadfd0; overflow: hidden; margin: 0 0 10px; }
+.progress span { display: block; height: 100%; background: #E07B39; border-radius: inherit; transition: width 0.25s ease; }
+.chips { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chips li { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 4px; border: 1px solid rgba(74, 11, 29, 0.25); border-radius: 999px; background: #fbf4ea; font: 600 12.5px/1 'Neue Haas Grotesk', Inter, sans-serif; color: #4A0B1D; }
+.chips li img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.chips li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chips li button { width: 28px; height: 28px; border: 0; border-radius: 50%; background: rgba(74, 11, 29, 0.1); color: #4A0B1D; cursor: pointer; font-size: 11px; }
+.chips li button:focus-visible { outline: 2px solid #E07B39; }

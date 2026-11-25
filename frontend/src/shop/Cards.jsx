@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import MrpTag from "../components/MrpTag";
 import QuickView from "./QuickView";
 import BundleQuickView from "./BundleQuickView";
 import { Link, useNavigate } from "react-router-dom";
@@ -156,7 +157,7 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
         </div>
       </Link>
       <div className={styles.cardFoot}>
-        <span className={styles.price}>{inr(p.price)}</span>
+        <span className={styles.price}>{inr(p.price)}<MrpTag mrp={p.mrp} price={p.price} /></span>
         {!inStock ? (
           <button type="button" className={`${styles.btn} ${styles.btnDisabled}`} disabled>Out of stock</button>
         ) : single && !multiFrag ? (
@@ -244,7 +245,7 @@ export function BundleCard({ bundle: b, catalog }) {
         >What&apos;s inside <span aria-hidden="true" style={{ fontSize: 9, marginLeft: 4 }}>▼</span></span>
       </div>
       <div className={styles.bundleFoot}>
-        <span className={styles.price}>{inr(b.price)}</span>
+        <span className={styles.price}>{inr(b.price)}<MrpTag mrp={b.mrp} price={b.price} /></span>
         <span
           data-bundle-quick
           role="button"

@@ -245,6 +245,38 @@
   height: 22px;
 }
 
+/* wishlist Om in the Get Started maroon */
+.wishSvg {
+  color: #4A0B1D;
+}
+
+.iconMotion { display: flex; transform-origin: center; }
+
+.wishPulse {
+  animation: wishlistPop 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wishPulse::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 2px solid #E07B39;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: wishlistRing 0.65s ease-out;
+}
+
+@keyframes wishlistPop {
+  0%, 100% { transform: scale(1); }
+  32% { transform: scale(1.2) rotate(-7deg); }
+  58% { transform: scale(0.96) rotate(4deg); }
+}
+
+@keyframes wishlistRing {
+  from { opacity: 0.85; transform: scale(0.7); }
+  to { opacity: 0; transform: scale(1.85); }
+}
+
 .cartBadge {
   position: absolute;
   top: 0;
@@ -269,6 +301,10 @@
   opacity: 0;
   transform: scale(0.4);
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wishPulse, .wishPulse::after { animation: none; }
 }
 
 /* ── User menu ── */

@@ -4,6 +4,7 @@ import Cart from "../models/Cart.js";
 import { priceCart, requirementsOf } from "../data/catalog.js";
 import { loadCtx, loadStock, deductStock, restoreStock, logOrderMovements, cancelOrderAndRestock, ApiError } from "../services/catalogService.js";
 import { upsertUserAddress } from "./authController.js";
+import { findApplicableCoupon, checkDonation, redeemCoupon, releaseCoupon } from "../services/offersService.js";
 
 /** Admin panel JWT uses id: "admin" — not a Mongo ObjectId. Storefront users use real ids. */
 function orderUserId(raw) {
@@ -152,7 +153,7 @@ export const hideMyOrder = async (req, res) => {
 // Stock for every component SKU is deducted atomically; bundles deduct their actual components.
 export const checkout = async (req, res) => {
   try {
-    const { items, address = {}, notes = "", paymentMethod = "cod" } = req.body;
+    const { items, address = {}, notes = "", paymentMethod = "cod", couponCode = "", donation: donationRaw = 0 } = req.body;
 
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ success: false, message: "Your cart is empty." });
@@ -192,7 +193,15 @@ export const checkout = async (req, res) => {
 
     // Validate + price against current stock
     const [ctx, stock] = await Promise.all([loadCtx(), loadStock()]);
-    const priced = priceCart(items, stock, ctx);
+    const uid = orderUserId(req.userId);
+    const firstPass = priceCart(items, stock, ctx);
+    const { coupon, error: couponError } = await findApplicableCoupon(couponCode, firstPass.subtotal, uid);
+    if (String(couponCode || "").trim() && couponError) {
+      return res.status(409).json({ success: false, code: "COUPON_INVALID", message: `${couponError} Please review your coupon.` });
+    }
+    const { amount: donation, error: donationError } = await checkDonation(donationRaw);
+    if (donationError) return res.status(409).json({ success: false, code: "DONATION_INVALID", message: donationError });
+    const priced = priceCart(items, stock, ctx, { coupon, donation });
     const bad = priced.lines.find((l) => !l.ok);
     if (bad) {
       return res.status(409).json({
@@ -204,8 +213,13 @@ export const checkout = async (req, res) => {
 
     // Reserve (deduct) every component SKU atomically — fails closed if anything raced out of stock
     const need = requirementsOf(priced.lines);
+    // Count the coupon redemption first (atomic against the usage limit); undone below if anything later fails
+    if (coupon && !(await redeemCoupon(coupon.code))) {
+      return res.status(409).json({ success: false, code: "COUPON_INVALID", message: "This coupon has just been fully redeemed." });
+    }
     const deducted = await deductStock(need);
     if (!deducted) {
+      if (coupon) await releaseCoupon(coupon.code);
       return res.status(409).json({
         success: false,
         code: "OUT_OF_STOCK",
@@ -236,6 +250,7 @@ export const checkout = async (req, res) => {
     const userId = orderUserId(req.userId);
     if (!userId) {
       await restoreStock(need);
+      if (coupon) await releaseCoupon(coupon.code);
       return res.status(401).json({
         success: false,
         message: "Please sign in with your customer account to place an order.",
@@ -249,7 +264,10 @@ export const checkout = async (req, res) => {
         type: "order",
         items: orderItems,
         amount: priced.total,
-        pricing: { subtotal: priced.subtotal, discount: 0, shipping: priced.shipping, total: priced.total },
+        pricing: {
+          subtotal: priced.subtotal, discount: priced.couponDiscount, mrpTotal: priced.mrpTotal, productDiscount: priced.productDiscount,
+          couponCode: coupon?.code || "", donation: priced.donation, shipping: priced.shipping, total: priced.total,
+        },
         address: a,
         paymentMethod: "cod",
         paymentStatus: "pending",
@@ -257,6 +275,7 @@ export const checkout = async (req, res) => {
       });
     } catch (err) {
       await restoreStock(need);
+      if (coupon) await releaseCoupon(coupon.code);
       throw err;
     }
     await logOrderMovements(deducted, order._id); // audit trail (best-effort, never blocks the order)
@@ -274,6 +293,8 @@ export const checkout = async (req, res) => {
       total: priced.total,
       shipping: priced.shipping,
       subtotal: priced.subtotal,
+      couponDiscount: priced.couponDiscount,
+      donation: priced.donation,
       items: orderItems.map((l) => ({
         item_id: l.kind === "bundle" ? `bundle:${l.slug}` : l.slug,
         item_name: l.title,

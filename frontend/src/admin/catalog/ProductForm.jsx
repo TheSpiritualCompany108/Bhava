@@ -6,7 +6,7 @@ import { Modal, ErrorList, ImageLightbox } from "./common";
 import AplusEditor from "./AplusEditor";
 
 const EMPTY = {
-  slug: "", name: "", category: "", price: "", mode: "single", status: "active", format: "", tagline: "", description: "", intention: "",
+  slug: "", name: "", category: "", price: "", mrp: "", mode: "single", status: "active", format: "", tagline: "", description: "", intention: "",
   pack: "", packQuantity: "", netWeight: "", fitNote: "", materials: "", usage: "", safety: "", storage: "", contents: [], faqs: [],
   image: "", gallery: [], seoTitle: "", seoDescription: "", copyPending: false, approvalNotes: "", sortOrder: 0,
   related: { upsell: "", upsellAlt: "", upsellBundle: "", crossSell: [], bundle: "" },
@@ -38,6 +38,23 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
   const fileRef = useRef(null);
   const galRef = useRef(null);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  // Selling price, discount % and MRP stay in step: whichever you edit last drives the others.
+  const [byPct, setByPct] = useState(false);
+  const [pctTxt, setPctTxt] = useState("");
+  const mrpFor = (price, pct) => (Number(price) > 0 && Number(pct) >= 1 && Number(pct) <= 90 ? String(Math.round(Number(price) / (1 - Number(pct) / 100))) : "");
+  const onPrice = (v) => setForm((f) => ({ ...f, price: v, mrp: byPct ? mrpFor(v, pctTxt) : f.mrp }));
+  const onMrp = (v) => { setByPct(false); setForm((f) => ({ ...f, mrp: v })); };
+  const onPct = (v) => { setByPct(true); setPctTxt(v); setForm((f) => ({ ...f, mrp: mrpFor(f.price, v) })); };
+  const priceN = Number(form.price);
+  const mrpN = Number(form.mrp);
+  const realPct = mrpN > priceN && priceN > 0 ? Math.round(((mrpN - priceN) / mrpN) * 100) : 0;
+  const disc = {
+    pct: byPct ? pctTxt : realPct ? String(realPct) : "",
+    bad: mrpN > 0 && mrpN <= priceN,
+    msg: mrpN > 0 && mrpN <= priceN
+      ? `MRP ₹${mrpN} is not higher than the selling price ₹${priceN}, so no discount will show. Raise the MRP or lower the selling price.`
+      : realPct ? `Customers see ₹${mrpN} struck through and ${realPct}% OFF (₹${mrpN - priceN} less). Collections add up their products’ MRPs.` : "",
+  };
   const setRel = (k, v) => setForm((f) => ({ ...f, related: { ...f.related, [k]: v } }));
 
   const allowed = meta.allowedVariants[form.mode] || [];
@@ -46,7 +63,7 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
   useEffect(() => {
     if (!editing) return;
     api(`/products/${slug}`).then(({ item }) => {
-      setForm({ ...EMPTY, ...item, price: String(item.price), related: { ...EMPTY.related, ...(item.related || {}) } });
+      setForm({ ...EMPTY, ...item, price: String(item.price), mrp: item.mrp ? String(item.mrp) : "", related: { ...EMPTY.related, ...(item.related || {}) } });
       setVariants(Object.fromEntries(item.variants.map((v) => [v.key, { included: true, sku: v.sku, active: v.active !== false, existing: true }])));
       setLoading(false);
     }).catch((e) => { setError(e); setLoading(false); });
@@ -73,6 +90,7 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
     const body = {
       ...form,
       price: Number(form.price),
+      mrp: form.mrp === "" ? 0 : Number(form.mrp),
       variants: allowed.filter((a) => variants[a.key]?.included).map((a) => ({ key: a.key, sku: variants[a.key].sku, active: variants[a.key].active !== false })),
     };
     try {
@@ -116,8 +134,15 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
                 {meta.categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
               </select>
             </Field>
-            <Field label="Selling price (₹, approved MRP)" error={fieldErr("price")} hint="Inclusive of applicable GST. Collection prices follow automatically." htmlFor="pf-price">
-              <input id="pf-price" className={`${s.input} ${fieldErr("price") ? s.invalid : ""}`} type="number" min="0" step="1" value={form.price} onChange={(e) => set("price", e.target.value)} />
+            <Field label="Selling price (₹)" error={fieldErr("price")} hint="What the customer pays, inclusive of GST. Collection prices follow automatically." htmlFor="pf-price">
+              <input id="pf-price" className={`${s.input} ${fieldErr("price") ? s.invalid : ""}`} type="number" min="0" step="1" value={form.price} onChange={(e) => onPrice(e.target.value)} />
+            </Field>
+            <Field label="Discount (%) — optional" error={fieldErr("mrp")} htmlFor="pf-disc"
+              hint={disc.msg || "Type a discount and the MRP is worked out from the selling price. Leave empty for no discount."}>
+              <input id="pf-disc" className={`${s.input} ${disc.bad ? s.invalid : ""}`} type="number" min="0" max="90" step="1" value={disc.pct} onChange={(e) => onPct(e.target.value)} placeholder="e.g. 11" />
+            </Field>
+            <Field label="MRP (₹) — optional" htmlFor="pf-mrp" hint="The struck-through price customers see. Or type the MRP and the discount is worked out. Must be higher than the selling price.">
+              <input id="pf-mrp" className={`${s.input} ${disc.bad ? s.invalid : ""}`} type="number" min="0" step="1" value={form.mrp} onChange={(e) => onMrp(e.target.value)} />
             </Field>
             <Field label="Variant type" error={fieldErr("mode")} hint={editing ? "Cannot be changed after creation." : "Decides which fragrance variants are allowed (approved matrix only)."} htmlFor="pf-mode">
               <select id="pf-mode" className={s.select} value={form.mode} disabled={editing} onChange={(e) => changeMode(e.target.value)}>

@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import useCartValidation from "../hooks/useCartValidation";
+import useOffers, { offersActions } from "../hooks/useOffers";
+import useCatalog from "../hooks/useCatalog";
+import OffersBox, { PriceRows } from "./OffersBox";
 import { imgSrc } from "../shop/shopUtils";
 import { beginCheckout, purchaseOnce } from "../utils/analytics";
 import {
@@ -30,6 +33,8 @@ const inr = (n) => `₹${n.toLocaleString("en-IN")}`;
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { cartItems, clearCart, itemCount } = useCart();
+  const { catalog } = useCatalog();
+  const offers = useOffers();
   const { loading: pricing, data: priced, error: priceError } = useCartValidation(cartItems);
 
   const token = localStorage.getItem("bhava_token");
@@ -116,7 +121,6 @@ export default function CheckoutPage() {
     return () => { delete document.body.dataset.cartBar; };
   }, [placed, cartItems.length]);
 
-  const subtotal = priced?.subtotal ?? 0;
   const shipping = typeof priced?.shipping === "number" ? priced.shipping : 0;
   const total = priced?.total ?? 0;
   const cartOk = !!priced?.allOk;
@@ -310,6 +314,8 @@ export default function CheckoutPage() {
           },
           notes: form.notes,
           paymentMethod: "cod",
+          couponCode: offers.couponCode,
+          donation: offers.donation,
         }),
       });
       const json = await res.json();
@@ -333,6 +339,7 @@ export default function CheckoutPage() {
         });
         pushAddressesToServer(addresses);
         clearCart();
+        offersActions.clearAll();
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch {
@@ -805,14 +812,8 @@ export default function CheckoutPage() {
               })}
             </ul>
 
-            <div className={x.row}><span>Total MRP</span><span>{priced ? inr(subtotal) : "…"}</span></div>
-            <div className={x.row}>
-              <span>Shipping</span>
-              <span className={shipping === 0 && priced ? x.free : undefined}>
-                {!priced ? "…" : shipping === 0 ? "FREE" : inr(shipping)}
-              </span>
-            </div>
-            <div className={`${x.row} ${x.total}`}><span>Total Amount</span><span>{priced ? inr(total) : "…"}</span></div>
+            <OffersBox priced={priced} donation={catalog?.donation} />
+            <PriceRows priced={priced} loading={pricing} shipping={shipping} />
             <p className={x.gst}>Inclusive of applicable GST · Pay on delivery</p>
 
             {priced && shipping === 0 && (

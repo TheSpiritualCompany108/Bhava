@@ -47,7 +47,9 @@ const cheapestBracelet = (ctx) => {
  * Bracelet choice slots: selected SKU price when `selection.bracelets` is provided; otherwise the cheapest bracelet (listing “from” price).
  * Returns null if a component is missing.
  */
-export function bundlePrice(ctx, b, selection) {
+export const mrpOf = (p) => (p && p.mrp > p.price ? p.mrp : p?.price);
+
+export function bundlePrice(ctx, b, selection, unit = (p) => p.price) {
   let total = 0;
   let bi = 0;
   const chosen = selection?.bracelets || [];
@@ -57,16 +59,16 @@ export function bundlePrice(ctx, b, selection) {
       if (slug) {
         const p = ctx.getProduct(slug);
         if (!p) return null;
-        total += p.price;
+        total += unit(p);
       } else {
-        const from = cheapestBracelet(ctx);
-        if (from == null) return null;
-        total += from;
+        const cheapest = ctx.bracelets.map((s) => ctx.getProduct(s)).filter((x) => x && Number.isFinite(x.price)).sort((x, y) => x.price - y.price)[0];
+        if (!cheapest) return null;
+        total += unit(cheapest);
       }
     } else {
       const p = ctx.getProduct(c.product);
       if (!p || !variantOf(p, c.via === "fixed" ? c.variant : p.variants[0]?.key)) return null;
-      total += p.price;
+      total += unit(p);
     }
   }
   return total;
@@ -116,11 +118,12 @@ export function resolveLine(input, ctx) {
       if (!product || !variant) return fail("That combination is not available.");
       components.push({
         sku: variant.sku, productSlug: product.slug, name: product.name, variantLabel: product.mode === "none" ? "" : variant.label,
-        pack: product.pack, unitPrice: product.price, quantity: 1,
+        pack: product.pack, unitPrice: product.price, unitMrp: mrpOf(product), quantity: 1,
       });
     }
 
     const unitPrice = components.reduce((s, c) => s + c.unitPrice, 0); // always the exact sum of its components
+    const unitMrp = components.reduce((s, c) => s + c.unitMrp, 0);
     return {
       ok: true,
       line: {
@@ -128,7 +131,7 @@ export function resolveLine(input, ctx) {
         kind: "bundle", slug: bundle.slug, title: bundle.name, category: "Curated Collection",
         variantLabel: [fragrance && fragLabel(fragrance), pair && pairLabel(pair), camphor && `Camphor: ${fragLabel(camphor)}`].filter(Boolean).join(" · "),
         selection: { fragrance, camphor, pair, bracelets },
-        unitPrice, quantity, components,
+        unitPrice, unitMrp, quantity, components,
       },
     };
   }
@@ -144,10 +147,10 @@ export function resolveLine(input, ctx) {
       lineId: `product:${product.slug}:${variant.key}`,
       kind: "product", slug: product.slug, title: product.name, category: catLabel,
       variantLabel: product.mode === "none" ? "" : variant.label, variant: variant.key,
-      unitPrice: product.price, quantity,
+      unitPrice: product.price, unitMrp: mrpOf(product), quantity,
       components: [{
         sku: variant.sku, productSlug: product.slug, name: product.name, variantLabel: product.mode === "none" ? "" : variant.label,
-        pack: product.pack, unitPrice: product.price, quantity: 1,
+        pack: product.pack, unitPrice: product.price, unitMrp: mrpOf(product), quantity: 1,
       }],
     },
   };
@@ -166,7 +169,7 @@ export function requirementsOf(lines) {
  * Price + validate a whole cart against a stock map {sku: number}.
  * A line is blocked if its components can't be covered by the stock left after earlier lines.
  */
-export function priceCart(items, stock, ctx) {
+export function priceCart(items, stock, ctx, offers = {}) {
   const remaining = { ...stock };
   const lines = [];
   for (const raw of Array.isArray(items) ? items : []) {
@@ -192,11 +195,31 @@ export function priceCart(items, stock, ctx) {
     }
     const maxQty = Math.min(MAX_LINE_QTY, ...l.components.map((c) => Math.floor((remaining[c.sku] || 0) / c.quantity)));
     for (const c of l.components) remaining[c.sku] -= c.quantity * l.quantity;
-    lines.push({ ...l, ok: true, lineTotal: l.unitPrice * l.quantity, maxQty });
+    lines.push({ ...l, ok: true, lineTotal: l.unitPrice * l.quantity, lineMrp: l.unitMrp * l.quantity, maxQty });
   }
   const subtotal = lines.filter((l) => l.ok).reduce((s, l) => s + l.lineTotal, 0);
+  const mrpTotal = lines.filter((l) => l.ok).reduce((s, l) => s + l.lineMrp, 0);
   const shipping = shippingFor(subtotal);
-  return { lines, subtotal, shipping, total: subtotal + shipping, allOk: lines.length > 0 && lines.every((l) => l.ok) };
+  const base = { lines, subtotal, mrpTotal, productDiscount: Math.max(0, mrpTotal - subtotal), shipping, allOk: lines.length > 0 && lines.every((l) => l.ok) };
+  return { ...base, ...applyOffers(base, offers) };
+}
+
+/** Discount a coupon gives on `subtotal` (selling prices). Pure — validity (dates, usage) is checked by the caller. */
+export function couponAmount(coupon, subtotal) {
+  if (!coupon || subtotal <= 0) return 0;
+  let off = coupon.type === "percent" ? Math.floor((subtotal * coupon.value) / 100) : coupon.value;
+  if (coupon.type === "percent" && coupon.maxDiscount > 0) off = Math.min(off, coupon.maxDiscount);
+  return Math.max(0, Math.min(off, subtotal));
+}
+
+/**
+ * Final amounts. Shipping is decided on the selling subtotal (before any coupon); a coupon reduces the payable amount;
+ * a donation is an optional extra the customer adds (whole rupees, within the admin's limits).
+ */
+export function applyOffers({ subtotal, shipping }, { coupon = null, donation = 0 } = {}) {
+  const couponDiscount = couponAmount(coupon, subtotal);
+  const gift = Number.isInteger(donation) && donation > 0 ? donation : 0;
+  return { couponDiscount, donation: gift, total: subtotal - couponDiscount + shipping + gift };
 }
 
 /**
