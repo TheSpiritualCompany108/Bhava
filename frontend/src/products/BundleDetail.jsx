@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
 import shop from "../shop/Shop.module.css";
@@ -6,12 +6,16 @@ import { useCart } from "../context/CartContext";
 import useCatalog from "../hooks/useCatalog";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
 import { FOOTNOTE_PRICE, PENDING_RETURNS } from "../shop/content";
-import { inr, imgSrc, shippingCopy, getProduct, getBundle, bundleLine, liveBundlePrice, bundleThumbImage, formatPackFacts, includeMetaLine } from "../shop/shopUtils";
+import { inr, imgSrc, shippingCopy, getProduct, getBundle, bundleLine, liveBundlePrice, bundleThumbImage, bundleItems, bundleInStock, productInStock } from "../shop/shopUtils";
 import { RETURNS_POLICY_LIVE } from "../shop/storeFlags";
 import { addToCartEvent, bundleView } from "../utils/analytics";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 import ResponsiveImg from "../components/ResponsiveImg";
 import { InlineBack } from "../components/PageBack";
+import ReviewsSection, { Stars } from "./ReviewsSection";
+import AplusContent from "./AplusContent";
+import SacredPairings from "./SacredPairings";
+import ImageZoom from "./ImageZoom";
 
 const CORE = ["guggal", "oud", "sandalwood"];
 const CAMPHOR = ["guggal", "sandalwood"];
@@ -36,6 +40,42 @@ function BundleDetailInner({ slug }) {
   const [zoomed, setZoomed] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
   const [tab, setTab] = useState("about");
+  const [zoomItem, setZoomItem] = useState(null); // included product photo shown large
+  const [reviewSummary, setReviewSummary] = useState(null);
+  const onReviewSummary = useCallback((x) => setReviewSummary(x), []);
+
+  // "Sacred Pairings": other collections related to this one — same group first, then most shared products
+  // (in-stock collections before unavailable ones). Up to 3 (+ one regular product = a row of 4), all from the live catalogue.
+  const related = useMemo(() => {
+    if (!bundle || !catalog?.bundles) return [];
+    const mine = new Set(bundle.components.map((c) => c.product).filter(Boolean));
+    const hasBracelet = bundle.components.some((c) => c.bracelet);
+    return catalog.bundles
+      .filter((b) => b.slug !== bundle.slug)
+      .map((b) => {
+        const shared = b.components.filter((c) => c.product && mine.has(c.product)).length;
+        const bracelet = hasBracelet && b.components.some((c) => c.bracelet) ? 1 : 0;
+        return { b, score: (b.group === bundle.group ? 100 : 0) + shared * 10 + bracelet, ok: bundleInStock(catalog, b.slug) };
+      })
+      .sort((x, y) => Number(y.ok) - Number(x.ok) || y.score - x.score || (x.b.sortOrder ?? 0) - (y.b.sortOrder ?? 0))
+      .slice(0, 3)
+      .map(({ b }) => b);
+  }, [catalog, bundle]);
+
+  // One regular product alongside the related collections (cross-sell / upsell picks of this collection's products, PDF §12)
+  const pairedProduct = useMemo(() => {
+    if (!bundle || !catalog?.products) return null;
+    const mine = new Set(bundle.components.map((c) => c.product).filter(Boolean));
+    const ok = (p) => p && !mine.has(p.slug) && p.status !== "archived" && p.price > 0 && productInStock(catalog, p);
+    for (const c of bundle.components) {
+      const rel = getProduct(catalog, c.product)?.related || {};
+      for (const sl of [...(rel.crossSell || []), rel.upsell, rel.upsellAlt].filter(Boolean)) {
+        const p = getProduct(catalog, sl);
+        if (ok(p)) return p;
+      }
+    }
+    return catalog.products.find(ok) || null;
+  }, [catalog, bundle]);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -45,9 +85,16 @@ function BundleDetailInner({ slug }) {
     const t = setTimeout(() => setToast(false), 3500);
     return () => clearTimeout(t);
   }, [toast]);
+  // one view event per collection (a catalogue refresh or dev StrictMode must not fire it twice)
+  const viewedRef = useRef("");
+  const bundleSlug = bundle?.slug;
+  const bundlePrice = bundle?.price;
   useEffect(() => {
-    if (bundle) bundleView(bundle, bundle.price);
-  }, [bundle]);
+    if (!bundleSlug || viewedRef.current === bundleSlug) return;
+    viewedRef.current = bundleSlug;
+    bundleView({ slug: bundleSlug, name: bundle.name }, bundlePrice);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- name only labels the event
+  }, [bundleSlug, bundlePrice]);
 
   if (loading) return <div className={styles.page}><div className={shop.loadingBox}>Loading…</div></div>;
   if (error || !catalog) {
@@ -86,32 +133,16 @@ function BundleDetailInner({ slug }) {
   const toggleBracelet = (s) =>
     setBracelets((cur) => (cur.includes(s) ? cur.filter((x) => x !== s) : cur.length < needN ? [...cur, s] : needN === 1 ? [s] : cur));
 
+  // A selection block follows the price and brings its own top spacing; a fixed collection keeps the normal gap
+  const hasSelBlock = !!(bundle.needs.fragrance || bundle.needs.camphor || bundle.needs.pair || needN > 0
+    || bundle.components.some((c) => c.via === "fixed" && getProduct(catalog, c.product)?.mode === "fixed"));
   const selection = { fragrance: fragrance || null, camphor: camphor || null, pair: pair || null, bracelets };
   const livePrice = liveBundlePrice(catalog, bundle, selection);
   const line = ready ? bundleLine(bundle, selection, 1, livePrice) : null;
   const inCart = line && cartItems.find((i) => i.productId === line.productId);
   const qualifiesFree = livePrice >= catalog.shipping.freeAbove;
 
-  let bi = 0;
-  const contents = bundle.components.map((c) => {
-    if (c.bracelet) {
-      const sl = bracelets[bi++];
-      const p = sl && getProduct(catalog, sl);
-      return { qty: 1, name: p ? p.name : "Bracelet — your choice", meta: p ? formatPackFacts(p.pack) : "Select your bracelet" };
-    }
-    const p = getProduct(catalog, c.product);
-    const f = c.via === "pair" ? pair : c.via === "fixed" ? c.variant : c.via === "camphor" ? camphor : fragrance;
-    let fragranceLabel = "";
-    if (f) {
-      if (c.via === "pair") fragranceLabel = f.split("-").map((x) => catalog.fragrances[x].label).join(" + ");
-      else if (!(c.via === "fixed" && p.mode === "none")) fragranceLabel = catalog.fragrances[f]?.label || "";
-    }
-    return {
-      qty: 1,
-      name: p.name,
-      meta: includeMetaLine({ pack: p.pack, via: c.via, fragranceLabel }),
-    };
-  });
+  const contents = bundleItems(catalog, bundle, selection);
 
   const add = (e) => {
     if (!ready) return;
@@ -205,21 +236,47 @@ function BundleDetailInner({ slug }) {
             <span className={styles.categoryTag}>{bundle.group || "Curated collection"}</span>
             <h1 className={styles.title}>{bundle.name}</h1>
 
+            <button
+              type="button"
+              className={styles.ratingRow}
+              onClick={() => document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            >
+              <Stars value={reviewSummary?.count ? Math.round(reviewSummary.average) : 0} size={15} />
+              <strong>{reviewSummary?.count ? reviewSummary.average.toFixed(2) : "—"}</strong>
+              <span>
+                {reviewSummary?.count
+                  ? `${reviewSummary.count} review${reviewSummary.count !== 1 ? "s" : ""}`
+                  : "Be the first to review"}
+              </span>
+            </button>
+
             <div className={shop.includesBlock} aria-label="What's included">
               <div className={shop.selLabel}>
                 <span>What's included</span>
               </div>
-              <ul className={shop.compList}>
+              <ul className={shop.bqvItems}>
                 {contents.map((c, i) => (
-                  <li key={i}>
-                    <span className={shop.compQty}>{c.qty}×</span>
-                    <span>{c.name}{c.meta && <span className={shop.compMeta}>{c.meta}</span>}</span>
+                  <li key={i} className={shop.bqvItem}>
+                    <span className={shop.bqvThumb}>
+                      {c.slot || !c.image
+                        ? <span className={shop.bqvThumbSlot} aria-hidden="true">◉</span>
+                        : (
+                          <button type="button" className={styles.incThumbBtn} onClick={() => setZoomItem(c)} aria-label={`Show ${c.name}`}>
+                            <img src={imgSrc(c.image)} alt="" width={48} height={48} loading="lazy" decoding="async" />
+                          </button>
+                        )}
+                    </span>
+                    <span className={shop.bqvItemText}>
+                      <strong>{c.name}</strong>
+                      {c.meta && <small>{c.meta}</small>}
+                    </span>
+                    <span className={shop.bqvQty} aria-label={`Quantity ${c.qty}`}>{c.qty}×</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className={styles.priceSection}>
+            <div className={styles.priceSection} style={hasSelBlock ? { marginBottom: 0 } : undefined}>
               <span className={styles.currentPrice}>{inr(livePrice)}</span>
               <span className={styles.taxNote}>{FOOTNOTE_PRICE}</span>
             </div>
@@ -232,7 +289,6 @@ function BundleDetailInner({ slug }) {
               <div className={shop.selBlock} role="radiogroup" aria-label="Fragrance">
                 <div className={shop.selLabel}>
                   <span>Choose your fragrance</span>
-                  <small>{bundle.components.filter((c) => c.via === "fragrance").length > 1 ? "Applied to every incense format" : ""}</small>
                 </div>
                 <div className={shop.chips}>
                   {CORE.map((f) => (
@@ -431,6 +487,16 @@ function BundleDetailInner({ slug }) {
             )}
           </div>
         </section>
+
+        {/* ── A+ Content (banners uploaded in Admin → Collections) ── */}
+        {bundle.aplusContent?.length > 0 && <AplusContent modules={bundle.aplusContent} />}
+
+        {/* ── Sacred Pairings: related collections (swipe row on phones, grid on larger screens) ── */}
+        {zoomItem && <ImageZoom item={zoomItem} onClose={() => setZoomItem(null)} />}
+        <SacredPairings bundles={related} product={pairedProduct} catalog={catalog} />
+
+        {/* ── Customer Reviews ── */}
+        <ReviewsSection productId={bundle.slug} productTitle={bundle.name} onSummary={onReviewSummary} />
       </div>
     </div>
   );

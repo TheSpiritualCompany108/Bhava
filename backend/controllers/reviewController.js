@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Review from "../models/Review.js";
 import CatalogProduct from "../models/CatalogProduct.js";
+import CatalogBundle from "../models/CatalogBundle.js";
 import User from "../models/User.js";
 import Order from "../models/Order.js";
 import { uploadToBlob } from "../utils/uploadToBlob.js";
@@ -120,17 +121,24 @@ export const createReview = async (req, res) => {
       CatalogProduct.findOne({ slug: productId, status: { $ne: "archived" } }).select("slug name"),
       User.findById(req.userId).select("name"),
     ]);
-    if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+    // Curated collections are reviewable too (keyed by the collection slug)
+    const bundle = product ? null : await CatalogBundle.findOne({ slug: productId, status: { $ne: "archived" } }).select("slug name");
+    if (!product && !bundle) return res.status(404).json({ success: false, message: "Product not found" });
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     const hasOrdered = await Order.exists({
       userId: req.userId,
       status: { $ne: "cancelled" },
-      $or: [
-        { "items.slug": product.slug },
-        { "items.components.productSlug": product.slug },
-        { "items.title": product.name },
-      ],
+      $or: product
+        ? [
+            { "items.slug": product.slug },
+            { "items.components.productSlug": product.slug },
+            { "items.title": product.name },
+          ]
+        : [
+            { items: { $elemMatch: { kind: "bundle", slug: bundle.slug } } },
+            { "items.title": bundle.name },
+          ],
     });
 
     const images = [];

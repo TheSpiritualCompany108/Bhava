@@ -392,6 +392,56 @@ export function bundleContentLines(catalog, b) {
   });
 }
 
+/**
+ * Short factual tagline: the admin tagline if set, otherwise built from the real products inside
+ * ("Sacred Notes Discovery, Pure Ritual Single & Sacred Ember — one fragrance across every format").
+ */
+export function bundleShortDescription(b, catalog) {
+  if (b?.tagline) return b.tagline;
+  const names = (b?.components || []).filter((c) => c.product).map((c) => getProduct(catalog, c.product)?.name).filter(Boolean);
+  const braceletSlots = (b?.components || []).filter((c) => c.bracelet).length;
+  const parts = [...names];
+  if (braceletSlots) parts.push(braceletSlots === 1 ? "a bracelet of your choice" : `${braceletSlots} bracelets of your choice`);
+  if (!parts.length) return String(b?.description || "").split(/(?<=\.)\s/)[0].replace(/\.$/, "");
+  const list = parts.length > 1 ? `${parts.slice(0, -1).join(", ")} & ${parts[parts.length - 1]}` : parts[0];
+  const n = b.needs || {};
+  const note = n.pair ? "your chosen fragrance pair" : n.fragrance ? "one fragrance across every format" : n.camphor ? "with your camphor fragrance" : "";
+  return note ? `${list} — ${note}` : list;
+}
+
+/**
+ * The products inside a collection, one row per component: { qty, name, meta, image, slot }.
+ * `selection` (fragrance / camphor / pair / bracelets) fills in the customer's choices; `slot` marks a
+ * bracelet the customer still has to pick (no product image yet).
+ */
+export function bundleItems(catalog, b, selection = {}) {
+  const { fragrance, camphor, pair, bracelets = [] } = selection;
+  let bi = 0;
+  return (b?.components || []).map((c) => {
+    if (c.bracelet) {
+      const sl = bracelets[bi++];
+      const p = sl && getProduct(catalog, sl);
+      return p
+        ? { qty: 1, name: p.name, meta: formatPackFacts(p.pack), image: p.image, slot: false }
+        : { qty: 1, name: "Bracelet — your choice", meta: "Select your bracelet", image: "", slot: true };
+    }
+    const p = getProduct(catalog, c.product);
+    const f = c.via === "pair" ? pair : c.via === "fixed" ? c.variant : c.via === "camphor" ? camphor : fragrance;
+    let fragranceLabel = "";
+    if (f && p) {
+      if (c.via === "pair") fragranceLabel = f.split("-").map((x) => catalog.fragrances[x]?.label || x).join(" + ");
+      else if (!(c.via === "fixed" && p.mode === "none")) fragranceLabel = catalog.fragrances[f]?.label || "";
+    }
+    return {
+      qty: 1,
+      name: p?.name || c.product,
+      meta: includeMetaLine({ pack: p?.pack, via: c.via, fragranceLabel }),
+      image: p?.image || "",
+      slot: false,
+    };
+  });
+}
+
 /** Soften catalog pack facts for UI — middots, drop redundant notes. */
 export function formatPackFacts(pack) {
   if (!pack) return "";

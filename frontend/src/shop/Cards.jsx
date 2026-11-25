@@ -5,8 +5,9 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./Shop.module.css";
 import { useCart } from "../context/CartContext";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
-import { inr, productInStock, bundleInStock, variantInStock, productLine, bundleContentLines, bundleThumbImage } from "./shopUtils";
+import { inr, productInStock, bundleInStock, variantInStock, productLine, bundleItems, bundleShortDescription, formatPackFacts, bundleThumbImage, imgSrc } from "./shopUtils";
 import { addToCartEvent } from "../utils/analytics";
+import WishlistHeart from "./WishlistHeart";
 import ResponsiveImg from "../components/ResponsiveImg";
 
 const FRAG_ORDER = ["guggal", "oud", "sandalwood"];
@@ -31,6 +32,7 @@ function useHoverSlides(count) {
   useEffect(() => stop, []);
   const start = (e) => {
     if (count < 2 || e.pointerType !== "mouse") return;
+    if (!e.currentTarget.contains(e.target)) return; // events bubbling out of a popup (React portal) are not hovers on the card
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     stop();
     setArmed(true);
@@ -40,11 +42,13 @@ function useHoverSlides(count) {
       timers.current.loop = setInterval(() => setIdx((i) => (i >= count ? 1 : i + 1)), SLIDE_EVERY_MS);
     }, SLIDE_FIRST_MS);
   };
-  const end = () => {
+  const end = (e) => {
+    if (e?.currentTarget && e.target && !e.currentTarget.contains(e.target)) return; // popup events, not the card
     stop();
     setIdx(0);
   };
-  return { idx, setIdx, armed, bind: { onPointerEnter: start, onPointerLeave: end } };
+  // reset: stop the slideshow right away (used when a popup opens over the card)
+  return { idx, setIdx, armed, reset: () => end(), bind: { onPointerEnter: start, onPointerLeave: end } };
 }
 
 function SlideTrack({ images, idx, setIdx, armed, alt, width, height, sizes }) {
@@ -87,6 +91,8 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
   const multiFrag = p.mode === "single" || p.mode === "camphor";
   const offered = FRAG_ORDER.filter((f) => p.variants.some((v) => v.fragrances.includes(f)));
   const showFrags = !dense && p.mode !== "none";
+  const rating = catalog.ratings?.[p.slug];
+  const packLine = formatPackFacts(p.pack); // phones show it as the subtitle (hidden on larger screens)
   const images = cardImages(p.image, p.gallery);
   const slides = useHoverSlides(images.length);
 
@@ -124,12 +130,19 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
           />
         </Link>
         {!inStock && <span className={`${styles.ribbon} ${styles.ribbonOff}`}>Out of stock</span>}
+        <WishlistHeart product={p} />
       </div>
       <Link to={`/product/${p.slug}`} className={styles.cardLink} aria-label={`${p.name} — ${inr(p.price)}`}>
         <div className={styles.cardBody}>
           <span className={styles.cardType}>{catalog.categories.find((c) => c.id === p.category)?.label}</span>
           <h3 className={styles.cardTitle}>{p.name}</h3>
           {p.tagline && <p className={styles.cardTagline}>{p.tagline}</p>}
+          {packLine && <p className={styles.cardPack}>{packLine}</p>}
+          {rating?.count > 0 && (
+            <p className={styles.cardRating} aria-label={`Rated ${rating.average} out of 5 from ${rating.count} reviews`}>
+              <span aria-hidden="true">★</span> <strong>{rating.average.toFixed(1)}</strong> <span>({rating.count})</span>
+            </p>
+          )}
           {showFrags && (
             <div className={styles.dots} aria-label="Fragrances">
               {p.mode === "pair" || p.mode === "all"
@@ -149,19 +162,19 @@ export function ProductCard({ product: p, catalog, onAdded, dense = false }) {
         ) : single && !multiFrag ? (
           <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={quickAdd}>
             <span data-label>
-              {inCartLine ? "Go to Cart →" : "Add to Cart +"}
+              {inCartLine ? "Go to Cart →" : <><svg className={styles.btnIcon} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></svg> Add to Cart</>}
             </span>
           </button>
         ) : (
           <button
             type="button"
             className={`${styles.btn} ${styles.btnGhost}`}
-            onClick={() => setQuickOpen(true)}
+            onClick={() => { slides.reset(); setQuickOpen(true); }}
             aria-haspopup="dialog"
           >
             {anyVariantInCart
               ? (p.mode === "pair" ? "Add another pair" : "Add another")
-              : "Choose & add →"}
+              : "Choose & Add →"}
           </button>
         )}
       </div>
@@ -183,11 +196,12 @@ export function BundleCard({ bundle: b, catalog }) {
   const images = cardImages(thumb, b.gallery);
   const slides = useHoverSlides(images.length);
   const [quickOpen, setQuickOpen] = useState(false);
+  const items = bundleItems(catalog, b);
   // "Choose & add" opens the popup; the rest of the card still opens the collection page
   const onCardClick = (e) => {
     if (inStock && e.target.closest?.("[data-bundle-quick]")) {
       e.preventDefault();
-      setQuickOpen(true);
+      slides.reset(); setQuickOpen(true);
     }
   };
   return (
@@ -206,14 +220,40 @@ export function BundleCard({ bundle: b, catalog }) {
         />
       </div>
       <span className={styles.cardType}>{b.group}</span>
+      <span className={styles.bcCount}>Set of {items.length}</span>
       <h3 className={styles.cardTitle}>{b.name}</h3>
-      {b.tagline && <p className={styles.cardTagline}>{b.tagline}</p>}
-      <ul className={styles.bundleList}>
-        {bundleContentLines(catalog, b).map((l, i) => <li key={i}>{l}</li>)}
-      </ul>
+      <p className={styles.bcDesc}>{bundleShortDescription(b, catalog)}</p>
+      <div className={styles.bcInside}>
+        <ul className={styles.bcThumbs}>
+          {items.slice(0, 3).map((it, i) => (
+            <li key={i} className={styles.bcThumb} title={it.name}>
+              {it.slot || !it.image
+                ? <span aria-hidden="true">◉</span>
+                : <img src={imgSrc(it.image)} alt="" width={36} height={36} loading="lazy" decoding="async" />}
+            </li>
+          ))}
+        </ul>
+        <span className={styles.bcViewAll}>View all {items.length} {items.length === 1 ? "item" : "items"}</span>
+        <span
+          className={styles.bcWhat}
+          role="button"
+          tabIndex={0}
+          aria-haspopup="dialog"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); slides.reset(); setQuickOpen(true); }}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); slides.reset(); setQuickOpen(true); } }}
+        >What&apos;s inside <span aria-hidden="true" style={{ fontSize: 9, marginLeft: 4 }}>▼</span></span>
+      </div>
       <div className={styles.bundleFoot}>
         <span className={styles.price}>{inr(b.price)}</span>
-        <span data-bundle-quick className={`${styles.btn} ${inStock ? styles.btnGhost : styles.btnDisabled}`}>{inStock ? "Choose & add →" : "Unavailable"}</span>
+        <span
+          data-bundle-quick
+          role="button"
+          tabIndex={inStock ? 0 : -1}
+          aria-haspopup="dialog"
+          onClick={(e) => { if (!inStock) return; e.preventDefault(); e.stopPropagation(); slides.reset(); setQuickOpen(true); }}
+          onKeyDown={(e) => { if (inStock && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); slides.reset(); setQuickOpen(true); } }}
+          className={`${styles.btn} ${inStock ? styles.btnGhost : styles.btnDisabled}`}
+        >{inStock ? <>Choose &amp; Add<span className={styles.bcArrow}> →</span></> : "Unavailable"}</span>
       </div>
     </Link>
     {quickOpen && <BundleQuickView bundle={b} catalog={catalog} onClose={() => setQuickOpen(false)} />}

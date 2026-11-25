@@ -1,4 +1,5 @@
 import CatalogProduct from "../models/CatalogProduct.js";
+import Review from "../models/Review.js";
 import CatalogBundle from "../models/CatalogBundle.js";
 import CatalogCategory from "../models/CatalogCategory.js";
 import CatalogSettings from "../models/CatalogSettings.js";
@@ -44,12 +45,18 @@ const publicProduct = (p) => {
 
 export const getCatalog = wrap(async (req, res) => {
   const [ctx, stock, settings] = await Promise.all([loadCtx(), loadStock(), getSettings()]);
+  // Real review averages for the shop cards (one grouped query; a failure just means no stars are shown)
+  const ratings = {};
+  try {
+    const rows = await Review.aggregate([{ $group: { _id: "$productId", count: { $sum: 1 }, average: { $avg: "$rating" } } }]);
+    rows.forEach((r) => { ratings[r._id] = { count: r.count, average: Math.round(r.average * 10) / 10 }; });
+  } catch { /* ignore */ }
   const bundles = ctx.bundles
     .map((b) => ({ b, price: bundlePrice(ctx, b) }))
     .filter(({ price }) => price !== null)
     .map(({ b, price }) => ({
       slug: b.slug, name: b.name, price, group: b.group, tagline: b.tagline, description: b.description, needs: b.needs,
-      image: b.image || "", gallery: b.gallery || [],
+      image: b.image || "", gallery: b.gallery || [], aplusContent: b.aplusContent || [],
       featured: !!b.featured, priority: b.launchPriority || null, homeModule: b.homeModule || "", sortOrder: b.sortOrder,
       components: b.components.map((c) => ({ product: c.product || null, bracelet: !!c.bracelet, via: c.via || null, variant: c.variant || null })),
     }));
@@ -62,6 +69,7 @@ export const getCatalog = wrap(async (req, res) => {
     bundles,
     availability: availabilityFor(stock, ctx),
     shopFilters: settings.shopFilters,
+    ratings,
   });
 });
 

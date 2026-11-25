@@ -15,6 +15,7 @@ import { viewItem, selectItem, addToCartEvent } from "../utils/analytics";
 import Seo, { siteOrigin, clipDesc } from "../components/Seo";
 import ReviewsSection, { Stars } from "./ReviewsSection";
 import AplusContent from "./AplusContent";
+import WishlistHeart from "../shop/WishlistHeart";
 import ResponsiveImg from "../components/ResponsiveImg";
 import { InlineBack } from "../components/PageBack";
 
@@ -249,6 +250,7 @@ function ProductDetailInner({ slug }) {
               aria-roledescription="carousel"
               aria-label={`${product.name} product images`}
             >
+              <WishlistHeart product={product} style={{ top: 12, right: 12, width: 36, height: 36 }} />
               {/* sliding track: every gallery image is a slide, moved with a CSS transform */}
               <div className={styles.mainTrack} style={{ transform: `translateX(-${Math.min(activeImg, gallery.length - 1) * 100}%)` }}>
                 {gallery.map((g, i) => (
@@ -542,7 +544,7 @@ function ProductDetailInner({ slug }) {
                   <div className={shop.promoT}>{bundle.name} — {inr(bundle.price)}</div>
                   <div className={shop.promoS}>{bundleContentLines(catalog, bundle).join(" · ")}</div>
                 </div>
-                <span className={shop.promoGo}>Choose &amp; add →</span>
+                <span className={shop.promoGo}>Choose &amp; Add →</span>
               </Link>
             )}
             {bundle && bundleQuick && (

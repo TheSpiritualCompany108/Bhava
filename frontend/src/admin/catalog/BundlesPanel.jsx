@@ -3,10 +3,11 @@ import { toast } from "../toast";
 import s from "./AdminCatalog.module.css";
 import { api, money, imgUrl, useDebounced, useNotice, slugify, optimizeImage } from "./adminApi";
 import { Notice, Confirm, ErrorList, StatusBadge, Modal, ImageLightbox } from "./common";
+import AplusEditor from "./AplusEditor";
 
 const VIA_FOR_MODE = { single: ["fragrance", "fixed"], pair: ["pair", "fixed"], camphor: ["camphor", "fixed"], all: ["fixed"], fixed: ["fixed"], none: ["fixed"] };
 const VIA_LABEL = { fragrance: "Customer's fragrance (shared)", camphor: "Customer's camphor fragrance", pair: "Customer's fragrance pair", fixed: "Fixed variant" };
-const EMPTY = { slug: "", name: "", group: "", tagline: "", description: "", image: "", status: "active", featured: false, launchPriority: "", homeModule: "", sortOrder: 0, approvalNotes: "", components: [{ bracelet: true }] };
+const EMPTY = { slug: "", name: "", group: "", tagline: "", description: "", image: "", status: "active", featured: false, launchPriority: "", homeModule: "", sortOrder: 0, approvalNotes: "", aplusContent: [], components: [{ bracelet: true }] };
 
 function defaultVariantKey(product) {
   if (!product?.variants?.length) return undefined;
@@ -124,7 +125,7 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
           {imgs.map((u, i) => (
             <div className={s.imgBox} key={u + i}>
               <img src={imgUrl(u)} alt={`Collection ${i + 1}`} title="Click to preview" onClick={() => setLightbox(i + 1)} />
-              {i === 0 ? <span className={s.hint}>Cover</span> : <button type="button" className={s.hint} onClick={() => setImgs([u, ...imgs.filter((_, j) => j !== i)])}>Make cover</button>}
+              {i === 0 ? <span className={s.coverTag}>Cover</span> : <button type="button" className={s.coverBtn} onClick={() => setImgs([u, ...imgs.filter((_, j) => j !== i)])}>Make cover</button>}
               <button type="button" className={s.imgX} onClick={() => setImgs(imgs.filter((_, j) => j !== i))} aria-label="Remove image">✕</button>
             </div>
           ))}
@@ -234,6 +235,8 @@ function BundleForm({ slug, bundle, products, onClose, onSaved }) {
         <div>Computed price: <b>{money(price)}</b> <span className={s.muted}>{needs.bracelets ? "— listing “from” uses the cheapest bracelet; the customer pays the selected bracelets plus the other components." : "— always the exact sum of the component prices (no discount, no compare-at price)."}</span></div>
         <div>Customer selects: <b>{picks.length ? picks.join(", ") : "nothing — fixed collection"}</b></div>
       </div>
+      <AplusEditor value={form.aplusContent} onChange={(v) => set("aplusContent", v)} onError={setError} />
+
       <div className={s.field} style={{ marginTop: 12 }}>
         <label className={s.label} htmlFor="bf-an">Approval notes (internal)</label>
         <textarea id="bf-an" className={s.textarea} rows={2} value={form.approvalNotes} onChange={(e) => set("approvalNotes", e.target.value)} />

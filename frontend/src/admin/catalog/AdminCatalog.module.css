@@ -81,6 +81,12 @@
 .imgs { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .imgBox { position: relative; }
 .imgBox img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; border: 1px solid #eee3d3; background: #f5f0e6; display: block; }
+.imgBox { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.coverTag, .coverBtn { width: 84px; padding: 5px 0; border-radius: 999px; font: inherit; font-size: 11.5px; font-weight: 700; text-align: center; box-sizing: border-box; }
+.coverTag { background: #4A0B1D; color: #fff; border: 1px solid #4A0B1D; }
+.coverBtn { background: #fff; color: #4A0B1D; border: 1px solid #d9c9b2; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.coverBtn:hover { background: #faf3e8; border-color: #E07B39; color: #C0671E; }
+.coverBtn:focus-visible { outline: 2px solid #E07B39; outline-offset: 2px; }
 .imgX { position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: #a2331f; color: #fff; cursor: pointer; font-size: 12px; line-height: 1; }
 .pickGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; max-height: 190px; overflow-y: auto; padding: 8px 10px; border: 1px solid #eee3d3; border-radius: 8px; }
 .preview { background: #faf6ee; border: 1px solid #eee3d3; border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.6; }
