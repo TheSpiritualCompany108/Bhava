@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import MrpTag from "../components/MrpTag";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
 import shop from "../shop/Shop.module.css";
@@ -16,6 +17,7 @@ import ReviewsSection, { Stars } from "./ReviewsSection";
 import AplusContent from "./AplusContent";
 import SacredPairings from "./SacredPairings";
 import ImageZoom from "./ImageZoom";
+import BraceletPreview from "./BraceletPreview";
 
 const CORE = ["guggal", "oud", "sandalwood"];
 const CAMPHOR = ["guggal", "sandalwood"];
@@ -39,6 +41,7 @@ function BundleDetailInner({ slug }) {
   const [toast, setToast] = useState(false);
   const [zoomed, setZoomed] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
+  const [view, setView] = useState("cover"); // "Any N bracelets" collections: original cover | personalised preview
   const [tab, setTab] = useState("about");
   const [zoomItem, setZoomItem] = useState(null); // included product photo shown large
   const [reviewSummary, setReviewSummary] = useState(null);
@@ -130,14 +133,20 @@ function BundleDetailInner({ slug }) {
   if (needN && bracelets.length !== needN) missing.push(needN === 1 ? "a bracelet" : `${needN} different bracelets`);
   const ready = missing.length === 0 && avail?.available;
 
-  const toggleBracelet = (s) =>
+  const toggleBracelet = (s) => {
     setBracelets((cur) => (cur.includes(s) ? cur.filter((x) => x !== s) : cur.length < needN ? [...cur, s] : needN === 1 ? [s] : cur));
+    if (!bracelets.includes(s)) setView("selection"); // choosing a bracelet switches to the personalised preview
+  };
+  const multiPick = needN >= 2; // Dual / Triple Intention
+  const pickedProducts = bracelets.map((s) => braceletProducts.find((p) => p.slug === s)).filter(Boolean);
+  const showSel = multiPick && view === "selection";
 
   // A selection block follows the price and brings its own top spacing; a fixed collection keeps the normal gap
   const hasSelBlock = !!(bundle.needs.fragrance || bundle.needs.camphor || bundle.needs.pair || needN > 0
     || bundle.components.some((c) => c.via === "fixed" && getProduct(catalog, c.product)?.mode === "fixed"));
   const selection = { fragrance: fragrance || null, camphor: camphor || null, pair: pair || null, bracelets };
   const livePrice = liveBundlePrice(catalog, bundle, selection);
+  const liveMrp = liveBundlePrice(catalog, bundle, selection, true);
   const line = ready ? bundleLine(bundle, selection, 1, livePrice) : null;
   const inCart = line && cartItems.find((i) => i.productId === line.productId);
   const qualifiesFree = livePrice >= catalog.shipping.freeAbove;
@@ -201,7 +210,17 @@ function BundleDetailInner({ slug }) {
         <div className={styles.productShowcase}>
           {/* ── Left: gallery (same as PDP) ── */}
           <div className={styles.galleryCol}>
+            {multiPick && (
+              <div className={shop.viewTabs} role="tablist" aria-label="Preview">
+                <button type="button" role="tab" aria-selected={!showSel} className={!showSel ? shop.viewTabOn : ""} onClick={() => setView("cover")}>Collection Cover</button>
+                <button type="button" role="tab" aria-selected={showSel} className={showSel ? shop.viewTabOn : ""} onClick={() => setView("selection")}>
+                  Your Selection <span>{bracelets.length}/{needN}</span>
+                </button>
+              </div>
+            )}
+            {showSel && <BraceletPreview count={needN} picked={pickedProducts} />}
             <div
+              hidden={showSel}
               className={styles.mainImageWrapper}
               onClick={() => setZoomed((z) => !z)}
               style={zoomed ? { cursor: "zoom-out" } : { cursor: "zoom-in" }}
@@ -220,7 +239,7 @@ function BundleDetailInner({ slug }) {
               />
               <span className={styles.badgeOverlay}>Collection</span>
             </div>
-            {gallery.length > 1 && (
+            {gallery.length > 1 && !showSel && (
               <div className={styles.thumbnailRow}>
                 {gallery.map((g, i) => (
                   <button key={g + i} type="button" className={`${styles.thumbnailBtn} ${i === activeImg ? styles.thumbnailActive : ""}`} onClick={() => setActiveImg(i)} aria-label={`Show image ${i + 1}`}>
@@ -277,7 +296,7 @@ function BundleDetailInner({ slug }) {
             </div>
 
             <div className={styles.priceSection} style={hasSelBlock ? { marginBottom: 0 } : undefined}>
-              <span className={styles.currentPrice}>{inr(livePrice)}</span>
+              <span className={styles.currentPrice}>{inr(livePrice)}<MrpTag mrp={liveMrp} price={livePrice} /></span>
               <span className={styles.taxNote}>{FOOTNOTE_PRICE}</span>
             </div>
 
@@ -368,6 +387,24 @@ function BundleDetailInner({ slug }) {
                   <span>{needN === 1 ? "Choose your bracelet" : `Choose ${needN} different bracelets`}</span>
                   <small>{bracelets.length}/{needN} selected</small>
                 </div>
+                {multiPick && (
+                  <>
+                    <div className={shop.progress} role="progressbar" aria-valuemin={0} aria-valuemax={needN} aria-valuenow={bracelets.length} aria-label="Bracelets selected">
+                      <span style={{ width: `${(bracelets.length / needN) * 100}%` }} />
+                    </div>
+                    {pickedProducts.length > 0 && (
+                      <ul className={shop.chips} aria-label="Selected bracelets">
+                        {pickedProducts.map((p) => (
+                          <li key={p.slug}>
+                            <img src={imgSrc(p.image)} alt="" width={28} height={28} />
+                            <span>{p.name.replace(" Bracelet", "")}</span>
+                            <button type="button" onClick={() => toggleBracelet(p.slug)} aria-label={`Remove ${p.name}`}>✕</button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
                 <div className={shop.braceletGrid}>
                   {braceletProducts.map((p) => {
                     const on = bracelets.includes(p.slug);
@@ -379,6 +416,7 @@ function BundleDetailInner({ slug }) {
                         type="button"
                         aria-pressed={on}
                         disabled={!stocked || full}
+                        title={full ? `You have chosen ${needN} — remove one to swap` : undefined}
                         className={`${shop.braceletOpt} ${on ? shop.braceletOn : ""}`}
                         onClick={() => toggleBracelet(p.slug)}
                       >
@@ -498,6 +536,28 @@ function BundleDetailInner({ slug }) {
         {/* ── Customer Reviews ── */}
         <ReviewsSection productId={bundle.slug} productTitle={bundle.name} onSummary={onReviewSummary} />
       </div>
+
+      {multiPick && (
+        <div className={styles.stickyBuyBar} role="region" aria-label="Quick add to cart">
+          <div className={styles.stickyBuyPrice}>
+            <strong>{inr(livePrice)}</strong>
+            <span>{bracelets.length}/{needN} bracelets</span>
+          </div>
+          <button
+            type="button"
+            className={styles.stickyBuyBtn}
+            disabled={!avail?.available}
+            onClick={(e) => {
+              if (!avail?.available) return;
+              if (inCart) navigate("/cart");
+              else if (ready) add(e);
+              else document.querySelector(`.${shop.selBlock}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }}
+          >
+            {inCart ? "View Bag →" : ready ? "Add to Bag +" : `Select ${needN - bracelets.length} more`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

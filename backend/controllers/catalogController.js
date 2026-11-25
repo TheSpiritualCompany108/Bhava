@@ -6,8 +6,12 @@ import CatalogSettings from "../models/CatalogSettings.js";
 import Inventory from "../models/Inventory.js";
 import { uploadToBlob } from "../utils/uploadToBlob.js";
 import {
-  SHIPPING, FRAGRANCES, PENDING, MODES, allowedVariants, availabilityFor, priceCart, bundlePrice, needsOf,
+  SHIPPING, FRAGRANCES, PENDING, MODES, allowedVariants, availabilityFor, priceCart, bundlePrice, needsOf, mrpOf,
 } from "../data/catalog.js";
+import Coupon from "../models/Coupon.js";
+import {
+  getDonationConfig, cleanDonationConfig, findApplicableCoupon, checkDonation, listPublicCoupons, cleanCouponInput,
+} from "../services/offersService.js";
 import {
   ApiError, loadCtx, loadAdminCtx, loadStock, syncCatalog, validateProductInput, validateBundleInput, adminListProducts, adminListBundles,
   inventoryList, inventorySummary, setStock, adjustStock, bulkSetStock, stockMovements, productReferences, bundleReferences, getSettings,
@@ -33,7 +37,7 @@ const invalid = (errors) => {
 const publicProduct = (p) => {
   const contents = [["Quantity", p.packQuantity], ["Net weight", p.netWeight], ...(p.contents || []).map((c) => [c.label, c.value])].filter(([, v]) => v);
   return {
-    slug: p.slug, name: p.name, category: p.category, price: p.price, mode: p.mode, format: p.format,
+    slug: p.slug, name: p.name, category: p.category, price: p.price, mrp: p.mrp > p.price ? p.mrp : 0, mode: p.mode, format: p.format,
     variants: p.variants.map((v) => ({ key: v.key, label: v.label, fragrances: v.fragrances })),
     tagline: p.tagline, description: p.description, intention: p.intention || "", copyPending: !!p.copyPending,
     pack: p.pack, contents, fitNote: p.fitNote || "", materials: p.materials || "", usage: p.usage || "", safety: p.safety || "", storage: p.storage || "",
@@ -44,7 +48,7 @@ const publicProduct = (p) => {
 };
 
 export const getCatalog = wrap(async (req, res) => {
-  const [ctx, stock, settings] = await Promise.all([loadCtx(), loadStock(), getSettings()]);
+  const [ctx, stock, settings, donation] = await Promise.all([loadCtx(), loadStock(), getSettings(), getDonationConfig()]);
   // Real review averages for the shop cards (one grouped query; a failure just means no stars are shown)
   const ratings = {};
   try {
@@ -55,7 +59,7 @@ export const getCatalog = wrap(async (req, res) => {
     .map((b) => ({ b, price: bundlePrice(ctx, b) }))
     .filter(({ price }) => price !== null)
     .map(({ b, price }) => ({
-      slug: b.slug, name: b.name, price, group: b.group, tagline: b.tagline, description: b.description, needs: b.needs,
+      slug: b.slug, name: b.name, price, mrp: Math.max(bundlePrice(ctx, b, undefined, mrpOf) || 0, price) > price ? bundlePrice(ctx, b, undefined, mrpOf) : 0, group: b.group, tagline: b.tagline, description: b.description, needs: b.needs,
       image: b.image || "", gallery: b.gallery || [], aplusContent: b.aplusContent || [],
       featured: !!b.featured, priority: b.launchPriority || null, homeModule: b.homeModule || "", sortOrder: b.sortOrder,
       components: b.components.map((c) => ({ product: c.product || null, bracelet: !!c.bracelet, via: c.via || null, variant: c.variant || null })),
@@ -69,13 +73,71 @@ export const getCatalog = wrap(async (req, res) => {
     bundles,
     availability: availabilityFor(stock, ctx),
     shopFilters: settings.shopFilters,
+    donation: donation.enabled ? donation : null,
     ratings,
   });
 });
 
+// Prices a cart and (optionally) a coupon code + donation. The same maths runs again at checkout.
 export const priceCartHandler = wrap(async (req, res) => {
   const [ctx, stock] = await Promise.all([loadCtx(), loadStock()]);
-  res.json({ success: true, shippingRule: SHIPPING, ...priceCart(req.body?.items, stock, ctx) });
+  const base = priceCart(req.body?.items, stock, ctx);
+  const { coupon, error: couponError } = await findApplicableCoupon(req.body?.couponCode, base.subtotal);
+  const { amount: donation, error: donationError } = await checkDonation(req.body?.donation);
+  const priced = priceCart(req.body?.items, stock, ctx, { coupon, donation });
+  res.json({
+    success: true, shippingRule: SHIPPING, ...priced,
+    coupon: coupon ? { code: coupon.code, title: coupon.title } : null, couponError, donationError,
+  });
+});
+
+// Coupons listed under "Apply Coupons" (visible ones only; `subtotal` shows what each would save on this bag)
+export const publicCoupons = wrap(async (req, res) => {
+  const subtotal = Math.max(0, parseInt(req.query.subtotal, 10) || 0);
+  res.json({ success: true, coupons: await listPublicCoupons(subtotal) });
+});
+
+// ── Admin: bulk product discount ─────────────────────────────────────────────
+// Sets each product's MRP so that its current selling price is `percent` below it (or clears the MRP).
+// Selling prices never change. Scope: every product, or one category.
+export const adminBulkDiscount = wrap(async (req, res) => {
+  const clear = req.body?.clear === true;
+  const percent = Number(req.body?.percent);
+  if (!clear && (!Number.isInteger(percent) || percent < 1 || percent > 90)) throw new ApiError(422, "Discount must be a whole number between 1 and 90.");
+  const category = String(req.body?.category || "").trim();
+  const q = { status: { $ne: "archived" }, price: { $gt: 0 }, ...(category ? { category } : {}) };
+  const products = await CatalogProduct.find(q, "slug price").lean();
+  if (!products.length) throw new ApiError(404, "No products match.");
+  await CatalogProduct.bulkWrite(products.map((p) => ({
+    updateOne: { filter: { slug: p.slug }, update: { $set: { mrp: clear ? 0 : Math.round(p.price / (1 - percent / 100)) } } },
+  })));
+  res.json({
+    success: true, count: products.length,
+    message: clear ? `Discount removed from ${products.length} product(s).` : `${percent}% discount applied to ${products.length} product(s). Selling prices are unchanged.`,
+  });
+});
+
+// ── Admin: coupons ───────────────────────────────────────────────────────────
+export const adminCoupons = wrap(async (req, res) => {
+  res.json({ success: true, coupons: await Coupon.find().sort({ createdAt: -1 }).lean() });
+});
+export const adminCreateCoupon = wrap(async (req, res) => {
+  const d = cleanCouponInput(req.body);
+  if (await Coupon.exists({ code: d.code })) throw new ApiError(409, `Coupon ${d.code} already exists.`);
+  const c = await Coupon.create(d);
+  res.status(201).json({ success: true, message: `Coupon ${c.code} created.`, coupon: c });
+});
+export const adminUpdateCoupon = wrap(async (req, res) => {
+  const existing = await Coupon.findOne({ code: String(req.params.code).toUpperCase() });
+  if (!existing) throw new ApiError(404, "Coupon not found.");
+  Object.assign(existing, cleanCouponInput(req.body, existing));
+  await existing.save();
+  res.json({ success: true, message: `Coupon ${existing.code} saved.`, coupon: existing });
+});
+export const adminDeleteCoupon = wrap(async (req, res) => {
+  const r = await Coupon.deleteOne({ code: String(req.params.code).toUpperCase() });
+  if (!r.deletedCount) throw new ApiError(404, "Coupon not found.");
+  res.json({ success: true, message: "Coupon deleted. Past orders keep their record." });
 });
 
 // ── Admin: products ──────────────────────────────────────────────────────────
@@ -231,7 +293,7 @@ export const adminBulkSetStock = wrap(async (req, res) => {
 export const adminMovements = wrap(async (req, res) => res.json({ success: true, items: await stockMovements(req.params.sku, 100) }));
 
 // ── Admin: settings / sync / upload ──────────────────────────────────────────
-export const adminGetSettings = wrap(async (req, res) => res.json({ success: true, ...(await getSettings()) }));
+export const adminGetSettings = wrap(async (req, res) => res.json({ success: true, ...(await getSettings()), donation: await getDonationConfig() }));
 export const adminPutSettings = wrap(async (req, res) => {
   const patch = {};
   if (req.body?.lowStockThreshold !== undefined) {
@@ -247,10 +309,13 @@ export const adminPutSettings = wrap(async (req, res) => {
     }
     Object.assign(patch, next);
   }
+  if (req.body?.donation && typeof req.body.donation === "object") {
+    for (const [k, v] of Object.entries(cleanDonationConfig(req.body.donation))) patch[`donation.${k}`] = v;
+  }
   if (!Object.keys(patch).length) throw new ApiError(400, "Nothing to update.");
   await CatalogSettings.updateOne({ key: "main" }, { $set: patch }, { upsert: true });
   const settings = await getSettings();
-  res.json({ success: true, message: "Shop settings saved.", ...settings });
+  res.json({ success: true, message: "Shop settings saved.", ...settings, donation: await getDonationConfig() });
 });
 export const adminSync = wrap(async (req, res) => {
   const report = await syncCatalog({ dryRun: !!req.body?.dryRun });

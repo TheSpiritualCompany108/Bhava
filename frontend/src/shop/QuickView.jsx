@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import MrpTag from "../components/MrpTag";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import s from "./Shop.module.css";
@@ -127,7 +128,7 @@ export default function QuickView({ product: p, catalog, onClose, onAdded }) {
           <h2 className={s.qvTitle}>{p.name}</h2>
           {p.tagline && <p className={s.cardTagline}>{p.tagline}</p>}
           <div className={s.qvPrice}>
-            {inr(p.price)} <small>{FOOTNOTE_PRICE}</small>
+            {inr(p.price)}<MrpTag mrp={p.mrp} price={p.price} /> <small>{FOOTNOTE_PRICE}</small>
           </div>
           {!inStock && (
             <span className={`${s.stockBadge} ${s.stockBadgeOut}`} role="status">

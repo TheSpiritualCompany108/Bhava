@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import MrpTag from "../components/MrpTag";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import useCartValidation from "../hooks/useCartValidation";
@@ -42,6 +43,8 @@ const catRank = (id) => {
   const i = LIKE_CAT_ORDER.indexOf(id);
   return i === -1 ? 50 : i;
 };
+
+import OffersBox, { PriceRows } from "./OffersBox";
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -421,6 +424,7 @@ export default function CartPage() {
 
                     <p className={x.priceRow}>
                       {blocked ? <span className={x.muted}>—</span> : <strong>{inr(unit * item.quantity)}</strong>}
+                      {!blocked && <MrpTag mrp={(sv?.unitMrp ?? 0) * item.quantity} price={unit * item.quantity} />}
                       {!blocked && item.quantity > 1 && <span className={x.muted}> ({inr(unit)} each)</span>}
                     </p>
 
@@ -454,13 +458,9 @@ export default function CartPage() {
 
           {/* ── Right: price details ── */}
           <aside className={x.right} id="cart-price-details" aria-label="Price details">
+            <OffersBox priced={data} donation={catalog?.donation} />
             <h2 className={x.sectionH}>PRICE DETAILS ({payableCount} {payableCount === 1 ? "Item" : "Items"})</h2>
-            <div className={x.row}><span>Total MRP</span><span>{loading && !data ? "…" : inr(subtotal)}</span></div>
-            <div className={x.row}>
-              <span>Shipping</span>
-              <span className={shipping === 0 && data ? x.free : undefined}>{!data ? "…" : shipping === 0 ? "FREE" : inr(shipping)}</span>
-            </div>
-            <div className={`${x.row} ${x.total}`}><span>Total Amount</span><span>{loading && !data ? "…" : inr(total)}</span></div>
+            <PriceRows priced={data} loading={loading} shipping={shipping} />
             <p className={x.gst}>Inclusive of applicable GST.</p>
 
             {data && allOk && shipUi && (

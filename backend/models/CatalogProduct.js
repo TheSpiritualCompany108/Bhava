@@ -49,6 +49,8 @@ const catalogProductSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     category: { type: String, required: true, index: true },
     price: { type: Number, required: true, min: 0 },
+    /** Optional printed MRP (₹). Shown struck-through only when admin sets it above `price`; 0 = no discount shown. */
+    mrp: { type: Number, default: 0, min: 0 },
     mode: { type: String, enum: MODES, required: true },
     variants: { type: [variantSchema], default: [] },
     status: { type: String, enum: PRODUCT_STATUSES, default: "active", index: true },

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import MrpTag from "../components/MrpTag";
 import { Link } from "react-router-dom";
 import styles from "./SacredPairings.module.css";
 import ResponsiveImg from "../components/ResponsiveImg";
@@ -65,7 +66,7 @@ function PairingCard({ bundle, catalog }) {
         <div className={styles.foot}>
           <p className={styles.price}>
             {fromPrice && <small>From</small>}
-            {inr(bundle.price)}
+            {inr(bundle.price)}<MrpTag mrp={bundle.mrp} price={bundle.price} />
           </p>
           <button
             ref={ctaRef}

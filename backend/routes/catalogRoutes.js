@@ -10,6 +10,7 @@ const admin = [protect, adminOnly]; // every write (and every admin read) requir
 // Public (read-only)
 router.get("/", c.getCatalog);
 router.post("/cart", c.priceCartHandler);
+router.get("/coupons", c.publicCoupons);
 
 // Admin — products
 router.get("/admin/products", admin, c.adminProducts);
@@ -38,6 +39,14 @@ router.put("/admin/inventory/bulk", admin, c.adminBulkSetStock);
 router.put("/admin/inventory", admin, c.adminSetStock);
 router.post("/admin/inventory/adjust", admin, c.adminAdjustStock);
 router.get("/admin/inventory/:sku/movements", admin, c.adminMovements);
+
+router.post("/admin/products/bulk-discount", admin, c.adminBulkDiscount);
+
+// Admin — coupons
+router.get("/admin/coupons", admin, c.adminCoupons);
+router.post("/admin/coupons", admin, c.adminCreateCoupon);
+router.put("/admin/coupons/:code", admin, c.adminUpdateCoupon);
+router.delete("/admin/coupons/:code", admin, c.adminDeleteCoupon);
 
 // Admin — settings, sync, uploads
 router.get("/admin/settings", admin, c.adminGetSettings);

@@ -119,7 +119,7 @@ export default function Products() {
   // The phone artwork is 375 x 400, so the banner gets taller while such a slide is showing
   const bannerPortrait = isMobile && !!bannerSlides[bannerIndex]?.mobileImage;
   const kicker = bannerData?.kicker || "The Spiritual Company";
-  const title = bannerData?.title || "Shop Bhava:";
+  const title = bannerData?.title || "Bhava: Rituals";
   const subtitle =
     bannerData?.subtitle ||
     "Incense Sticks, Bamboo-less Incense, Sambrani, Camphor and Sacred Beads — chosen with care for a more considered daily ritual.";

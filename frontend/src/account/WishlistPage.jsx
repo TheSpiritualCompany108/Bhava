@@ -20,7 +20,7 @@ export default function WishlistPage() {
       {error && <p style={{ textAlign: "center" }}>{error} <button className={shop.btn} onClick={reload}>Try again</button></p>}
       {catalog && products.length === 0 && (
         <div style={{ textAlign: "center" }}>
-          <p>Your wishlist is empty. Tap the heart on any product to save it here.</p>
+          <p>Your wishlist is empty. Tap the Om icon on any product to save it here.</p>
           <Link to="/products" className={`${shop.btn} ${shop.btnGhost}`}>Browse the shop</Link>
         </div>
       )}

@@ -215,19 +215,21 @@ export const productLine = (p, variantKey, quantity = 1) => {
 };
 
 /** Exact collection total: selected bracelets + fixed components. Unchosen bracelet slots use the cheapest bracelet (listing “from”). */
-export function liveBundlePrice(catalog, b, selection) {
-  if (!catalog || !b) return b?.price || 0;
+export function liveBundlePrice(catalog, b, selection, asMrp = false) {
+  if (!catalog || !b) return (asMrp ? b?.mrp : 0) || b?.price || 0;
+  const unit = (p) => (asMrp && p.mrp > p.price ? p.mrp : p.price);
   const beads = catalog.products.filter((p) => p.mode === "none");
-  const cheapest = beads.length ? Math.min(...beads.map((p) => p.price)) : 0;
+  const cheapest = beads.length ? beads.reduce((m, p) => (p.price < m.price ? p : m)) : null;
   let total = 0;
   let bi = 0;
   const chosen = selection?.bracelets || [];
   for (const c of b.components) {
     if (c.bracelet) {
-      const p = getProduct(catalog, chosen[bi++]);
-      total += p ? p.price : cheapest;
+      const p = getProduct(catalog, chosen[bi++]) || cheapest;
+      total += p ? unit(p) : 0;
     } else {
-      total += getProduct(catalog, c.product)?.price || 0;
+      const p = getProduct(catalog, c.product);
+      total += p ? unit(p) : 0;
     }
   }
   return total;

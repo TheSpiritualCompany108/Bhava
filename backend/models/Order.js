@@ -65,7 +65,11 @@ const orderSchema = new mongoose.Schema(
     // Price breakdown for checkout orders
     pricing: {
       subtotal: { type: Number, default: 0 },
-      discount: { type: Number, default: 0 },
+      discount: { type: Number, default: 0 },       // coupon discount (₹)
+      mrpTotal: { type: Number, default: 0 },       // sum of MRPs at order time
+      productDiscount: { type: Number, default: 0 }, // MRP − selling price
+      couponCode: { type: String, default: "" },
+      donation: { type: Number, default: 0 },
       shipping: { type: Number, default: 0 },
       total:    { type: Number, default: 0 },
     },

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import MrpTag from "../components/MrpTag";
 import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
 import shop from "../shop/Shop.module.css";
@@ -337,7 +338,7 @@ function ProductDetailInner({ slug }) {
             </button>
 
             <div className={styles.priceSection}>
-              <span className={styles.currentPrice}>{inr(product.price)}</span>
+              <span className={styles.currentPrice}>{inr(product.price)}<MrpTag mrp={product.mrp} price={product.price} /></span>
               <span className={styles.taxNote}>{FOOTNOTE_PRICE}</span>
             </div>
 
@@ -702,7 +703,7 @@ function ProductDetailInner({ slug }) {
       {stickyBuy && (
         <div className={styles.stickyBuyBar} role="region" aria-label="Quick add to cart">
           <div className={styles.stickyBuyPrice}>
-            <strong>{inr(product.price)}</strong>
+            <strong>{inr(product.price)}<MrpTag mrp={product.mrp} price={product.price} /></strong>
             <span>{FOOTNOTE_PRICE}</span>
           </div>
           <button
