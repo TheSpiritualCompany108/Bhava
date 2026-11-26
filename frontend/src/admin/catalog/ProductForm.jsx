@@ -64,7 +64,7 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
     if (!editing) return;
     api(`/products/${slug}`).then(({ item }) => {
       setForm({ ...EMPTY, ...item, price: String(item.price), mrp: item.mrp ? String(item.mrp) : "", related: { ...EMPTY.related, ...(item.related || {}) } });
-      setVariants(Object.fromEntries(item.variants.map((v) => [v.key, { included: true, sku: v.sku, active: v.active !== false, existing: true }])));
+      setVariants(Object.fromEntries(item.variants.map((v) => [v.key, { included: true, sku: v.sku, active: v.active !== false, existing: true, images: v.images?.length ? v.images : v.image ? [v.image] : [] }])));
       setLoading(false);
     }).catch((e) => { setError(e); setLoading(false); });
   }, [editing, slug]);
@@ -84,6 +84,21 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
     } catch (e) { setError(e); toast.error(e.message || "Could not upload the image."); } finally { setUploading(false); }
   };
 
+  // Optional photo per fragrance (shown on the product page when that fragrance is chosen)
+  const uploadVariantImages = async (files, key) => {
+    const list = Array.from(files || []);
+    if (!list.length) return;
+    setUploading(true);
+    try {
+      for (const file of list) {
+        const fd = new FormData();
+        fd.append("image", await optimizeImage(file));
+        const { url } = await api("/upload", { method: "POST", form: fd });
+        setVariants((cur) => ({ ...cur, [key]: { ...cur[key], images: [...(cur[key].images || []), url].slice(0, 8) } }));
+      }
+    } catch (e) { toast.error(e.message || "Could not upload the image."); } finally { setUploading(false); }
+  };
+
   const save = async () => {
     setBusy(true);
     setError(null);
@@ -91,7 +106,7 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
       ...form,
       price: Number(form.price),
       mrp: form.mrp === "" ? 0 : Number(form.mrp),
-      variants: allowed.filter((a) => variants[a.key]?.included).map((a) => ({ key: a.key, sku: variants[a.key].sku, active: variants[a.key].active !== false })),
+      variants: allowed.filter((a) => variants[a.key]?.included).map((a) => ({ key: a.key, sku: variants[a.key].sku, active: variants[a.key].active !== false, images: variants[a.key].images || [] })),
     };
     try {
       const j = editing ? await api(`/products/${slug}`, { method: "PUT", body }) : await api("/products", { method: "POST", body });
@@ -179,10 +194,44 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
                 <input className={`${s.input} ${s.mono}`} placeholder="SKU (e.g. SN-DIS-GUG)" value={v.sku} disabled={v.existing || !v.included} maxLength={31}
                   onChange={(e) => upd({ sku: e.target.value.toUpperCase() })} aria-label={`SKU for ${a.label}`} />
                 <label className={s.check}><input type="checkbox" checked={v.active} disabled={!v.included} onChange={(e) => upd({ active: e.target.checked })} /> Active</label>
+                {v.included && allowed.length > 1 && (
+                  <div className={s.variantImg}>
+                    {(v.images || []).map((u, i) => (
+                      <div key={u + i} className={s.vThumb}>
+                        <img src={imgUrl(u)} alt={`${a.label} photo ${i + 1}`} />
+                        {i === 0 && <span className={s.vLead}>Lead</span>}
+                        <button type="button" onClick={() => upd({ images: v.images.filter((_, k) => k !== i) })} aria-label={`Remove ${a.label} photo ${i + 1}`}>✕</button>
+                      </div>
+                    ))}
+                    {(v.images || []).length < 8 && (
+                      <label className={`${s.btn} ${s.btnGhost} ${s.btnSm}`} style={{ cursor: uploading ? "wait" : "pointer" }}>
+                        {(v.images || []).length ? "+ Add photo" : "Upload photos"}
+                        <input type="file" accept="image/png,image/jpeg,image/webp" multiple hidden disabled={uploading} onChange={(e) => { uploadVariantImages(e.target.files, a.key); e.target.value = ""; }} />
+                      </label>
+                    )}
+                    <span className={s.hint}>Shown as the product images when a customer picks {a.label} (first photo leads). Optional, up to 8.</span>
+                  </div>
+                )}
               </div>
             );
           })}
           <span className={s.hint}>Existing SKUs are locked (they are linked to stock and past orders) — deactivate a variant instead. New variants start at 0 stock.</span>
+
+          <div className={s.sect}>Images</div>
+          <div className={s.imgs}>
+            {form.image && <div className={s.imgBox}><img src={imgUrl(form.image)} alt="Main" title="Click to preview / download" onClick={() => setLightbox(0)} /><button className={s.imgX} onClick={() => set("image", "")} aria-label="Remove main image">✕</button></div>}
+            <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { upload(e.target.files[0], "main"); e.target.value = ""; }} />
+            <button className={`${s.btn} ${s.btnGhost}`} onClick={() => fileRef.current.click()} disabled={uploading}>{uploading ? "Uploading…" : form.image ? "Replace main image" : "Upload main image"}</button>
+          </div>
+          <div className={s.hint} style={{ margin: "6px 0 12px" }}>Main image: {form.image || "none"}</div>
+          <span className={s.label}>Gallery (front, close-up, packaging, contents, scale)</span>
+          <div className={s.imgs} style={{ marginTop: 6 }}>
+            {form.gallery.map((g, i) => (
+              <div key={g + i} className={s.imgBox}><img src={imgUrl(g)} alt={`Gallery ${i + 1}`} title="Click to preview / download" onClick={() => setLightbox((form.image ? 1 : 0) + i)} /><button className={s.imgX} onClick={() => set("gallery", form.gallery.filter((_, j) => j !== i))} aria-label="Remove image">✕</button></div>
+            ))}
+            <input ref={galRef} type="file" accept="image/*" hidden onChange={(e) => { upload(e.target.files[0], "gallery"); e.target.value = ""; }} />
+            <button className={`${s.btn} ${s.btnGhost}`} onClick={() => galRef.current.click()} disabled={uploading || form.gallery.length >= 10}>+ Add gallery image</button>
+          </div>
 
           <div className={s.sect}>Descriptions</div>
           <div className={s.grid2}>
@@ -218,22 +267,6 @@ export default function ProductForm({ slug, meta, onClose, onSaved }) {
             <Field label="Safety information" full htmlFor="pf-safe"><textarea id="pf-safe" className={s.textarea} rows={3} value={form.safety} onChange={(e) => set("safety", e.target.value)} /></Field>
             <Field label="Storage" htmlFor="pf-sto"><textarea id="pf-sto" className={s.textarea} rows={2} value={form.storage} onChange={(e) => set("storage", e.target.value)} /></Field>
             <Field label="Materials / ingredients" hint="Only where approved / supported by supplier documents." htmlFor="pf-mat"><textarea id="pf-mat" className={s.textarea} rows={2} value={form.materials} onChange={(e) => set("materials", e.target.value)} /></Field>
-          </div>
-
-          <div className={s.sect}>Images</div>
-          <div className={s.imgs}>
-            {form.image && <div className={s.imgBox}><img src={imgUrl(form.image)} alt="Main" title="Click to preview / download" onClick={() => setLightbox(0)} /><button className={s.imgX} onClick={() => set("image", "")} aria-label="Remove main image">✕</button></div>}
-            <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { upload(e.target.files[0], "main"); e.target.value = ""; }} />
-            <button className={`${s.btn} ${s.btnGhost}`} onClick={() => fileRef.current.click()} disabled={uploading}>{uploading ? "Uploading…" : form.image ? "Replace main image" : "Upload main image"}</button>
-          </div>
-          <div className={s.hint} style={{ margin: "6px 0 12px" }}>Main image: {form.image || "none"}</div>
-          <span className={s.label}>Gallery (front, close-up, packaging, contents, scale)</span>
-          <div className={s.imgs} style={{ marginTop: 6 }}>
-            {form.gallery.map((g, i) => (
-              <div key={g + i} className={s.imgBox}><img src={imgUrl(g)} alt={`Gallery ${i + 1}`} title="Click to preview / download" onClick={() => setLightbox((form.image ? 1 : 0) + i)} /><button className={s.imgX} onClick={() => set("gallery", form.gallery.filter((_, j) => j !== i))} aria-label="Remove image">✕</button></div>
-            ))}
-            <input ref={galRef} type="file" accept="image/*" hidden onChange={(e) => { upload(e.target.files[0], "gallery"); e.target.value = ""; }} />
-            <button className={`${s.btn} ${s.btnGhost}`} onClick={() => galRef.current.click()} disabled={uploading || form.gallery.length >= 10}>+ Add gallery image</button>
           </div>
 
           <div className={s.sect}>FAQs (product-specific)</div>

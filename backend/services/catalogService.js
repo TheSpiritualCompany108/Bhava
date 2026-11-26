@@ -256,7 +256,10 @@ export async function validateProductInput(input, { existing } = {}) {
     if (prev && prev.sku !== sku) { err("variants", `The SKU of "${rule.label}" (${prev.sku}) cannot be changed — it is linked to stock and past orders. Deactivate the variant and add a new one instead.`); continue; }
     const clash = await CatalogProduct.findOne({ "variants.sku": sku, ...(existing ? { slug: { $ne: existing.slug } } : {}) }, "slug").lean();
     if (clash) { err("variants", `SKU ${sku} is already used by "${clash.slug}".`); continue; }
-    d.variants.push({ key, label: rule.label, fragrances: rule.fragrances, sku, active: v.active !== false });
+    const rawImgs = Array.isArray(v.images) ? v.images : v.image ? [v.image] : [];
+    const images = [...new Set(rawImgs.map((u) => str(u, 500)).filter(Boolean))].slice(0, 8);
+    if (images.some((u) => !/^(\/uploads\/|\/Products\/|https:\/\/)/.test(u))) { err("variants", `Images for ${rule.label} must be uploaded images.`); continue; }
+    d.variants.push({ key, label: rule.label, fragrances: rule.fragrances, sku, active: v.active !== false, image: images[0] || "", images });
   }
   if (existing) for (const prev of existing.variants) if (!seenKeys.has(prev.key)) err("variants", `Variant "${prev.label}" cannot be removed — deactivate it instead (stock and orders reference it).`);
   if (!d.variants.length) err("variants", "Add at least one variant (every sellable product needs a SKU).");
