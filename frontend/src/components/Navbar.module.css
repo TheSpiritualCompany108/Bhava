@@ -245,11 +245,6 @@
   height: 22px;
 }
 
-/* wishlist Om in the Get Started maroon */
-.wishSvg {
-  color: #4A0B1D;
-}
-
 .iconMotion { display: flex; transform-origin: center; }
 
 .wishPulse {

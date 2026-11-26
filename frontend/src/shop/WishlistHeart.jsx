@@ -1,7 +1,6 @@
 import React from "react";
 import styles from "./Shop.module.css";
 import { useWishlist } from "../context/WishlistContext";
-import OmIcon from "../components/OmIcon";
 import { heartBurst } from "../utils/heartBurst";
 
 /** Wishlist heart for a product. Place it inside a `position: relative` image box; `style` sets the corner. */
@@ -26,7 +25,7 @@ export default function WishlistHeart({ product, style }) {
       aria-pressed={wished}
       aria-label={wished ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
     >
-      <OmIcon size={17} filled />
+      <svg width="17" height="17" viewBox="0 0 24 24" fill={wished ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-9.3-9.1C1.1 8.7 3 5 6.5 5c2 0 3.5 1.2 5.5 3.2C14 6.2 15.5 5 17.5 5 21 5 22.9 8.7 21.3 11.9 19 16.4 12 21 12 21z" /></svg>
     </button>
   );
 }
