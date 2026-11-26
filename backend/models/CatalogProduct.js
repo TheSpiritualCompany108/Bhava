@@ -38,6 +38,10 @@ const variantSchema = new mongoose.Schema(
     sku: { type: String, required: true, trim: true, uppercase: true },
     fragrances: { type: [String], default: [] },
     active: { type: Boolean, default: true },
+    /** Optional photo for this fragrance. Shown as the main image on the product page when it is chosen. */
+    image: { type: String, default: "" },
+    /** All photos for this fragrance (first = lead image). */
+    images: { type: [String], default: [] },
   },
   { _id: false }
 );

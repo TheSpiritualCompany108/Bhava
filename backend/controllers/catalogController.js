@@ -38,7 +38,7 @@ const publicProduct = (p) => {
   const contents = [["Quantity", p.packQuantity], ["Net weight", p.netWeight], ...(p.contents || []).map((c) => [c.label, c.value])].filter(([, v]) => v);
   return {
     slug: p.slug, name: p.name, category: p.category, price: p.price, mrp: p.mrp > p.price ? p.mrp : 0, mode: p.mode, format: p.format,
-    variants: p.variants.map((v) => ({ key: v.key, label: v.label, fragrances: v.fragrances })),
+    variants: p.variants.map((v) => ({ key: v.key, label: v.label, fragrances: v.fragrances, image: v.image || "", images: v.images?.length ? v.images : v.image ? [v.image] : [] })),
     tagline: p.tagline, description: p.description, intention: p.intention || "", copyPending: !!p.copyPending,
     pack: p.pack, contents, fitNote: p.fitNote || "", materials: p.materials || "", usage: p.usage || "", safety: p.safety || "", storage: p.storage || "",
     faqs: p.faqs || [], image: p.image, gallery: p.gallery || [], seoTitle: p.seoTitle || "", seoDescription: p.seoDescription || "",

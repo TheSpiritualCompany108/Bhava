@@ -168,3 +168,12 @@
 .bulkFill { margin-top: 4px; }
 .bulkFillRow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .bulkTableWrap { margin-top: 14px; max-height: 360px; overflow: auto; border: 1px solid #eee3d3; border-radius: 10px; }
+
+/* per-fragrance photo row inside a variant row */
+.variantImg { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-top: 6px; border-top: 1px dashed #eee3d3; }
+.variantImg img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; background: #f5f0e6; }
+.variantImgEmpty { width: 48px; height: 48px; border-radius: 8px; border: 1px dashed #d9cdbb; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; color: #8a7a7e; line-height: 1.1; }
+.vThumb { position: relative; width: 56px; height: 56px; }
+.vThumb img { width: 100%; height: 100%; border-radius: 8px; object-fit: cover; background: #f5f0e6; display: block; }
+.vThumb button { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border: 0; border-radius: 50%; background: #a2331f; color: #fff; font-size: 10px; line-height: 1; cursor: pointer; }
+.vLead { position: absolute; left: 3px; bottom: 3px; padding: 1px 5px; border-radius: 999px; background: rgba(74, 11, 29, .85); color: #fff; font-size: 9.5px; font-weight: 700; }

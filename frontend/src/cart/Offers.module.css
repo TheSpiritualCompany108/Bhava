@@ -35,8 +35,8 @@
 .chipOn { background: #4A0B1D !important; color: #fff !important; border-color: #4A0B1D !important; }
 .other.chipOn::placeholder { color: #fff; }
 
-.save { color: #2f7a4a; font-weight: 700; }
-.saved { margin: 2px 0 8px; padding: 6px 10px; border-radius: 4px; background: #eef7f0; color: #2f7a4a; font-size: 12.5px; }
+.save { color: #C0671E; font-weight: 700; }
+.saved { margin: 2px 0 8px; padding: 6px 10px; text-align: center; border-radius: 4px; background: #FFF1E4; border: 1px solid #f3d6bd; color: #4A0B1D; font-size: 12.5px; }
 .rows > div { padding: 5px 0; font-size: 14px; }
 .rows > div:last-of-type { padding-top: 12px; }
 .saved strong { font-weight: 800; }

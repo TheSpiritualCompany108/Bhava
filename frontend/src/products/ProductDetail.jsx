@@ -37,6 +37,7 @@ function ProductDetailInner({ slug }) {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("about");
   const [toast, setToast] = useState(false);
+  const [askPick, setAskPick] = useState(0); // bumps each time the shopper tries to buy before choosing a fragrance
   const [addedQty, setAddedQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
   const [zoomed, setZoomed] = useState(false);
@@ -88,6 +89,11 @@ function ProductDetailInner({ slug }) {
     const t = setTimeout(() => setToast(false), 3500);
     return () => clearTimeout(t);
   }, [toast]);
+  useEffect(() => {
+    if (!askPick) return undefined;
+    const t = setTimeout(() => setAskPick(0), 3200);
+    return () => clearTimeout(t);
+  }, [askPick]);
 
   useEffect(() => {
     if (product) viewItem(product, variantKey);
@@ -102,7 +108,10 @@ function ProductDetailInner({ slug }) {
   const maxQty = !product ? 20 : variant ? Math.max(0, productMaxQty(catalog, product.slug, variant.key) - (inCart?.quantity || 0)) : productMaxQtyAny(catalog, product, cartItems);
   const qtyEff = Math.max(1, Math.min(qty, maxQty || 1));
   const atStockLimit = !!variant && inStock && maxQty < 20 && qtyEff >= maxQty;
-  const gallery = product ? [product.image, ...(product.gallery || [])].filter(Boolean) : [];
+  // A fragrance with its own photos (Admin) shows only those; otherwise the product's own images
+  const gallery = product
+    ? [...new Set((variant?.images?.length ? variant.images : [product.image, ...(product.gallery || [])]).filter(Boolean))]
+    : [];
   const faqs = useMemo(() => (product && catalog ? faqsFor(product, catalog) : []), [product, catalog]);
   // Must stay above early returns — cold QR deep-links hit loading first, then remount hooks
   const alsoLike = useMemo(() => {
@@ -162,8 +171,22 @@ function ProductDetailInner({ slug }) {
   ].filter(Boolean);
   const bundle = rel.bundle ? getBundle(catalog, rel.bundle) : null;
 
+  // Tried to add / buy without choosing a fragrance: say so, and point at the selector
+  const askChoice = () => {
+    setAskPick((n) => n + 1);
+    const block = document.querySelector("[data-pick-block]");
+    block?.scrollIntoView({ behavior: "smooth", block: "center" });
+    // shake only (no re-mount, so nothing fades out and back in)
+    if (block?.animate && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      block.animate(
+        [{ transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "translateX(-4px)" }, { transform: "translateX(4px)" }, { transform: "translateX(0)" }],
+        { duration: 450, delay: 250, easing: "ease" }
+      );
+    }
+  };
   const add = (e) => {
-    if (needsChoice || !inStock) return;
+    if (needsChoice) return askChoice();
+    if (!inStock) return;
     const btn = e?.currentTarget;
     const line = productLine(product, variant.key, qtyEff);
     addToCart(line);
@@ -173,7 +196,8 @@ function ProductDetailInner({ slug }) {
     setToast(true);
   };
   const buyNow = () => {
-    if (needsChoice || !inStock) return;
+    if (needsChoice) return askChoice();
+    if (!inStock) return;
     const line = productLine(product, variant.key, qtyEff);
     addToCart(line);
     addToCartEvent(line);
@@ -213,6 +237,11 @@ function ProductDetailInner({ slug }) {
           },
         }}
       />
+      {askPick > 0 && needsChoice && (
+        <div key={askPick} className={`${styles.toast} ${styles.toastWarn}`} role="alert">
+          <span>Please select {choiceNoun} first, then add to cart or buy now.</span>
+        </div>
+      )}
       {toast && (
         <div className={styles.toast} role="status">
           <span>✓ Added {addedQty} × “{product.name}”{variant?.label && product.mode !== "none" ? ` (${variant.label})` : ""}</span>
@@ -375,7 +404,7 @@ function ProductDetailInner({ slug }) {
               </div>
             )}
             {(product.mode === "single" || product.mode === "pair" || product.mode === "camphor") && (
-              <div className={shop.selBlock} role="radiogroup" aria-label={product.mode === "pair" ? "Fragrance pair" : "Fragrance"}>
+              <div data-pick-block className={shop.selBlock} role="radiogroup" aria-label={product.mode === "pair" ? "Fragrance pair" : "Fragrance"}>
                 <div className={shop.selLabel}>
                   <span>{product.mode === "pair" ? "Choose your pair" : "Choose your fragrance"}</span>
                   {product.mode === "camphor" && <small>Both tablets share the same fragrance</small>}
@@ -391,7 +420,7 @@ function ProductDetailInner({ slug }) {
                         disabled={!ok}
                         title={ok ? "" : "Out of stock"}
                         className={`${shop.chip} ${variantKey === v.key ? shop.chipOn : ""}`}
-                        onClick={() => { setPicked(v.key); selectItem(product, v.key); setSearchParams({ fragrance: v.key }, { replace: true }); }} /* keep the URL shareable: ?fragrance=oud */
+                        onClick={() => { setPicked(v.key); setActiveImg(0); selectItem(product, v.key); setSearchParams({ fragrance: v.key }, { replace: true }); }} /* keep the URL shareable: ?fragrance=oud */
                       >
                         {v.label}
                       </button>
@@ -430,7 +459,7 @@ function ProductDetailInner({ slug }) {
               <div className={styles.addWrap}>
                 <button
                   className={`${styles.addToCartBtn} ${inCart ? styles.addedBtn : ""}`}
-                  disabled={!inStock || needsChoice}
+                  disabled={!inStock}
                   onClick={(e) => (inCart ? navigate("/cart") : add(e))}
                 >
                   <span data-label style={{ display: "inline-block" }}>
@@ -444,7 +473,7 @@ function ProductDetailInner({ slug }) {
                   </span>
                 </button>
               </div>
-              <button className={styles.buyNowBtn} onClick={buyNow} disabled={!inStock || needsChoice}>Buy Now →</button>
+              <button className={styles.buyNowBtn} onClick={buyNow} disabled={!inStock}>Buy Now →</button>
             </div>
 
             <div className={styles.perks}>
@@ -712,7 +741,7 @@ function ProductDetailInner({ slug }) {
             disabled={!needsChoice && !inStock}
             onClick={(e) => {
               if (needsChoice) {
-                document.querySelector(`.${shop.selBlock}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                askChoice();
                 return;
               }
               if (!inStock) return;
