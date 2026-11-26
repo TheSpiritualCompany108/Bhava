@@ -367,8 +367,8 @@ function ProductDetailInner({ slug }) {
             </button>
 
             <div className={styles.priceSection}>
-              <span className={styles.currentPrice}>{inr(product.price)}<MrpTag mrp={product.mrp} price={product.price} /></span>
-              <span className={styles.taxNote}>{FOOTNOTE_PRICE}</span>
+              <span className={styles.currentPrice}>{inr(product.price)}<MrpTag mrp={product.mrp} price={product.price} variant="savings" note="Incl. GST" /></span>
+              {!(product.mrp > product.price) && <span className={styles.taxNote}>Incl. GST</span>}
             </div>
 
             {!inStock && (

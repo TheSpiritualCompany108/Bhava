@@ -309,16 +309,16 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 6px;
   padding: 16px 0;
   border-top: 1px solid #f0e9df;
   border-bottom: 1px solid #f0e9df;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .currentPrice {
   font-size: 34px;
-  font-weight: 800;
+  font-weight: 700;
   color: #4A0B1D;
   font-family: 'Neue Haas Grotesk', Inter, sans-serif;
   line-height: 1.15;
@@ -341,7 +341,7 @@
 
 .taxNote {
   font-size: 12px;
-  color: #888;
+  color: #938589;
   line-height: 1.4;
   margin: 0;
 }
@@ -1112,7 +1112,7 @@
   }
   .priceSection {
     gap: 6px;
-    padding: 14px 0;
+    padding: 16px 0;
   }
   .currentPrice {
     font-size: 28px;
@@ -1356,3 +1356,6 @@
 
 /* "Select a fragrance first" prompt */
 .toastWarn { background: #8a2a14; bottom: 96px; }
+
+/* The selector block below brings its own top spacing; anything else gets the normal gap */
+.priceSection + *:not([class*="selBlock"]) { margin-top: 20px; }

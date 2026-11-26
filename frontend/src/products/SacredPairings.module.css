@@ -261,3 +261,6 @@
 /* a regular product card sharing the row: stretch it to the same height as the bundle cards */
 .productSlot { display: flex; min-width: 0; }
 .productSlot > * { flex: 1; min-width: 0; }
+
+/* MRP + discount sit flush-left under the price (no indent from the tag's inline margin) */
+.price > span { margin-left: 0; }

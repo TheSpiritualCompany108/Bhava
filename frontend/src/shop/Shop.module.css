@@ -50,10 +50,11 @@
 .cardTitle { font-family: 'Canela', serif; font-size: 19px; line-height: 1.25; color: #4A0B1D; margin: 2px 0 0; font-weight: 500; }
 .cardTagline { font-size: 13.5px; color: #5c4a4f; margin: 2px 0 0; line-height: 1.45; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
 .cardPack { display: none; font-size: 12.5px; color: #7a6a6e; margin: 4px 0 0; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
-.cardFoot { padding: 10px 14px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: auto; min-width: 0; box-sizing: border-box; }
+.cardFoot { padding: 10px 14px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: nowrap; margin-top: auto; min-width: 0; box-sizing: border-box; }
 .cardDense .cardFoot { padding: 8px 14px 14px; }
 .cardFoot .btn { flex-shrink: 0; white-space: nowrap; max-width: 100%; box-sizing: border-box; }
-.cardFoot .price { min-width: 0; overflow-wrap: anywhere; }
+.cardFoot .price { min-width: 0; white-space: nowrap; flex: 0 1 auto; }
+.cardFoot .btn { padding-left: 14px; padding-right: 14px; }
 .price { font-size: 18px; font-weight: 800; color: #4A0B1D; font-family: 'Neue Haas Grotesk', Inter, sans-serif; }
 .priceNote { display: block; font-size: 12px; font-weight: 500; color: #8a7a7e; }
 .dots { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
@@ -768,3 +769,23 @@
 .chips li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chips li button { width: 28px; height: 28px; border: 0; border-radius: 50%; background: rgba(74, 11, 29, 0.1); color: #4A0B1D; cursor: pointer; font-size: 11px; }
 .chips li button:focus-visible { outline: 2px solid #E07B39; }
+
+/* Desktop: price on one line, MRP and discount underneath, left-aligned — same as the collection cards beside it */
+@media (min-width: 768px) {
+  .cardBody, .cardDense .cardBody { padding-bottom: 14px; }
+  .cardFoot, .cardDense .cardFoot { margin-left: 14px; margin-right: 14px; padding: 12px 0 14px; border-top: 1px solid #F0E8DD; }
+  .cardFoot .price { display: flex; flex-direction: column; align-items: flex-start; font-size: 19px; line-height: 1.15; }
+  .cardFoot .price > span { margin-left: 0; }
+  .bundleFoot .price { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+  .cardFoot .price, .bundleFoot .price { font-size: 22px; font-weight: 600; }
+  .cardFoot .price > span, .bundleFoot .price > span { margin-left: 0; margin-top: 4px; gap: 0 14px; align-items: center; }
+  .cardFoot .price s, .bundleFoot .price s { font-size: 13px; font-weight: 400; color: #938589; }
+  .cardFoot .price em, .bundleFoot .price em { font-size: 12px; font-weight: 500; color: #4A0B1D; background: rgba(74, 11, 29, 0.08); padding: 3px 8px; border-radius: 6px; line-height: 1.2; }
+}
+
+/* Mobile: same maroon-tint badge behind the discount */
+@media (max-width: 767px) {
+  .cardBody .dots { flex-wrap: nowrap; gap: 3px; }
+  .cardBody .dot { font-size: 9.5px; padding: 2px 5px; white-space: nowrap; }
+  .cardFoot .price em, .bundleFoot .price em { background: rgba(74, 11, 29, 0.08); padding: 2px 6px; border-radius: 6px; line-height: 1.2; }
+}

@@ -6,7 +6,7 @@ import shop from "../shop/Shop.module.css";
 import { useCart } from "../context/CartContext";
 import useCatalog from "../hooks/useCatalog";
 import { playAddToCartAnimation } from "../utils/cartAnimation";
-import { FOOTNOTE_PRICE, PENDING_RETURNS } from "../shop/content";
+import { PENDING_RETURNS } from "../shop/content";
 import { inr, imgSrc, shippingCopy, getProduct, getBundle, bundleLine, liveBundlePrice, bundleThumbImage, bundleItems, bundleInStock, productInStock } from "../shop/shopUtils";
 import { RETURNS_POLICY_LIVE } from "../shop/storeFlags";
 import { addToCartEvent, bundleView } from "../utils/analytics";
@@ -296,8 +296,8 @@ function BundleDetailInner({ slug }) {
             </div>
 
             <div className={styles.priceSection} style={hasSelBlock ? { marginBottom: 0 } : undefined}>
-              <span className={styles.currentPrice}>{inr(livePrice)}<MrpTag mrp={liveMrp} price={livePrice} /></span>
-              <span className={styles.taxNote}>{FOOTNOTE_PRICE}</span>
+              <span className={styles.currentPrice}>{inr(livePrice)}<MrpTag mrp={liveMrp} price={livePrice} variant="savings" note="Incl. GST" /></span>
+              {!(liveMrp > livePrice) && <span className={styles.taxNote}>Incl. GST</span>}
             </div>
 
             {!avail?.available && (
