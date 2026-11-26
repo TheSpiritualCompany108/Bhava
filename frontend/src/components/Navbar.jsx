@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
-import OmIcon from "./OmIcon";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 import ExpandingSearchDock from "./ui/ExpandingSearchDock";
@@ -307,7 +306,7 @@ function Navbar() {
               aria-label={`Wishlist${wishCount ? `, ${wishCount} saved` : ""}`}
             >
               <span ref={wishIconRef} className={styles.iconMotion}>
-                <OmIcon className={`${styles.cartSvg} ${styles.wishSvg}`} size={22} filled />
+                <svg className={styles.cartSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s-7-4.6-9.3-9.1C1.1 8.7 3 5 6.5 5c2 0 3.5 1.2 5.5 3.2C14 6.2 15.5 5 17.5 5 21 5 22.9 8.7 21.3 11.9 19 16.4 12 21 12 21z" /></svg>
               </span>
               <span className={styles.cartBadge} data-empty={wishCount === 0 ? "1" : "0"} aria-hidden={wishCount === 0}>
                 {wishCount > 99 ? "99+" : wishCount}
@@ -401,7 +400,7 @@ function Navbar() {
 
                       <button type="button" className={styles.dropdownItem} onClick={() => { navigate("/wishlist"); setDropdownOpen(false); }}>
                         <span className={styles.dropdownItemIcon}>
-                          <OmIcon size={20} />
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s-7-4.6-9.3-9.1C1.1 8.7 3 5 6.5 5c2 0 3.5 1.2 5.5 3.2C14 6.2 15.5 5 17.5 5 21 5 22.9 8.7 21.3 11.9 19 16.4 12 21 12 21z" /></svg>
                         </span>
                         My Wishlist
                         {wishCount > 0 && <span className={styles.dropdownBadge}>{wishCount}</span>}
