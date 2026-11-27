@@ -41,6 +41,10 @@ function BundleDetailInner({ slug }) {
   const [toast, setToast] = useState(false);
   const [zoomed, setZoomed] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
+  const goToImg = (i, count) => {
+    setZoomed(false);
+    setActiveImg(Math.max(0, Math.min(count - 1, i)));
+  };
   const [view, setView] = useState("cover"); // "Any N bracelets" collections: original cover | personalised preview
   const [tab, setTab] = useState("about");
   const [zoomItem, setZoomItem] = useState(null); // included product photo shown large
@@ -223,28 +227,67 @@ function BundleDetailInner({ slug }) {
               hidden={showSel}
               className={styles.mainImageWrapper}
               onClick={() => setZoomed((z) => !z)}
+              onTouchStart={(e) => { e.currentTarget.dataset.x = e.touches[0].clientX; }}
+              onTouchEnd={(e) => {
+                const dx = e.changedTouches[0].clientX - Number(e.currentTarget.dataset.x || 0);
+                if (dx > 40) goToImg(activeImg - 1, gallery.length);
+                if (dx < -40) goToImg(activeImg + 1, gallery.length);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowLeft") goToImg(activeImg - 1, gallery.length);
+                if (e.key === "ArrowRight") goToImg(activeImg + 1, gallery.length);
+              }}
+              tabIndex={gallery.length > 1 ? 0 : undefined}
               style={zoomed ? { cursor: "zoom-out" } : { cursor: "zoom-in" }}
-              role="img"
-              aria-label={`${bundle.name} collection image`}
+              role="group"
+              aria-roledescription="carousel"
+              aria-label={`${bundle.name} collection images`}
             >
-              <ResponsiveImg
-                src={hero}
-                alt={bundle.name}
-                className={styles.mainImage}
-                width={720}
-                height={720}
-                loading="eager"
-                sizes="(max-width: 600px) 55vw, (max-width: 900px) 80vw, 480px"
-                style={zoomed ? { transform: "scale(1.45)" } : undefined}
-              />
+              <div className={styles.mainTrack} style={{ transform: `translateX(-${Math.min(activeImg, gallery.length - 1) * 100}%)` }}>
+                {gallery.map((g, i) => (
+                  <div className={styles.mainSlide} key={g + i} aria-hidden={i !== Math.min(activeImg, gallery.length - 1)}>
+                    <ResponsiveImg
+                      src={g}
+                      alt={gallery.length > 1 ? `${bundle.name} (${i + 1} of ${gallery.length})` : bundle.name}
+                      className={styles.mainImage}
+                      width={720}
+                      height={720}
+                      loading={i === 0 ? "eager" : "lazy"}
+                      sizes="(max-width: 600px) 55vw, (max-width: 900px) 80vw, 480px"
+                      style={zoomed && i === activeImg ? { transform: "scale(1.45)" } : undefined}
+                    />
+                  </div>
+                ))}
+              </div>
               <span className={styles.badgeOverlay}>Collection</span>
+              {gallery.length > 1 && (
+                <>
+                  <button type="button" className={`${styles.galleryArrow} ${styles.galleryArrowPrev}`} aria-label="Previous image" disabled={activeImg <= 0}
+                    onClick={(e) => { e.stopPropagation(); goToImg(activeImg - 1, gallery.length); }}>
+                    <span className="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+                  </button>
+                  <button type="button" className={`${styles.galleryArrow} ${styles.galleryArrowNext}`} aria-label="Next image" disabled={activeImg >= gallery.length - 1}
+                    onClick={(e) => { e.stopPropagation(); goToImg(activeImg + 1, gallery.length); }}>
+                    <span className="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                  </button>
+                </>
+              )}
             </div>
             {gallery.length > 1 && !showSel && (
               <div className={styles.thumbnailRow}>
                 {gallery.map((g, i) => (
-                  <button key={g + i} type="button" className={`${styles.thumbnailBtn} ${i === activeImg ? styles.thumbnailActive : ""}`} onClick={() => setActiveImg(i)} aria-label={`Show image ${i + 1}`}>
+                  <button key={g + i} type="button" className={`${styles.thumbnailBtn} ${i === activeImg ? styles.thumbnailActive : ""}`} onClick={() => goToImg(i, gallery.length)} aria-label={`Show image ${i + 1}`}>
                     <img src={imgSrc(g)} alt={`${bundle.name} view ${i + 1}`} className={styles.thumbnailImg} loading="lazy" width={96} height={96} />
                   </button>
+                ))}
+              </div>
+            )}
+            {gallery.length > 1 && !showSel && (
+              <div className={styles.galleryDots} role="tablist" aria-label="Collection images">
+                {gallery.map((g, i) => (
+                  <button key={`dot-${g}-${i}`} type="button" role="tab" aria-selected={i === activeImg}
+                    className={`${styles.galleryDot} ${i === activeImg ? styles.galleryDotOn : ""}`}
+                    onClick={() => goToImg(i, gallery.length)} aria-label={`Image ${i + 1} of ${gallery.length}`} />
                 ))}
               </div>
             )}
