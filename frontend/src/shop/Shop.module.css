@@ -745,10 +745,15 @@
 .btnIcon { vertical-align: -2px; }
 
 /* Wishlist heart on product cards */
-.heart { position: absolute; top: 8px; right: 8px; z-index: 3; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.92); color: #4A0B1D; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); transition: transform 0.15s ease, color 0.15s ease; }
+.heart { overflow: hidden; position: absolute; top: 8px; right: 8px; z-index: 3; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.92); color: #4A0B1D; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); transition: transform 0.15s ease, color 0.15s ease; }
 .heart:hover { transform: scale(1.08); }
 .heart:active { transform: scale(0.94); }
 .heartOn { background: rgba(255, 255, 255, 0.92); color: #4A0B1D; }
+/* OM replaces the heart once saved; the button clips it so the zoom never spills outside the circle */
+.heartOm { font: 700 19px/1 'Nirmala UI', 'Noto Sans Devanagari', 'Mangal', serif; color: #4A0B1D; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; will-change: transform; }
+.heartHidden { opacity: 0; }
+.heartPop { animation: heartPop 0.35s ease-out; }
+@keyframes heartPop { 0% { transform: scale(0.4); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
 .heart:focus-visible { outline: 3px solid #E07B39; outline-offset: 2px; }
 
 /* Quick view: heart sits at the top-right of the photo; on phones the close button is there, so it goes to the top-left */

@@ -219,6 +219,7 @@ export function BundleCard({ bundle: b, catalog }) {
           height={480}
           sizes="(max-width: 600px) 90vw, 320px"
         />
+        <WishlistHeart product={{ slug: `bundle:${b.slug}`, name: b.name }} />
       </div>
       <span className={styles.cardType}>{b.group}</span>
       <span className={styles.bcCount}>Set of {items.length}</span>
