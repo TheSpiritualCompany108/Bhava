@@ -12,11 +12,11 @@ import ResponsiveImg from "../components/ResponsiveImg";
 // (1 Hero = HomeMain, 10 Footer = Layout. 9 Reviews is omitted until genuine verified reviews exist.)
 
 const FORMATS = [
-  { id: "sacred-beads", label: "Sacred Beads", note: "Sacred Bracelets", img: "/Products/Sacred Beads Dhan Yog.jpg" },
   { id: "incense-sticks", label: "Incense Sticks", note: "Sacred Notes", img: "/Products/Format Incense Sticks.jpg", pos: "68% center" },
   { id: "bamboo-less-incense", label: "Bamboo-less Incense", note: "Pure Ritual", img: "/Products/Format Bamboo-less Incense.jpg", pos: "70% center" },
   { id: "incense-cones", label: "Incense Cones", note: "Sacred Ember", img: "/Products/Format Incense Cones.jpg", pos: "70% center" },
-  { id: "sambrani", label: "Sambrani", note: "Offering Cups", img: "/Products/Format Sambrani.jpg", pos: "78% center" },
+  { id: "sambrani", label: "Sambrani", note: "Offering Cups", img: "/Products/Format Sambrani.jpg", pos: "30% center" },
+  { id: "sacred-beads", label: "Sacred Beads", note: "Sacred Bracelets", img: "/Products/Sacred Beads Dhan Yog.jpg" },
 ];
 
 function Head({ kicker, title, sub }) {
