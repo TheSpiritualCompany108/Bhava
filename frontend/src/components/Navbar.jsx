@@ -56,6 +56,8 @@ function Navbar() {
     let gsap;
     let om;
     let cart;
+    const wishEl = wishIconRef.current;
+    const cartEl = cartIconRef.current;
     import("gsap").then((module) => {
       if (cancelled) return;
       gsap = module.default || module.gsap;
@@ -71,7 +73,9 @@ function Navbar() {
       cancelled = true;
       om?.kill();
       cart?.kill();
-      gsap?.set([wishIconRef.current, cartIconRef.current], { clearProps: "transform" });
+      // Refs are already null when the Navbar unmounts (e.g. navigating to /auth) — use the captured elements.
+      const targets = [wishEl, cartEl].filter(Boolean);
+      if (gsap && targets.length) gsap.set(targets, { clearProps: "transform" });
     };
   }, []);
 
