@@ -17,6 +17,7 @@ import ReviewsSection, { Stars } from "./ReviewsSection";
 import AplusContent from "./AplusContent";
 import SacredPairings from "./SacredPairings";
 import ImageZoom from "./ImageZoom";
+import WishlistHeart from "../shop/WishlistHeart";
 import BraceletPreview from "./BraceletPreview";
 
 const CORE = ["guggal", "oud", "sandalwood"];
@@ -260,6 +261,7 @@ function BundleDetailInner({ slug }) {
                 ))}
               </div>
               <span className={styles.badgeOverlay}>Collection</span>
+              <WishlistHeart product={{ slug: `bundle:${bundle.slug}`, name: bundle.name }} style={{ top: 12, right: 12, width: 36, height: 36 }} />
               {gallery.length > 1 && (
                 <>
                   <button type="button" className={`${styles.galleryArrow} ${styles.galleryArrowPrev}`} aria-label="Previous image" disabled={activeImg <= 0}
